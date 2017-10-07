@@ -1,0 +1,46 @@
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+
+@font-face {
+    font-family: '';
+    src: url('./assets/fonts/CircularStd-Black.otf');
+}
+
+@font-face {
+    font-family: 'CircularStd-BlackItalic';
+    src: url('./assets/fonts/CircularStd-BlackItalic.otf');
+}
+
+@font-face {
+    font-family: 'CircularStd-Bold';
+    src: url('./assets/fonts/CircularStd-Bold.otf');
+}
+
+@font-face {
+    font-family: 'CircularStd-BoldItalic';
+    src: url('./assets/fonts/CircularStd-BoldItalic.otf');
+}
+
+@font-face {
+    font-family: 'CircularStd-Book';
+    src: url('./assets/fonts/CircularStd-Book.otf');
+}
+
+@font-face {
+    font-family: 'CircularStd-BookItalic';
+    src: url('./assets/fonts/CircularStd-BookItalic.otf');
+}
+
+@font-face {
+    font-family: 'CircularStd-Medium';
+    src: url('./assets/fonts/CircularStd-Medium.otf');
+}
+
+@font-face {
+    font-family: 'CircularStd-MediumItalic';
+    src: url('./assets/fonts/CircularStd-MediumItalic.otf');
+}
+
+@font-face {
+    font-family: 'GoodDog';
+    src: url('./assets/fonts/GoodDog.otf');
+}

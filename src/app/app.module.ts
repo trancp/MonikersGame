@@ -2,9 +2,14 @@ import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { NgModule } from '@angular/core';
+import { FlexLayoutModule } from "@angular/flex-layout";
 import { AngularFireModule } from 'angularfire2';
 import { AngularFireDatabaseModule } from 'angularfire2/database';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppComponent } from './app.component';
+
+import { MatProgressSpinnerModule } from '@angular/material';
+
 
 export const firebaseConfig = {
     apiKey: 'AIzaSyDDYJxYt4TVIJo_TGP_0Ii-WE9yUrhK1c4',
@@ -24,7 +29,10 @@ export const firebaseConfig = {
         FormsModule,
         HttpModule,
         AngularFireModule.initializeApp(firebaseConfig),
-        AngularFireDatabaseModule
+        AngularFireDatabaseModule,
+        FlexLayoutModule,
+        BrowserAnimationsModule,
+        MatProgressSpinnerModule
     ],
     providers: [],
     bootstrap: [AppComponent]
