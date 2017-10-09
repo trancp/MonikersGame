@@ -1,0 +1,52 @@
+<div *ngIf="player.ready"
+     fxLayout="row"
+     [fxLayoutAlign]="alignment + ' center'"
+     [attr.id]="id"
+     (touchmove)="touched($event)"
+     (touchend)="touchEnd()"
+     [draggable]="user.vip"
+     [ngStyle]="dragStart ? { 'opacity': '0.5' } : { 'opacity': '1' }"
+     (dragend)="endDrag()"
+     (dragstart)="startDrag($event)"
+     class="nameTag--hover">
+    <div
+        style="font-size: 26px; padding-left: 5px; height: 35px;  border-top-left-radius: 8px; border-bottom-left-radius: 8px;"
+        class="color-black u-textTruncate transition-bg-color nameTag">
+        {{player.name}}
+    </div>
+    <div *ngIf="player.vip"
+         class="u-fontFamily-GoodDog transition-bg-color vipTag"
+         style="color: #007EFF; font-size: 30px; padding-left: 5px; height: 35px;">
+        Vip
+    </div>
+    <div style="padding-right: 5px; height: 35px; border-top-right-radius: 8px; border-bottom-right-radius: 8px;"
+         class="closeNameTag transition-bg-color">
+    </div>
+</div>
+<div *ngIf="dragStart && dataToTransfer"
+     [ngStyle]="{ 'opacity': '0.5' }"
+     fxLayout="row"
+     [fxLayoutAlign]="alignment + ' center'">
+    <div
+        style="font-size: 26px; padding-left: 5px; height: 35px;  border-top-left-radius: 8px; border-bottom-left-radius: 8px;"
+        class="color-black u-textTruncate transition-bg-color nameTag">
+        {{player.name}}
+    </div>
+    <div *ngIf="player.vip"
+         class="u-fontFamily-GoodDog transition-bg-color vipTag"
+         style="color: #007EFF; font-size: 30px; padding-left: 5px; height: 35px;">
+        Vip
+    </div>
+    <div style="padding-right: 5px; height: 35px; border-top-right-radius: 8px; border-bottom-right-radius: 8px;"
+         class="closeNameTag transition-bg-color">
+    </div>
+</div>
+<div *ngIf="!player.ready"
+     fxLayout="row"
+     [fxLayoutAlign]="alignment + ' center'"
+     style="cursor: pointer;">
+    <i class="material-icons color-grey"
+       style="font-size: 40px;">
+        more_horiz
+    </i>
+</div>

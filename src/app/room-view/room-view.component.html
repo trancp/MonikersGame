@@ -1,0 +1,80 @@
+<ng-container *ngIf="roomState | async as room">
+    <ng-container *ngIf="!room.loading">
+        <div [ngStyle]="{ 'padding': '20px 20px 30px 20px' }"
+             class="u-fontFamily-CircularStd-Black u-height-100"
+             fxLayout="column">
+            <div fxLayout="row"
+                 fxFlex="none">
+                <div fxFlex="100"></div>
+                <div fxFlex="none"
+                     class="u-textAlign-Right u-textTransform-uppercase">
+                    <div class="roomCode">
+                        {{room.code}}
+                    </div>
+                </div>
+            </div>
+            <div fxFlex="100%"
+                 [ngStyle]="{ 'margin': '20px 0' }">
+                <div fxLayout="row"
+                     style="overflow: auto; height: 280px; box-shadow: inset 0 -10px 15px -5px #e6e6e6;">
+                    <div *ngFor="let team of (room.players | SortByTeams); let index = index"
+                         fxFlex="50%">
+                        <app-players-list [players]="team.players"
+                                          (onDragStart)="dragStart($event)"
+                                          [dataToTransfer]="dataToTransfer"
+                                          [user]="playerState | async"
+                                          (switchPlayerToNewTeam)="switchPlayerToNewTeam($event, room)"
+                                          [teamName]="team.teamName"
+                                          [teamId]="index + 1"
+                                          [alignment]="team.listAlignment">
+                        </app-players-list>
+                    </div>
+                </div>
+                <div *ngIf="playerState | async as user"
+                     [ngStyle]="{ 'margin': '20px 0' }">
+                    <button mat-raised-button
+                            color="primary"
+                            class="c-btn u-width-100"
+                            (click)="switchTeams(user)">
+                        Switch Teams
+                    </button>
+                </div>
+            </div>
+            <div fxFlex="none">
+                <ng-container *ngIf="playerState | async as user">
+                    <ng-container *ngIf="user.vip && !user.loading">
+                        <div class="color-grey u-textAlign-Center"
+                             [ngClass]="{ 'color-black': roomIsReadyToStart(room), 'color-grey': !roomIsReadyToStart(room) }"
+                             style="margin-bottom: 10px;">
+                            press
+                        </div>
+                        <div [ngStyle]="{ 'margin-bottom': '10px' }">
+                            <button mat-raised-button
+                                    color="accent"
+                                    class="c-btn u-width-100"
+                                    (click)="goToGame(room, user)"
+                                    [ngClass]="{ 'c-btn-bottom-border--light-black': roomIsReadyToStart(room), 'c-btn--grey c-btn--game--disabled': !roomIsReadyToStart(room) }">
+                                Everybody's in
+                            </button>
+                        </div>
+                        <div class="color-grey u-textAlign-Center"
+                             [ngClass]="{ 'color-black': roomIsReadyToStart(room), 'color-grey': !roomIsReadyToStart(room) }"
+                             style="margin-bottom: 10px;">
+                            to start the game.
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="!user.vip && !user.loading">
+                        <div class="u-textAlign-Center u-fontFamily-CircularStd-Black u-fontSize-20"
+                             [ngStyle]="{ 'margin': '20px 0' }">
+                            Sit back, and fucking chill.
+                        </div>
+                    </ng-container>
+                </ng-container>
+            </div>
+        </div>
+    </ng-container>
+    <ng-container *ngIf="room.loading">
+        <app-loading-view></app-loading-view>
+    </ng-container>
+</ng-container>
+

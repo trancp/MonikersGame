@@ -1,0 +1,25 @@
+<h3 mat-dialog-title
+    class="CircularStd-Black"
+    [innerHTML]="data.title">
+</h3>
+<mat-dialog-content>
+    <p class="CircularStd-Black"
+       [innerHTML]="data.content">
+    </p>
+</mat-dialog-content>
+<mat-dialog-actions fxLayout="row"
+                    fxLayoutAlign="end center">
+    <button mat-button
+            (click)="onNoClick()">
+        <div class="CircularStd-Black"
+             [innerHTML]="data.cancel">
+        </div>
+    </button>
+    <button mat-raised-button
+            (click)="confirm(data)"
+            color="primary">
+        <div class="CircularStd-Black"
+             [innerHTML]="data.confirm">
+        </div>
+    </button>
+</mat-dialog-actions>

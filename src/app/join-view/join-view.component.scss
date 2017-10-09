@@ -1,0 +1,51 @@
+@import "../../stylesheets/colors";
+
+.inputLabel {
+    font-size: 15px;
+    color: #D5D5D3;
+    text-align: center;
+}
+
+.inputContainer {
+    max-width: 550px;
+    margin: 10px auto 0;
+    transition: color 100ms;
+}
+
+.inputEmptyContainer {
+    border-bottom: 2px solid #D5D5D3;
+}
+
+.inputExistsContainer {
+    max-width: 550px;
+    margin: 10px auto 0;
+    border-bottom: 2px solid #000;
+}
+
+.input {
+    font-size: 40px;
+    color: #D5D5D3;
+    border: none;
+    text-align: center;
+    width: 100%;
+    transition: color 100ms;
+}
+
+.inputEmpty {
+    opacity: 0.36;
+}
+
+.inputExists {
+    opacity: 1;
+    color: black;
+}
+
+.c-btn--grey {
+    color: white;
+    background-color: #D5D5D3;
+    border-bottom: 5px solid #e6e6e5;
+}
+
+.c-btn-bottom-border--light-black {
+    border-bottom: 5px solid #666 !important;
+}

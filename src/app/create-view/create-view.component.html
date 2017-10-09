@@ -1,0 +1,89 @@
+<div *ngIf="room$ | async as room"
+     [ngStyle]="{ 'padding': '20px 20px 30px 20px' }"
+     class="u-fontFamily-CircularStd-Black u-height-100">
+    <div *ngIf="!room.loading"
+         class="u-height-100"
+         fxLayout="column"
+         fxFlex="100%">
+        <div fxLayout="row"
+             fxFlex="none">
+            <div fxFlex
+                 fxLayout="row"
+                 fxLayoutAlign="start center">
+                <a href="javascript: void(0)"
+                   (click)="goBack()"
+                   mat-icon-button
+                   class="color-black">
+                    <i class="material-icons"
+                       style="font-size: 40px;">
+                        chevron_left
+                    </i>
+                </a>
+            </div>
+            <div fxFlex="none"
+                 class="u-textAlign-Right u-textTransform-uppercase">
+                <div class="roomCode">
+                    {{room.code}}
+                </div>
+            </div>
+        </div>
+        <div fxLayout="column"
+             fxFlex>
+            <div fxFlex="15%"></div>
+            <div fxFlex="85%">
+                <form #form="ngForm"
+                      (ngSubmit)="onSubmit(form.value.name)"
+                      novalidate
+                      class="u-height-100">
+                    <div fxLayout="column"
+                         class="u-height-100">
+                        <div fxFlex="15%"
+                             fxLayout="column">
+                            <div class="inputLabel">
+                                What is your fucking name?
+                            </div>
+                            <div class="inputContainer"
+                                 [ngClass]="{ 'inputExistsContainer': inputName, 'inputEmptyContainer': !inputName }">
+                                <div fxLayout="row"
+                                     fxLayoutAlign="center">
+                                    <div fxFlex="80%">
+                                        <input class="input"
+                                               name="name"
+                                               ngModel
+                                               #name="ngModel"
+                                               [(ngModel)]="inputName"
+                                               [ngClass]="{ 'inputExists': inputName, 'inputEmpty': !inputName }"
+                                               style="font-family: 'CircularStd-Black'"
+                                               type="text"
+                                               autocomplete="off"
+                                               autofocus
+                                               placeholder="{{inputPlaceholder}}"/>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div fxFlex="85%"
+                             fxLayout="column"
+                             fxLayoutAlign="end center">
+                            <div class="u-width-100">
+                                <button mat-raised-button
+                                        type="submit"
+                                        color="accent"
+                                        class="c-btn u-width-100"
+                                        (click)="onGoToWords(room, inputName)"
+                                        [ngClass]="{ 'c-btn-bottom-border--light-black': inputName, 'c-btn--grey c-btn--name--disabled': !inputName }">
+                                    Yeah, that's my name
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="room.loading">
+        <app-loading-view></app-loading-view>
+    </div>
+</div>
+

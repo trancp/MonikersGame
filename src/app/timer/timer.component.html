@@ -1,0 +1,34 @@
+<div [ngStyle]="{ 'position': 'relative' }">
+    <div fxFlex="100%"
+         fxLayout="row"
+         fxLayoutAlign="center center"
+         class="u-width-100 alt-theme"
+         [ngStyle]="{ 'position': 'absolute', 'top': '0' }">
+        <mat-progress-spinner mode="determinate"
+                              [strokeWidth]="strokeWidth"
+                              [diameter]="diameter"
+                              value="100"
+                              color="accent">
+        </mat-progress-spinner>
+    </div>
+    <div fxFlex="100%"
+         fxLayout="row"
+         fxLayoutAlign="center center"
+         class="u-width-100"
+         [ngStyle]="{ 'position': 'absolute', 'top': '0' }">
+        <mat-progress-spinner mode="determinate"
+                              [strokeWidth]="strokeWidth"
+                              [diameter]="diameter"
+                              [value]="value"
+                              color="warn">
+        </mat-progress-spinner>
+    </div>
+    <div fxFlex="100%"
+         fxLayout="row"
+         fxLayoutAlign="center center"
+         class="u-width-100 color-white"
+         id="timer"
+         [ngStyle]="{ 'position': 'absolute', 'top': '0', 'font-size': '36px', 'height': diameter + 'px' }">
+        {{timeLeft}}
+    </div>
+</div>

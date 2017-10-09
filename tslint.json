@@ -15,7 +15,9 @@
         "forin": true,
         "import-blacklist": [
             true,
-            "rxjs"
+            "rxjs",
+            "rxjs/operators",
+            "lodash"
         ],
         "import-spacing": true,
         "indent": [
@@ -42,6 +44,7 @@
         ],
         "no-arg": true,
         "no-bitwise": true,
+        "no-consecutive-blank-lines": true,
         "no-console": [
             true,
             "debug",
@@ -138,5 +141,10 @@
         "no-access-missing-member": true,
         "templates-use-public": true,
         "invoke-injectable": true
+    },
+    "linterOptions": {
+        "exclude": [
+            "node_modules/**"
+        ]
     }
 }

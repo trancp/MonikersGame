@@ -1,0 +1,109 @@
+<div *ngIf="roomState | async as room"
+     fxLayout="column"
+     class="bg-color-blue u-height-100 u-fontFamily-CircularStd-Black">
+    <ng-container *ngIf="playerState | async as user">
+        <div *ngIf="!room.loading"
+             fxLayout="column"
+             [ngStyle]="{ 'padding': '20px 20px 30px 20px', 'position': 'relative' }"
+             fxFlex="100%">
+            <app-timer *ngIf="room.timer && room.words.length"
+                       [stopTime]="room.timer || stopTime"
+                       (onTimerEnd)="onTimerEnd(user, room)"
+                       [ngStyle]="{ 'min-width': '0' }"
+                       class="u-display-block">
+            </app-timer>
+            <app-score-board fxFlex="none"
+                             class="u-display-block"
+                             [room]="room">
+            </app-score-board>
+            <div fxFlex="100%">
+                <ng-container *ngIf="room.turnOrder[room.turn].id !== user.id || !room.timer">
+                    <ng-container *ngFor="let team of room.teams">
+                        <div *ngIf="team.teamId === user.team"
+                             fxFlex="100%"
+                             fxLayout="column"
+                             class="color-white">
+                            <ng-container *ngIf="team.isTurn">
+                                <app-three-line-text [lineOne]="'Let\'s Go ' + room.turnOrder[room.turn].name"
+                                                     class="u-display-block u-height-100">
+                                </app-three-line-text>
+                            </ng-container>
+                            <ng-container *ngIf="!team.isTurn">
+                                <app-three-line-text [lineOne]="team.name + ','"
+                                                     [lineTwo]="'it\'s the other'"
+                                                     [lineThree]="'guys\' turn'"
+                                                     class="u-display-block u-height-100">
+                                </app-three-line-text>
+                            </ng-container>
+                            <div fxFlex="none">
+                                <div class="u-marginBottom-20 alt-theme">
+                                    <button mat-raised-button
+                                            color="primary"
+                                            (click)="startTimer(room.turnOrder[room.turn].id === user.id)"
+                                            [ngClass]="{ 'u-opacity-50': room.turnOrder[room.turn].id !== user.id }"
+                                            class="u-width-100 c-btn c-btn-bottom-border--light-blue">
+                                        <div [innerHTML]="'Ready, start timer!'"></div>
+                                    </button>
+                                </div>
+                                <!--<div class="alt-theme">-->
+                                <!--<button mat-button-->
+                                <!--color="primary"-->
+                                <!--[ngClass]="{ 'u-opacity-50': room.turnOrder[room.turn].id !== user.id }"-->
+                                <!--class="u-width-100 c-btn c-btn-border&#45;&#45;white">-->
+                                <!--<div [innerHTML]="'Someone else go'"></div>-->
+                                <!--</button>-->
+                                <!--</div>-->
+                            </div>
+                        </div>
+                    </ng-container>
+                </ng-container>
+                <ng-container *ngIf="room.turnOrder[room.turn].id === user.id && room.timer">
+                    <ng-container *ngIf="room.words.length">
+                        <app-word [word]="room.words[room.word]"
+                                  [wordIndex]="room.word"
+                                  [round]="room.round"
+                                  [ngStyle]="{ 'margin': '20px auto', 'max-width': '330px' }"
+                                  (onScoreWord)="score($event, room)"
+                                  (onSkipWord)="skip($event, room.words)"
+                                  class="u-display-block u-width-100 u-height-100">
+                        </app-word>
+                    </ng-container>
+                    <ng-container *ngIf="!room.words.length">
+                        <div fxLayout="column"
+                             class="u-height-100 u-width-100">
+                            <div fxFlex="100%">
+                                <app-three-line-text [lineOne]="'Alright,'"
+                                                     [lineTwo]="'no more'"
+                                                     [lineThree]="'cards left.'"
+                                                     class="u-display-block color-white u-height-100">
+                                </app-three-line-text>
+                            </div>
+                            <div fxFlex="none"
+                                 class="alt-theme">
+                                <button mat-raised-button
+                                        color="primary"
+                                        class="u-width-100 c-btn c-btn-bottom-border--light-blue"
+                                        (click)="handleNextTurn(room)">
+                                    <div [innerHTML]="'Okay next player!'"></div>
+                                </button>
+                            </div>
+                        </div>
+                    </ng-container>
+                </ng-container>
+            </div>
+        </div>
+    </ng-container>
+    <div *ngIf="!room.loading"
+         fxLayout="row"
+         fxLayoutAlign="center center"
+         class="progress-bar-color"
+         [ngStyle]="{ 'padding': '20px 0' }">
+        <mat-progress-bar [value]="calculateRemainingWordsProgress(room)"
+                          [ngStyle]="{ 'width': '50%' }">
+        </mat-progress-bar>
+    </div>
+    <div *ngIf="room.loading"
+         class="alt-theme">
+        <app-loading-view color="accent"></app-loading-view>
+    </div>
+</div>

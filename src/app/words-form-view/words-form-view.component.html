@@ -1,0 +1,101 @@
+<div *ngIf="room$ | async as room"
+     class="u-fontFamily-CircularStd-Black u-height-100">
+    <ng-container *ngIf="!room.loading">
+        <ng-container *ngIf="player$ | async as player">
+            <div *ngIf="!player.loading"
+                 fxLayout="column"
+                 fxFlex="100%"
+                 [ngStyle]="{ 'padding': '20px 20px 30px 20px' }">
+                <div fxLayout="row"
+                     fxFlex="none">
+                    <div fxFlex="auto"
+                         fxLayout="row"
+                         fxLayoutAlign="start center">
+                        <a href="javascript: void(0)"
+                           (click)="goBack(room.code)"
+                           mat-icon-button
+                           class="color-black">
+                            <i class="material-icons"
+                               style="font-size: 40px;">
+                                chevron_left
+                            </i>
+                        </a>
+                    </div>
+                    <div fxFlex="none"
+                         class="u-textAlign-Right u-textTransform-uppercase">
+                        <div class="roomCode">
+                            {{room.code}}
+                        </div>
+                    </div>
+                </div>
+                <form #form="ngForm"
+                      fxFlex="100%"
+                      [ngStyle]="{ 'margin': '20px 0' }"
+                      (ngSubmit)="onSubmit(form.value.word, wordIndex)"
+                      novalidate>
+                    <div class="inputLabel">
+                        Enter a Word
+                    </div>
+                    <div class="inputContainer"
+                         [ngClass]="{ 'inputExistsContainer': inputWord, 'inputEmptyContainer': !inputWord }">
+                        <div fxLayout="row"
+                             fxLayoutAlign="center">
+                            <div>
+                                <input class="input"
+                                       name="word"
+                                       ngModel
+                                       #word="ngModel"
+                                       [(ngModel)]="inputWord"
+                                       [ngClass]="{ 'inputExists': inputWord, 'inputEmpty': !inputWord }"
+                                       style="font-family: 'CircularStd-Black'"
+                                       type="text"
+                                       autocomplete="off"
+                                       autofocus
+                                       [disabled]="hasEnoughWords()"
+                                       placeholder="{{inputPlaceholder}}"/>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="wordsContainer">
+                        <div *ngFor="let word of words; let index = index"
+                             style="margin-bottom: 5px;">
+                            <a (click)="editWord(index)"
+                               [ngStyle]="{ 'display': 'block' }"
+                               mat-button>
+                                <div fxLayout="row"
+                                     class="u-fontFamily-CircularStd-Black"
+                                     [ngClass]="{ 'word': words[index] }">
+                                    <div class="u-fontSize-16"
+                                         style="margin-right: 10px;">
+                                        {{ index + 1 }}
+                                    </div>
+                                    <div>{{ word }}</div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </form>
+                <div *ngIf="room.started"
+                     class="u-textAlign-Center">
+                    Chill out, a game is currently in progress.
+                </div>
+                <div *ngIf="!room.started">
+                    <button mat-raised-button
+                            color="accent"
+                            class="c-btn u-width-100"
+                            (click)="submitWordList(words, room, player)"
+                            [ngClass]="{ 'c-btn-bottom-border--light-black': hasEnoughWords(), 'c-btn--grey c-btn--word--disabled': !hasEnoughWords() }">
+                        Yep, got five words
+                    </button>
+                </div>
+            </div>
+            <div *ngIf="player.loading">
+                <app-loading-view></app-loading-view>
+            </div>
+        </ng-container>
+    </ng-container>
+    <div *ngIf="room.loading">
+        <app-loading-view></app-loading-view>
+    </div>
+</div>

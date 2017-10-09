@@ -1,0 +1,58 @@
+@import "../../stylesheets/colors";
+@import "../../stylesheets/screen-sizes";
+
+.color-grey {
+    color: $grey;
+}
+
+.c-btn-bottom-border--darken-red {
+    border-bottom: 5px solid $darken-red !important;
+}
+
+.c-btn-bottom-border--darken-green {
+    border-bottom: 5px solid $darken-green !important;
+}
+
+.u-padding-10-0-20 {
+    padding: 10px 0 20px;
+}
+
+.u-padding-20-0-10 {
+    padding: 20px 0 10px;
+}
+
+.font-sizes-sm-string {
+    font-size: 10vw;
+
+    @media (min-width: $lg) {
+        font-size: 40px;
+    }
+}
+
+.font-sizes-md-string {
+    font-size: 7vw;
+
+    @media (min-width: $lg) {
+        font-size: 25px;
+    }
+}
+
+.font-sizes-lg-string {
+    font-size: 5vw;
+
+    @media (min-width: $lg) {
+        font-size: 20px;
+    }
+}
+
+.font-sizes-xl-string {
+    font-size: 4vw;
+
+    @media (min-width: $lg) {
+        font-size: 15px;
+    }
+}
+
+.word-break-break-all {
+    word-break: break-all;
+}

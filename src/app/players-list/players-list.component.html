@@ -1,0 +1,33 @@
+<div [ngStyle]="'end' === alignment ? { 'text-align': 'right' } : {}"
+     class="color-grey">
+    {{teamName}}
+</div>
+<div *ngFor="let player of players; let index = index; let last = last">
+    <ng-container *ngIf="!dropZoneIsAroundDataTransferPlayer(index, dataToTransfer)">
+        <app-name-drop-zone [alignment]="alignment"
+                            [dataToTransfer]="dataToTransfer"
+                            [teamName]="teamName"
+                            [dropZoneIndex]="index"
+                            (onDropEmitted)="switchTeamsHandler($event, index)">
+        </app-name-drop-zone>
+    </ng-container>
+    <ng-container *ngIf="dropZoneIsAroundDataTransferPlayer(index, dataToTransfer)">
+        <app-name-drop-zone></app-name-drop-zone>
+    </ng-container>
+    <app-name-tag [player]="player"
+                  [id]="player.id"
+                  [user]="user"
+                  [dataToTransfer]="dataToTransfer"
+                  (onDragStart)="dragStart($event)"
+                  (onDragDrop)="dragDrop($event)"
+                  [alignment]="alignment">
+    </app-name-tag>
+</div>
+<app-name-drop-zone *ngIf="!dropZoneIsAroundDataTransferPlayer(players.length, dataToTransfer)"
+                    [alignment]="alignment"
+                    [dataToTransfer]="dataToTransfer"
+                    [teamName]="teamName"
+                    [dropZoneIndex]="players.length + 1"
+                    (onDropEmitted)="switchTeamsHandler($event, players.length)">
+</app-name-drop-zone>
+<div [ngStyle]="{ 'padding': '20px 0 0 0'}"></div>

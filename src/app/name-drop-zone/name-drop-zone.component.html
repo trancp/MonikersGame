@@ -1,0 +1,12 @@
+<div style="height: 21px;"
+     #dropZone
+     fxLayout="row"
+     [fxLayoutAlign]="alignment + ' center'"
+     (dragenter)="toggleDragZoneActive()"
+     (dragover)="dragOver($event)"
+     (drop)="dropped($event)"
+     (dragleave)="toggleDragZoneActive()">
+    <div style="height: 20px; border-radius: 50px; max-width: 100px; flex: 1 1 100%"
+         [ngClass]="{ 'bg-color-blue': dropZoneActive, 'bg-color-transparent': !dropZoneActive }">
+    </div>
+</div>

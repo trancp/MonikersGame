@@ -1,0 +1,56 @@
+<div class="bg-color-salmon color-white u-height-100 u-fontFamily-CircularStd-Black"
+     fxLayout="row"
+     fxLayoutAlign="start center"
+     style="padding: 10px 10px 30px 10px;">
+    <div fxFlex
+         fxLayout="row"
+         class="u-height-100">
+        <div fxLayout="column"
+             fxFlex>
+            <div fxFlex
+                 fxLayout="row"
+                 fxLayoutAlign="center">
+                <div fxFlex="none"
+                     fxLayout="column"
+                     fxLayoutAlign="center center">
+                    <div class="title"
+                         fxFlex="none">
+                        Monikers.
+                    </div>
+                    <div class="subtitle"
+                         fxFlex="none">
+                        <span>A dumb party game</span>
+                        <div>
+                            that respects your intelligence.
+                        </div>
+                    </div>
+                    <div fxFlex="25%"></div>
+                </div>
+                <div fxFlex="0%"
+                     fxFlex.xs="20%">
+                </div>
+            </div>
+            <div *ngIf="rooms$ | async as rooms">
+                <div class="u-marginBottom-20">
+                    <button mat-raised-button
+                            color="accent"
+                            (click)="startAGame(rooms.items)"
+                            class="c-btn u-width-100 c-btn-bottom-border--light-black">
+                        Start a game
+                    </button>
+                </div>
+                <div class="alt-theme">
+                    <button mat-raised-button
+                            routerLink="/join"
+                            color="accent"
+                            class="c-btn u-width-100 c-btn-bottom-border--darken-white">
+                        Join a game
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div *ngIf="isLoading">
+    <app-loading-view></app-loading-view>
+</div>

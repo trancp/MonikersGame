@@ -1,0 +1,21 @@
+@import "../../stylesheets/colors";
+
+.bg-color-salmon {
+    background-color: #FF9CA5;
+}
+
+.title {
+    font-size: 65px;
+}
+
+.subtitle {
+    font-size: 20px
+}
+
+.c-btn-bottom-border--darken-white {
+    border-bottom: 5px solid $darken-white !important;
+}
+
+.c-btn-bottom-border--light-black {
+    border-bottom: 5px solid $light-black !important;
+}

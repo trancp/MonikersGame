@@ -1,0 +1,17 @@
+<div fxLayout="row">
+    <div *ngFor="let team of room.teams; let last = last;"
+         fxFlex="50%"
+         fxLayout="row"
+         [fxLayoutAlign]="last ? 'end center' : 'start center'">
+        <div class="u-fontFamily-CircularStd-Black color-white"
+             [ngClass]="{ 'isActive': team.isTurn, 'u-textAlign-Right': last }"
+             [ngStyle]="{ 'width': '60px' }">
+            <div [ngStyle]="{ 'opacity': '0.6' }">
+                {{team.name}}
+            </div>
+            <div [ngStyle]="{ 'font-size': '26px', 'margin': '10px 0' }">
+                {{team.words?.length || 0}}
+            </div>
+        </div>
+    </div>
+</div>

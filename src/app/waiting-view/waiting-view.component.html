@@ -1,0 +1,27 @@
+<div *ngIf="roomState | async as room"
+     class="u-height-100">
+    <div *ngIf="!room.isLoading"
+         style="padding: 20px;"
+         class="u-fontFamily-CircularStd-Black u-height-100"
+         fxLayout="column">
+        <div fxFlex="none"
+             class="u-textAlign-Right u-textTransform-uppercase">
+            <div class="roomCode">
+                {{room.code}}
+            </div>
+        </div>
+        <div fxFlex
+             fxLayout="column">
+            <div fxFlex="20%"></div>
+            <div fxFlex="80%"
+                 class="color-black"
+                 style="font-size: 42px; margin-top: 20px;"
+                 [innerHTML]="WAITING_TEXT[0]">
+            </div>
+        </div>
+    </div>
+    <ng-container *ngIf="room.isLoading">
+        <app-loading-view></app-loading-view>
+    </ng-container>
+</div>
+

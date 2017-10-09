@@ -1,0 +1,59 @@
+<div class="u-height-100"
+     fxLayout="column"
+     [ngStyle]="{ 'position': 'relative', 'padding': '0 10px' }">
+    <div class="bg-color-white u-fontFamily-CircularStd-Black u-height-100"
+         fxFlex="none"
+         fxLayout="column"
+         [ngStyle]="{ 'border-radius': '10px', 'padding': '20px', 'position': 'relative' }">
+        <div fxFlex="70%"
+             fxLayout="column"
+             fxLayoutAlign="center center">
+            <div class="u-textAlign-Center">
+                <div class="color-grey u-padding-20-0-10"
+                     [ngStyle]="{ 'font-size': '15px' }"
+                     [innerHTML]="roundText">
+                </div>
+                <div class="u-padding-10-0-20 word-break-break-all"
+                     [ngClass]="{ 'font-sizes-sm-string': word.length <= 10, 'font-sizes-md-string': (word.length > 10 && word.length <= 15), 'font-sizes-lg-string': (word.length > 15 && word.length <= 20), 'font-sizes-xl-string': (word.length > 20) }"
+                     [innerHTML]="word">
+                </div>
+            </div>
+        </div>
+        <div fxFlex="30%"></div>
+    </div>
+    <div fxLayout="row"
+         class="u-width-100 u-height-100"
+         fxFlex="30%"
+         [ngStyle]="{ 'position': 'absolute', 'bottom': '0', 'left': '0' }">
+        <div fxFlex="50%"
+             fxLayout="row"
+             fxLayoutAlign="start start">
+            <button mat-raised-button
+                    color="warn"
+                    class="c-btn c-btn-bottom-border--darken-red u-width-100"
+                    [ngStyle]="{ 'margin-right': '20px' }"
+                    (click)="skip(wordIndex)">
+                <i class="material-icons"
+                   style="font-size: 40px;">
+                    close
+                </i>
+            </button>
+        </div>
+        <div fxFlex="50%"
+             fxLayout="row"
+             fxLayoutAlign="end start"
+             class="alt-theme">
+            <button mat-raised-button
+                    color="warn"
+                    class="c-btn c-btn-bottom-border--darken-green u-width-100"
+                    [ngStyle]="{ 'margin-left': '20px' }"
+                    (click)="score(wordIndex)">
+                <i class="material-icons"
+                   style="font-size: 40px;">
+                    check
+                </i>
+            </button>
+        </div>
+    </div>
+</div>
+

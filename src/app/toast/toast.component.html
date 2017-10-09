@@ -1,0 +1,22 @@
+<div fxLayout="row"
+     fxLayoutAlign="start center"
+     class="u-fontFamily-CircularStd-Book">
+    <div [ngSwitch]="data.type"
+         fxLayout="row"
+         fxLayoutAlign="start center"
+         [ngStyle]="{ 'padding-right': '8px' }">
+        <ng-container *ngSwitchCase="'success'">
+            <i class="material-icons"
+               [ngStyle]="{ color: 'green' }">
+                check
+            </i>
+        </ng-container>
+        <ng-container *ngSwitchCase="'error'">
+            <i class="material-icons"
+               [ngStyle]="{ color: 'red' }">
+                close
+            </i>
+        </ng-container>
+    </div>
+    <div [innerHTML]="data.message"></div>
+</div>
