@@ -5,7 +5,7 @@ import some from 'lodash-es/some';
 import values from 'lodash-es/values';
 
 import { Player } from '../interfaces/player.model';
-import { DataTransfer } from '../data-transfer/data-transfer.model';
+import { DataTransfer } from '../interfaces/data-transfer.model';
 
 @Component({
     selector: 'app-name-tag',
@@ -19,10 +19,10 @@ export class NameTagComponent implements OnInit {
     @Output() onDragStart: EventEmitter<any> = new EventEmitter();
     @Output() onDragDrop: EventEmitter<any> = new EventEmitter();
     @Input() id: string;
+    @Input() dataToTransfer: DataTransfer;
     dragStart: boolean;
     defaultX: string;
     defaultY: string;
-    @Input() dataToTransfer: DataTransfer;
 
     ngOnInit() {
     }

@@ -6,13 +6,13 @@ import { filter as rxjsFilter } from 'rxjs/operators/filter';
 import { take } from 'rxjs/operators/take';
 import { tap } from 'rxjs/operators/tap';
 
-import { RoomService } from '../room/room.service';
-import { PlayerService } from '../player/player.service';
-import { RouteGuardService } from '../router-guards/router-guards.service';
+import { RoomService } from '../../room/room.service';
+import { PlayerService } from '../../player/player.service';
+import { RouteGuardService } from '../../router-guards/router-guards.service';
 
-import { Room } from '../interfaces/room.model';
-import { Player } from '../interfaces/player.model';
-import { AppState } from '../app.state';
+import { Room } from '../../interfaces/room.model';
+import { Player } from '../../interfaces/player.model';
+import { AppState } from '../../app.state';
 
 import concat from 'lodash-es/concat';
 import flatten from 'lodash-es/flatten';

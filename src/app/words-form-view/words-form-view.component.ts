@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router, ParamMap } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { NgForm } from '@angular/forms';
 
 import { PlayerService } from '../player/player.service';
 import { RoomService } from '../room/room.service';

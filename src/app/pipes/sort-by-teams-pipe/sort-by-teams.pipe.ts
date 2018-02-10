@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-import { Player } from '../interfaces/player.model';
+import { Player } from '../../interfaces/player.model';
 
 import filter from 'lodash-es/filter';
 import isEqual from 'lodash-es/isEqual';

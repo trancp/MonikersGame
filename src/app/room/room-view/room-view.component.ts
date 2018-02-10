@@ -8,14 +8,14 @@ import { mergeMap } from 'rxjs/operators/mergeMap';
 import { take } from 'rxjs/operators/take';
 import { tap } from 'rxjs/operators/tap';
 
-import { RoomService } from '../room/room.service';
-import { PlayerService } from '../player/player.service';
-import { RouteGuardService } from '../router-guards/router-guards.service';
+import { RoomService } from '../room.service';
+import { PlayerService } from '../../player/player.service';
+import { RouteGuardService } from '../../router-guards/router-guards.service';
 
-import { Room } from '../interfaces/room.model';
-import { Player } from '../interfaces/player.model';
-import { AppState } from '../app.state';
-import { DataTransfer } from '../data-transfer/data-transfer.model';
+import { Room } from '../../interfaces/room.model';
+import { Player } from '../../interfaces/player.model';
+import { AppState } from '../../app.state';
+import { DataTransfer } from '../../interfaces/data-transfer.model';
 
 interface ImovingPlayer {
     player: Player;

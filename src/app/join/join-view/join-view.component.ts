@@ -3,11 +3,11 @@ import { Router } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import { Store } from '@ngrx/store';
 
-import { RoomsService } from '../rooms/rooms.service';
-import { ToastService } from '../toast/toast.service';
+import { RoomsService } from '../../rooms/rooms.service';
+import { ToastService } from '../../toast/toast.service';
 
-import { AppState } from '../app.state';
-import { Rooms } from '../interfaces/rooms.model';
+import { AppState } from '../../app.state';
+import { Rooms } from '../../interfaces/rooms.model';
 
 const INPUT_CODE_LENGTH = 4;
 const ERROR_ROOM_DOES_NOT_EXIST = 'Wrong code bro.';

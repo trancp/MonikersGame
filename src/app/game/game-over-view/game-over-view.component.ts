@@ -1,15 +1,15 @@
-import { Component, OnDestroy } from '@angular/core';
-import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { Component } from '@angular/core';
+import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import { Store } from '@ngrx/store';
 
-import { PlayerService } from '../player/player.service';
-import { RoomService } from '../room/room.service';
-import { RouteGuardService } from '../router-guards/router-guards.service';
+import { PlayerService } from '../../player/player.service';
+import { RoomService } from '../../room/room.service';
+import { RouteGuardService } from '../../router-guards/router-guards.service';
 
-import { AppState } from '../app.state';
-import { Player } from '../interfaces/player.model';
-import { Room } from '../interfaces/room.model';
+import { AppState } from '../../app.state';
+import { Player } from '../../interfaces/player.model';
+import { Room } from '../../interfaces/room.model';
 
 import { take } from 'rxjs/operators/take';
 import { tap } from 'rxjs/operators/tap';

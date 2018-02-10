@@ -1,16 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { NgForm } from '@angular/forms';
 import { filter } from 'rxjs/operators/filter';
 import { take } from 'rxjs/operators/take';
 import { tap } from 'rxjs/operators/tap';
 
-import { RoomService } from '../room/room.service';
-import { PlayerService } from '../player/player.service';
-import { DialogService } from '../dialog/dialog.service';
+import { RoomService } from '../../room/room.service';
+import { PlayerService } from '../../player/player.service';
+import { DialogService } from '../../dialog/dialog.service';
 
-import { DialogConfirmPromptComponent } from '../dialog-confirm-prompt/dialog-confirm-prompt.component';
+import { DialogConfirmPromptComponent } from '../../dialog/dialog-confirm-prompt/dialog-confirm-prompt.component';
 
 import { Observable } from 'rxjs/Observable';
 
@@ -19,8 +18,8 @@ import get from 'lodash-es/get';
 import isEqual from 'lodash-es/isEqual';
 import random from 'lodash-es/random';
 
-import { AppState } from '../app.state';
-import { Player } from '../interfaces/player.model';
+import { AppState } from '../../app.state';
+import { Player } from '../../interfaces/player.model';
 
 const INPUT_PLACEHOLDERS = [
     'Asshat',

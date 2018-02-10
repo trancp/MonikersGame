@@ -4,12 +4,12 @@ import { Store } from '@ngrx/store';
 
 import { Observable } from 'rxjs/Observable';
 
-import { RoomService } from '../room/room.service';
-import { RoomsService } from '../rooms/rooms.service';
-import { ToastService } from '../toast/toast.service';
+import { RoomService } from '../../room/room.service';
+import { RoomsService } from '../../rooms/rooms.service';
+import { ToastService } from '../../toast/toast.service';
 
-import { AppState } from '../app.state';
-import { Rooms } from '../interfaces/rooms.model';
+import { AppState } from '../../app.state';
+import { Rooms } from '../../interfaces/rooms.model';
 
 const ERRORS = {
     maxRooms: 'Sorry there are no available rooms!',

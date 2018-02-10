@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, Output, EventEmitter, OnChanges } from '@angular/core';
 
-import { DataTransfer } from '../data-transfer/data-transfer.model';
+import { DataTransfer } from '../interfaces/data-transfer.model';
 import get from 'lodash-es/get';
 import isEqual from 'lodash-es/isEqual';
 

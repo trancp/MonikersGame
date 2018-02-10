@@ -5,15 +5,9 @@
          fxLayout="column"
          fxLayoutAlign="center start">
         <div fxFlex="none">
-            <ng-container *ngIf="lineOne">
-                <div [innerHTML]="lineOne"></div>
-            </ng-container>
-            <ng-container *ngIf="lineTwo">
-                <div [innerHTML]="lineTwo"></div>
-            </ng-container>
-            <ng-container *ngIf="lineThree">
-                <div [innerHTML]="lineThree"></div>
-            </ng-container>
+            <div [ngStyle]="{ 'height': '44px' }">{{lineOne}}</div>
+            <div [ngStyle]="{ 'height': '44px' }">{{lineTwo}}</div>
+            <div [ngStyle]="{ 'height': '44px' }">{{lineThree}}</div>
         </div>
     </div>
 </div>

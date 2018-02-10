@@ -24,7 +24,8 @@
                              fxLayout="column"
                              class="color-white">
                             <ng-container *ngIf="team.isTurn">
-                                <app-three-line-text [lineOne]="'Let\'s Go ' + room.turnOrder[room.turn].name"
+                                <app-three-line-text [lineOne]="'Let\'s go'"
+                                                     [lineTwo]="room.turnOrder[room.turn].name"
                                                      class="u-display-block u-height-100">
                                 </app-three-line-text>
                             </ng-container>
@@ -45,14 +46,6 @@
                                         <div [innerHTML]="'Ready, start timer!'"></div>
                                     </button>
                                 </div>
-                                <!--<div class="alt-theme">-->
-                                <!--<button mat-button-->
-                                <!--color="primary"-->
-                                <!--[ngClass]="{ 'u-opacity-50': room.turnOrder[room.turn].id !== user.id }"-->
-                                <!--class="u-width-100 c-btn c-btn-border&#45;&#45;white">-->
-                                <!--<div [innerHTML]="'Someone else go'"></div>-->
-                                <!--</button>-->
-                                <!--</div>-->
                             </div>
                         </div>
                     </ng-container>
@@ -93,7 +86,7 @@
             </div>
         </div>
     </ng-container>
-    <div *ngIf="!room.loading"
+    <div *ngIf="!room.loading && room.timer"
          fxLayout="row"
          fxLayoutAlign="center center"
          class="progress-bar-color"

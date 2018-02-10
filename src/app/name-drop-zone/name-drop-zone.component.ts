@@ -1,6 +1,6 @@
 import { Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, ViewChild } from '@angular/core';
 
-import { DataTransfer } from '../data-transfer/data-transfer.model';
+import { DataTransfer } from '../interfaces/data-transfer.model';
 import defer from 'lodash-es/defer';
 import get from 'lodash-es/get';
 import isEmpty from 'lodash-es/isEmpty';

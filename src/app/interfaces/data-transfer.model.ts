@@ -1,4 +1,4 @@
-import { Player } from '../interfaces/player.model';
+import { Player } from './player.model';
 
 export interface DataTransfer {
     player: Player;
