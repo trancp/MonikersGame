@@ -9,7 +9,7 @@ import {
     UPDATE_PLAYER_FAIL,
     DELETE_PLAYER,
     DELETE_PLAYER_FAIL,
-    DELETE_PLAYER_SUCCESS
+    DELETE_PLAYER_SUCCESS,
 } from './player.actions';
 import { Player } from '../interfaces/player.model';
 
@@ -18,60 +18,60 @@ export function playerReducer(playerState: Player, action: PlayerActions) {
         case GET_PLAYER:
             return {
                 ...playerState,
-                loading: true
+                loading: true,
             };
         case GET_PLAYER_SUCCESS:
             return {
                 ...playerState,
                 ...action.payload,
-                loading: false
+                loading: false,
             };
         case UPDATE_PLAYER:
             return {
                 ...playerState,
                 ...action.payload,
-                loading: true
+                loading: true,
             };
         case UPDATE_PLAYER_SUCCESS:
             return {
                 ...playerState,
                 ...action.payload,
-                loading: false
+                loading: false,
             };
         case UPDATE_PLAYER_FAIL:
             return {
                 ...playerState,
                 ...action.payload,
-                loading: false
+                loading: false,
             };
         case DELETE_PLAYER:
             return {
                 ...playerState,
                 ...action.payload,
-                loading: true
+                loading: true,
             };
         case DELETE_PLAYER_SUCCESS:
             return {
                 ...playerState,
                 ...action.payload,
-                loading: false
+                loading: false,
             };
         case DELETE_PLAYER_FAIL:
             return {
                 ...playerState,
                 ...action.payload,
-                loading: false
+                loading: false,
             };
         case CREATE_PLAYER:
             return {
                 ...playerState,
-                loading: true
+                loading: true,
             };
         case CREATE_PLAYER_SUCCESS:
             return {
                 ...playerState,
                 ...action.payload,
-                loading: false
+                loading: false,
             };
         default:
             return playerState;

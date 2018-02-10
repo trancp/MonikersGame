@@ -7,7 +7,7 @@ import {
     UpdateRoom,
     StartGame,
     ResetRoom,
-    InitRoom
+    InitRoom,
 } from './room.actions';
 
 import { AppState } from '../app.state';
@@ -50,7 +50,7 @@ const CODE_CHARACTERS = [
     'W',
     'X',
     'Y',
-    'Z'
+    'Z',
 ];
 const CODE_LENGTH = 4;
 const MAX_NUM_ROOMS = Math.pow(CODE_LENGTH, CODE_CHARACTERS.length);
@@ -88,14 +88,14 @@ export class RoomService {
                 name: 'Team 1',
                 teamId: 1,
                 isTurn: false,
-                words: []
+                words: [],
             },
             {
                 name: 'Team 2',
                 teamId: 2,
                 isTurn: false,
-                words: []
-            }
+                words: [],
+            },
         ];
         const teamList = this.sortPlayersByStartingTeam(room.players, startingTeam + 1);
         const turnOrder = flatten(zip(...map(teamList, (team: any) => shuffle(team))));
@@ -109,7 +109,7 @@ export class RoomService {
             round: 1,
             turn: 0,
             teamToStart: startingTeam + 1,
-            word: 0
+            word: 0,
         };
     }
 
@@ -143,9 +143,9 @@ export class RoomService {
                 return {
                     ...player,
                     ready: false,
-                    words: []
+                    words: [],
                 };
-            })
+            }),
         };
     }
 

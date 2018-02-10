@@ -29,7 +29,7 @@ import zip from 'lodash-es/zip';
 @Component({
     selector: 'app-game-view',
     templateUrl: './game-view.component.html',
-    styleUrls: ['./game-view.component.scss']
+    styleUrls: ['./game-view.component.scss'],
 })
 export class GameViewComponent implements OnInit {
     roomState: Observable<Room>;
@@ -54,7 +54,7 @@ export class GameViewComponent implements OnInit {
         this.playerState.pipe(
             rxjsFilter((playerState: Player) => !isEmpty(playerState) && !playerState.ready && !playerState.loading),
             take(1),
-            tap(() => this.playerService.dispatchUpdatePlayer({ ready: true }))
+            tap(() => this.playerService.dispatchUpdatePlayer({ ready: true })),
         ).subscribe();
     }
 
@@ -107,7 +107,7 @@ export class GameViewComponent implements OnInit {
             teams,
             gameOver: isGameOver,
             word: incrementedWordIndex,
-            words: updatedWordsList
+            words: updatedWordsList,
         };
         this.roomService.dispatchUpdateRoom(update);
     }
@@ -119,7 +119,7 @@ export class GameViewComponent implements OnInit {
         const updatedTeams = map(room.teams, (team: any) => {
             return {
                 ...team,
-                isTurn: !team.isTurn
+                isTurn: !team.isTurn,
             };
         });
         const otherTeam = room.teamToStart === 1 ? 2 : 1;
@@ -127,7 +127,7 @@ export class GameViewComponent implements OnInit {
         const setTeamForNewRound = map(room.teams, (team: any) => {
             return {
                 ...team,
-                isTurn: team.teamId === nextTeamToStart
+                isTurn: team.teamId === nextTeamToStart,
             };
         });
         const isGameOver = isEqual(3, room.round) && lastPlayerDone;
@@ -138,7 +138,7 @@ export class GameViewComponent implements OnInit {
             timer: '',
             turn: isRoundOver ? 0 : room.turn + 1,
             turnOrder: isRoundOver ? this.initTurnOrderForNewRound(room.players, nextTeamToStart) : room.turnOrder,
-            words: isRoundOver ? this.roomService.compileShuffledRoomWords(room.players) : shuffle(room.words)
+            words: isRoundOver ? this.roomService.compileShuffledRoomWords(room.players) : shuffle(room.words),
         };
         this.roomService.dispatchUpdateRoom(update);
     }

@@ -39,20 +39,20 @@ const INPUT_PLACEHOLDERS = [
     'Biebs',
     'Kungfu Kenny',
     'Bernie',
-    'Bitchass'
+    'Bitchass',
 ];
 
 const CONFIRM_AS_EXISTING_USER_PROMPT = {
     title: (name: string) => `"${name}" is already in the room, continue as "${name}"?`,
     cancel: 'No',
     confirm: 'Yeah',
-    content: ''
+    content: '',
 };
 
 @Component({
     selector: 'app-create-view',
     templateUrl: './create-view.component.html',
-    styleUrls: ['./create-view.component.scss']
+    styleUrls: ['./create-view.component.scss'],
 })
 
 export class CreateViewComponent implements OnInit {
@@ -98,29 +98,28 @@ export class CreateViewComponent implements OnInit {
             return;
         }
         const playerAlreadyInRoom = find(room.players, (player: Player) => isEqual(player.name, name));
+        const nextStateUrl = this._generateNextStateUrl(room.code, name);
         if (playerAlreadyInRoom) {
             const context = {
                 ...CONFIRM_AS_EXISTING_USER_PROMPT,
-                title: CONFIRM_AS_EXISTING_USER_PROMPT.title(name)
+                title: CONFIRM_AS_EXISTING_USER_PROMPT.title(name),
             };
             const config = {
                 component: DialogConfirmPromptComponent,
                 config: {
-                    data: context
-                }
+                    data: context,
+                },
             };
             this.dialogService.openDialogComponent(config).afterClosed().pipe(
                 filter((data: any) => data),
                 take(1),
                 tap(() => {
-                    const nextStateUrl = this._generateNextStateUrl(room.code, name);
                     this.router.navigate([nextStateUrl]);
-                })
+                }),
             ).subscribe();
             return;
         }
         this.playerService.dispatchCreatePlayer(name);
-        const nextStateUrl = this._generateNextStateUrl(room.code, name);
         this.router.navigate([nextStateUrl]);
     }
 

@@ -15,7 +15,7 @@ const ERROR_ROOM_DOES_NOT_EXIST = 'Wrong code bro.';
 @Component({
     selector: 'app-join-view',
     templateUrl: './join-view.component.html',
-    styleUrls: ['./join-view.component.scss']
+    styleUrls: ['./join-view.component.scss'],
 })
 export class JoinViewComponent implements OnInit {
     inputCode: string;

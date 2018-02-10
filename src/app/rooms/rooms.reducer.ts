@@ -6,14 +6,14 @@ export function roomsReducer(state: Rooms, action: RoomsActions) {
         case GET_ROOMS:
             return {
                 ...state,
-                loading: true
+                loading: true,
             };
 
         case GET_ROOMS_SUCCESS:
             return {
                 ...state,
                 items: action.payload,
-                loading: false
+                loading: false,
             };
 
         default:

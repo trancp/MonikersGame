@@ -25,5 +25,5 @@ interface Team {
 
 export const DEFAULT_ROOM_PROPERTIES = {
     gameOver: false,
-    started: false
+    started: false,
 };

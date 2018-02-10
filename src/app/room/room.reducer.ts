@@ -9,7 +9,7 @@ import {
     UPDATE_ROOM_SUCCESS,
     START_GAME_TYPE,
     START_GAME_SUCCESS_TYPE,
-    RESET_ROOM
+    RESET_ROOM,
 } from './room.actions';
 
 export function roomReducer(state: Room, action: RoomActions) {
@@ -18,53 +18,53 @@ export function roomReducer(state: Room, action: RoomActions) {
         case GET_ROOM:
             return {
                 ...state,
-                loading: true
+                loading: true,
             };
 
         case GET_ROOM_SUCCESS:
             return {
                 ...state,
                 ...action.payload,
-                loading: false
+                loading: false,
             };
 
         case CREATE_ROOM:
             return {
                 ...state,
-                loading: true
+                loading: true,
             };
 
         case CREATE_ROOM_SUCCESS:
             return {
                 ...state,
                 ...action.payload,
-                loading: false
+                loading: false,
             };
 
         case UPDATE_ROOM:
             return {
                 ...state,
-                loading: true
+                loading: true,
             };
 
         case UPDATE_ROOM_SUCCESS:
             return {
                 ...state,
                 ...action.payload,
-                loading: false
+                loading: false,
             };
 
         case START_GAME_TYPE:
             return {
                 ...state,
-                loading: true
+                loading: true,
             };
 
         case START_GAME_SUCCESS_TYPE:
             return {
                 ...state,
                 loading: false,
-                ...action.payload
+                ...action.payload,
             };
 
         case RESET_ROOM:

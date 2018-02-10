@@ -3,7 +3,7 @@ import {
     MatSnackBar,
     MatSnackBarRef,
     MatSnackBarHorizontalPosition,
-    MatSnackBarVerticalPosition
+    MatSnackBarVerticalPosition,
 } from '@angular/material/snack-bar';
 
 import {ToastComponent} from './toast.component';
@@ -26,8 +26,8 @@ export class ToastService {
         return this.showToast({
             data: {
                 message,
-                type: 'success'
-            }
+                type: 'success',
+            },
         });
     }
 
@@ -35,17 +35,17 @@ export class ToastService {
         return this.showToast({
             data: {
                 message,
-                type: 'error'
-            }
+                type: 'error',
+            },
         });
     }
 
-    private showToast({message, action = '', duration = 5000, horizontalPosition = 'left', verticalPosition = 'bottom', data}: Itoast): MatSnackBarRef<any> {
+    private showToast({message, action = '', duration = 5000, horizontalPosition = 'left', verticalPosition = 'bottom', data}: Itoast) {
         const toastConfig = {
             data,
             duration,
             horizontalPosition,
-            verticalPosition
+            verticalPosition,
         };
         if (message) {
             return this.toast.open(message, action, toastConfig);

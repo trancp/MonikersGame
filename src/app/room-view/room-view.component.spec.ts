@@ -8,7 +8,7 @@ describe('RoomViewComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ RoomViewComponent ]
+      declarations: [ RoomViewComponent ],
     })
     .compileComponents();
   }));

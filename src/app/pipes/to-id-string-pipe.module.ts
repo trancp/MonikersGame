@@ -4,7 +4,7 @@ import { ToIdStringPipe } from './to-id-string.pipe';
 
 @NgModule({
     exports: [ToIdStringPipe],
-    declarations: [ToIdStringPipe]
+    declarations: [ToIdStringPipe],
 })
 export class ToIdStringPipeModule {
 }

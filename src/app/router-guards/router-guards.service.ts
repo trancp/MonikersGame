@@ -29,8 +29,8 @@ export class RouteGuardService {
                         return this.router.navigate(['/']);
                     }
                     return true;
-                })
-            )
+                }),
+            ),
         ).subscribe();
     }
 
@@ -47,7 +47,7 @@ export class RouteGuardService {
                     return this.router.navigate(['create', roomState.code, playerState.name, 'words']);
                 }
                 return this.router.navigate(['join', roomState.code, playerState.name, 'words']);
-            })
+            }),
         ).subscribe();
     }
 
@@ -59,7 +59,7 @@ export class RouteGuardService {
                 return gameIsOver && playerIsLoaded;
             }),
             take(1),
-            tap(([roomState, playerState]) => this.router.navigate(['gameover', roomState.code, playerState.name]))
+            tap(([roomState, playerState]) => this.router.navigate(['gameover', roomState.code, playerState.name])),
         ).subscribe();
     }
 }

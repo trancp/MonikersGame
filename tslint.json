@@ -140,7 +140,19 @@
         "directive-class-suffix": true,
         "no-access-missing-member": true,
         "templates-use-public": true,
-        "invoke-injectable": true
+        "invoke-injectable": true,
+        "pipe-naming": [
+            true,
+            "camelCase",
+            "app"
+        ],
+        "trailing-comma": [
+            true,
+            {
+                "multiline": "always",
+                "esSpecCompliant": true
+            }
+        ]
     },
     "linterOptions": {
         "exclude": [

@@ -7,7 +7,7 @@ import map from 'lodash-es/map';
 import max from 'lodash-es/max';
 
 @Pipe({
-    name: 'appWinningTeam'
+    name: 'appWinningTeam',
 })
 export class WinningTeamPipe implements PipeTransform {
     transform(teams: any) {

@@ -22,7 +22,7 @@ import {
     CreatePlayerSuccess,
     UPDATE_PLAYER,
     UpdatePlayerSuccess,
-    UpdatePlayerFail
+    UpdatePlayerFail,
 } from './player.actions';
 
 import get from 'lodash-es/get';
@@ -54,11 +54,11 @@ export class PlayerEffects {
                         const url = `/rooms/${room.pushKey}/players/${playerKey}`;
                         this.playerService.dispatchSetPlayer({pushKey: url, id: playerKey});
                         return url;
-                    })
+                    }),
                 );
             }),
             mergeMap((url: string) => this._getPlayer(url)),
-            rxjsMap((player: any) => GetPlayerSuccess(player))
+            rxjsMap((player: any) => GetPlayerSuccess(player)),
         );
 
     @Effect()
@@ -80,14 +80,14 @@ export class PlayerEffects {
                                 teamPlayerIndex: this.playerService.getPlayerIndexForTeam(teamToJoin, room.players),
                                 team: teamToJoin,
                                 vip: isVip,
-                                words: []
-                            }
+                                words: [],
+                            },
                         };
-                    })
+                    }),
                 );
             }),
             mergeMap(({url, player}: { url: string, player: any }) => this._createPlayer(url, player)),
-            rxjsMap((player: any) => CreatePlayerSuccess(player))
+            rxjsMap((player: any) => CreatePlayerSuccess(player)),
         );
 
     @Effect()
@@ -100,14 +100,14 @@ export class PlayerEffects {
                     rxjsMap((player: any) => {
                         return {
                             url: player.pushKey,
-                            update: action.payload
+                            update: action.payload,
                         };
-                    })
+                    }),
                 );
             }),
             mergeMap(({url, update}: { url: string, update: any }) => this._updatePlayer(url, update)),
             rxjsMap((player: any) => UpdatePlayerSuccess(player)),
-            catchError((err: any) => of(UpdatePlayerFail()))
+            catchError((err: any) => of(UpdatePlayerFail())),
         );
 
     private _getPlayer(url): FirebaseObjectObservable<any> {
@@ -128,7 +128,7 @@ export class PlayerEffects {
                 return {
                     ...player,
                     id: playerRef.key,
-                    pushKey: `${url}/${playerRef.key}`
+                    pushKey: `${url}/${playerRef.key}`,
                 };
             });
     }

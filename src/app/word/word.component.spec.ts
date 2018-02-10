@@ -8,7 +8,7 @@ describe('WordComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ WordComponent ]
+      declarations: [ WordComponent ],
     })
     .compileComponents();
   }));

@@ -21,13 +21,10 @@ export class RoomsEffects {
     getRooms: Observable<Action> = this.actions.ofType(GET_ROOMS)
         .pipe(
             mergeMap(() => this._getRooms()),
-            map((rooms: any) => GetRoomsSuccess(rooms))
+            map((rooms: any) => GetRoomsSuccess(rooms)),
         );
 
     private _getRooms(): FirebaseListObservable<any> {
         return this.db.list('/rooms');
     }
 }
-
-
-

@@ -37,14 +37,14 @@ const INPUT_PLACEHOLDERS = [
     'Coitus',
     'A baby fetus',
     'Pepsi Chrystal',
-    'Mom jokes'
+    'Mom jokes',
 ];
 const MAX_WORD_SUBMISSIONS = 5;
 
 @Component({
     selector: 'app-words-form-view',
     templateUrl: './words-form-view.component.html',
-    styleUrls: ['./words-form-view.component.scss']
+    styleUrls: ['./words-form-view.component.scss'],
 })
 export class WordsFormViewComponent {
     inputPlaceholder: string;

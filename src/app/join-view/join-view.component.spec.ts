@@ -8,7 +8,7 @@ describe('JoinViewComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ JoinViewComponent ]
+      declarations: [ JoinViewComponent ],
     })
     .compileComponents();
   }));

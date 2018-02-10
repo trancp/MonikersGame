@@ -16,7 +16,7 @@ import {
     UPDATE_ROOM,
     UpdateRoomSuccess,
     START_GAME_TYPE,
-    INIT_ROOM_TYPE
+    INIT_ROOM_TYPE,
 } from './room.actions';
 
 import { filter } from 'rxjs/operators/filter';
@@ -45,10 +45,10 @@ export class RoomEffects {
                 const foundRoom = {
                     ...room,
                     words: room.words ? room.words : [],
-                    pushKey: room.$key
+                    pushKey: room.$key,
                 };
                 return GetRoomSuccess(foundRoom);
-            })
+            }),
         );
 
     @Effect()
@@ -56,7 +56,7 @@ export class RoomEffects {
         .pipe(
             rxjsMap((action: any) => action.payload),
             mergeMap((payload: any) => this._createRoom(payload)),
-            rxjsMap((room: any) => CreateRoomSuccess(room))
+            rxjsMap((room: any) => CreateRoomSuccess(room)),
         );
 
     @Effect()
@@ -69,13 +69,13 @@ export class RoomEffects {
                     rxjsMap((room: any) => {
                         return {
                             url: `/rooms/${room.pushKey}`,
-                            update: action.payload
+                            update: action.payload,
                         };
-                    })
+                    }),
                 );
             }),
             mergeMap(({ url, update }: { url: string, update: any }) => this._updateRoom(url, update)),
-            rxjsMap((room: any) => UpdateRoomSuccess(room))
+            rxjsMap((room: any) => UpdateRoomSuccess(room)),
         );
 
     @Effect()
@@ -90,21 +90,21 @@ export class RoomEffects {
                         if (!action.payload.vip) {
                             return {
                                 url,
-                                update: {}
+                                update: {},
                             };
                         }
                         return {
                             url,
-                            update: this.roomService.initializeGame(room)
+                            update: this.roomService.initializeGame(room),
                         };
-                    })
+                    }),
                 );
             }),
             mergeMap(({ url, update }: { url: string, update: any }) => {
                 this.addToGlobalWordBank(update.words);
                 return this._updateRoom(url, update);
             }),
-            rxjsMap((room: any) => UpdateRoomSuccess(room))
+            rxjsMap((room: any) => UpdateRoomSuccess(room)),
         );
 
     @Effect()
@@ -118,21 +118,21 @@ export class RoomEffects {
                         const url = `/rooms/${room.pushKey}`;
                         return {
                             url,
-                            update: this.roomService.initializeRoom(room)
+                            update: this.roomService.initializeRoom(room),
                         };
-                    })
+                    }),
                 );
             }),
             mergeMap(({ url, update }: { url: string, update: any }) => this._updateRoom(url, update)),
-            rxjsMap((room: any) => UpdateRoomSuccess(room))
+            rxjsMap((room: any) => UpdateRoomSuccess(room)),
         );
 
     private _findRoomByCode(code: string) {
         return this.db.list('/rooms', {
             query: {
                 orderByChild: 'code',
-                equalTo: upperCase(code)
-            }
+                equalTo: upperCase(code),
+            },
         });
     }
 
@@ -142,12 +142,12 @@ export class RoomEffects {
             .push({
                 code,
                 created_at: new Date().toString(),
-                ...DEFAULT_ROOM_PROPERTIES
+                ...DEFAULT_ROOM_PROPERTIES,
             })
             .then(roomRef => {
                 return {
                     code,
-                    pushKey: roomRef.key
+                    pushKey: roomRef.key,
                 };
             });
     }

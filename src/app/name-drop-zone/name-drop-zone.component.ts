@@ -8,7 +8,7 @@ import isEmpty from 'lodash-es/isEmpty';
 @Component({
     selector: 'app-name-drop-zone',
     templateUrl: './name-drop-zone.component.html',
-    styleUrls: ['./name-drop-zone.component.scss']
+    styleUrls: ['./name-drop-zone.component.scss'],
 })
 export class NameDropZoneComponent implements OnInit, OnChanges {
     @Input() alignment: string;
@@ -38,7 +38,10 @@ export class NameDropZoneComponent implements OnInit, OnChanges {
             this.emitterIsActive = true;
             this.createSetIntervalForIsDropZoneActive();
         }
-        if (isEmpty(get(changes, 'dataToTransfer.currentValue')) && !isEmpty(get(changes, 'dataToTransfer.previousValue')) && this.emitterIsActive) {
+        const shouldClearInterval = isEmpty(get(changes, 'dataToTransfer.currentValue'))
+            && !isEmpty(get(changes, 'dataToTransfer.previousValue'))
+            && this.emitterIsActive;
+        if (shouldClearInterval) {
             clearInterval(this.dropZoneActiveEmitter);
             this.dropZoneActive = false;
             this.emitterIsActive = false;
@@ -70,7 +73,10 @@ export class NameDropZoneComponent implements OnInit, OnChanges {
     }
 
     isDropZoneActive() {
-        const dropZoneActive = this.left <= this.dataToTransfer.posX && this.dataToTransfer.posX <= this.right && this.top <= this.dataToTransfer.posY && this.dataToTransfer.posY <= this.bottom;
+        const dropZoneActive = this.left <= this.dataToTransfer.posX
+            && this.dataToTransfer.posX <= this.right
+            && this.top <= this.dataToTransfer.posY
+            && this.dataToTransfer.posY <= this.bottom;
         this.dataToTransfer.dropZones[`${this.teamName}${this.dropZoneIndex}`] = dropZoneActive;
         this.dropZoneActive = dropZoneActive;
         if (!dropZoneActive) {

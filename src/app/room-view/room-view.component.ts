@@ -35,7 +35,7 @@ import slice from 'lodash-es/slice';
 @Component({
     selector: 'app-room-view',
     templateUrl: './room-view.component.html',
-    styleUrls: ['./room-view.component.scss']
+    styleUrls: ['./room-view.component.scss'],
 })
 export class RoomViewComponent implements OnInit {
     isJoiningGame: boolean;
@@ -86,16 +86,16 @@ export class RoomViewComponent implements OnInit {
         this.roomState.pipe(
             rxjsFilter((room: Room) => room.started),
             take(1),
-            tap((room: Room) => this.router.navigate(['game', room.code, name]))
+            tap((room: Room) => this.router.navigate(['game', room.code, name])),
         ).subscribe();
     }
 
     public switchPlayerToNewTeam(movingPlayerParams: ImovingPlayer, room: any): void {
         const movingPlayer = {
             ...movingPlayerParams.player,
-            team: movingPlayerParams.newTeam
+            team: movingPlayerParams.newTeam,
         };
-        const playersWithoutMovingPlayer = filter(room.players, (player: any) => !isEqual(player.name, movingPlayer.name))
+        const playersWithoutMovingPlayer = filter(room.players, (player: any) => !isEqual(player.name, movingPlayer.name));
         const playersWithIndexing = map(playersWithoutMovingPlayer, (player: any) => player);
         const teamOnePlayers = this.playerService.getTeamPlayers(playersWithIndexing, 1);
         const teamTwoPlayers = this.playerService.getTeamPlayers(playersWithIndexing, 2);
@@ -108,7 +108,7 @@ export class RoomViewComponent implements OnInit {
         const updatedTeamArray = this.addToIndexOfTeam(teamWithMovingPlayer, movingPlayer, movingPlayerParams.listIndex);
         const playersWithPlayerKeys = {
             ...this.updateTeamPlayerIndexAndPlayerKeyForTeam(updatedTeamArray, room.players),
-            ...this.updateTeamPlayerIndexAndPlayerKeyForTeam(teamWithoutMovingPlayer, room.players)
+            ...this.updateTeamPlayerIndexAndPlayerKeyForTeam(teamWithoutMovingPlayer, room.players),
         };
         this.roomService.dispatchUpdateRoom({ players: playersWithPlayerKeys });
     }
@@ -117,7 +117,7 @@ export class RoomViewComponent implements OnInit {
         return reduce(team, (result: any, player: any, index: number) => {
             result[this.playerService.getPlayerKey(allPlayers, player.name)] = {
                 ...player,
-                teamPlayerIndex: index
+                teamPlayerIndex: index,
             };
             return result;
         }, {});
@@ -160,9 +160,9 @@ export class RoomViewComponent implements OnInit {
                         const teamPlayers = filter(roomPlayers, (teamPlayer: Player) => isEqual(teamPlayer.team, newTeam));
                         const teamPlayerIndex = findIndex(teamPlayers, (teamPlayer: Player) => isEqual(teamPlayer.id, player.id));
                         return this.playerService.dispatchUpdatePlayer({ ...player, teamPlayerIndex: teamPlayerIndex });
-                    })
+                    }),
                 );
-            })
+            }),
         ).subscribe();
     }
 }

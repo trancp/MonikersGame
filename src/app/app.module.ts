@@ -57,50 +57,50 @@ export const firebaseConfig = {
     databaseURL: 'https://monikersgame.firebaseio.com',
     projectId: 'monikersgame',
     storageBucket: '',
-    messagingSenderId: '355956033923'
+    messagingSenderId: '355956033923',
 };
 
 const routes: Routes = [
     {
         path: '',
-        component: MainViewComponent
+        component: MainViewComponent,
     },
     {
         path: 'create/:code',
-        component: CreateViewComponent
+        component: CreateViewComponent,
     },
     {
         path: 'create/:code/:name/words',
-        component: WordsFormViewComponent
+        component: WordsFormViewComponent,
     },
     {
         path: 'join',
-        component: JoinViewComponent
+        component: JoinViewComponent,
     },
     {
         path: 'join/:code',
-        component: CreateViewComponent
+        component: CreateViewComponent,
     },
     {
         path: 'join/:code/:name/words',
-        component: WordsFormViewComponent
+        component: WordsFormViewComponent,
     },
     {
         path: 'room/:code/:name',
-        component: RoomViewComponent
+        component: RoomViewComponent,
     },
     {
         path: 'game/:code/:name',
-        component: GameViewComponent
+        component: GameViewComponent,
     },
     {
         path: 'waiting/:code/:name',
-        component: WaitingViewComponent
+        component: WaitingViewComponent,
     },
     {
         path: 'gameover/:code/:name',
-        component: GameOverViewComponent
-    }
+        component: GameOverViewComponent,
+    },
 ];
 
 @NgModule({
@@ -121,7 +121,7 @@ const routes: Routes = [
         TimerComponent,
         WordComponent,
         ThreeLineTextComponent,
-        GameOverViewComponent
+        GameOverViewComponent,
     ],
     imports: [
         BrowserModule,
@@ -144,20 +144,20 @@ const routes: Routes = [
         StoreModule.forRoot({
             rooms: roomsReducer,
             room: roomReducer,
-            player: playerReducer
+            player: playerReducer,
         }),
         StoreDevtoolsModule.instrument({
-            maxAge: 25
+            maxAge: 25,
         }),
         ToastModule,
-        WinningTeamPipeModule
+        WinningTeamPipeModule,
     ],
     providers: [
         RoomService,
         RoomsService,
-        PlayerService
+        PlayerService,
     ],
-    bootstrap: [AppComponent]
+    bootstrap: [AppComponent],
 })
 export class AppModule {
 }

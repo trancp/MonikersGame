@@ -8,7 +8,7 @@ describe('WaitingViewComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ WaitingViewComponent ]
+      declarations: [ WaitingViewComponent ],
     })
     .compileComponents();
   }));

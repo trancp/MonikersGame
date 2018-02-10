@@ -17,7 +17,7 @@
                  [ngStyle]="{ 'margin': '20px 0' }">
                 <div fxLayout="row"
                      style="overflow: auto; height: 280px; box-shadow: inset 0 -10px 15px -5px #e6e6e6;">
-                    <div *ngFor="let team of (room.players | SortByTeams); let index = index"
+                    <div *ngFor="let team of (room.players | appSortByTeams); let index = index"
                          fxFlex="50%">
                         <app-players-list [players]="team.players"
                                           (onDragStart)="dragStart($event)"

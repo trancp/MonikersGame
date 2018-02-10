@@ -17,7 +17,7 @@ import { tap } from 'rxjs/operators/tap';
 @Component({
     selector: 'app-game-over-view',
     templateUrl: './game-over-view.component.html',
-    styleUrls: ['./game-over-view.component.scss']
+    styleUrls: ['./game-over-view.component.scss'],
 })
 export class GameOverViewComponent {
     playerState: Observable<Player> = this.store.select('player');
@@ -38,7 +38,7 @@ export class GameOverViewComponent {
                 this.playerState.subscribe();
                 this.roomState.subscribe();
                 this.routeGuardService.returnToWordsFormViewOnPlayAgain();
-            })
+            }),
         ).subscribe();
     }
 

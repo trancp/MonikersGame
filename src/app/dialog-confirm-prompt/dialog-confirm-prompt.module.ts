@@ -10,10 +10,10 @@ import { MatDialogModule } from '@angular/material/dialog';
         CommonModule,
         FlexLayoutModule,
         MatButtonModule,
-        MatDialogModule
+        MatDialogModule,
     ],
     declarations: [DialogConfirmPromptComponent],
-    entryComponents: [DialogConfirmPromptComponent]
+    entryComponents: [DialogConfirmPromptComponent],
 })
 export class DialogConfirmPromptModule {
 }

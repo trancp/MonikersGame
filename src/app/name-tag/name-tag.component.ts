@@ -10,7 +10,7 @@ import { DataTransfer } from '../data-transfer/data-transfer.model';
 @Component({
     selector: 'app-name-tag',
     templateUrl: './name-tag.component.html',
-    styleUrls: ['./name-tag.component.scss']
+    styleUrls: ['./name-tag.component.scss'],
 })
 export class NameTagComponent implements OnInit {
     @Input() alignment: string;

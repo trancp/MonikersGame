@@ -3,7 +3,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 const ROUND = {
     1: `Say Anything You Want,${'<br>'}but the word.`,
     2: 'One Word.',
-    3: 'Charades. No Words.'
+    3: 'Charades. No Words.',
 };
 
 import get from 'lodash-es/get';
@@ -11,7 +11,7 @@ import get from 'lodash-es/get';
 @Component({
     selector: 'app-word',
     templateUrl: './word.component.html',
-    styleUrls: ['./word.component.scss']
+    styleUrls: ['./word.component.scss'],
 })
 export class WordComponent implements OnInit {
     @Input() word: string;

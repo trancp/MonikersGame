@@ -8,7 +8,7 @@ describe('NameDropZoneComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ NameDropZoneComponent ]
+      declarations: [ NameDropZoneComponent ],
     })
     .compileComponents();
   }));

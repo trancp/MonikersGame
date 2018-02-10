@@ -4,7 +4,7 @@ import { SortByTeamsPipe } from './sort-by-teams.pipe';
 
 @NgModule({
     exports: [SortByTeamsPipe],
-    declarations: [SortByTeamsPipe]
+    declarations: [SortByTeamsPipe],
 })
 export class SortByTeamsModule {
 }

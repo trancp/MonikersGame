@@ -23,7 +23,7 @@ import { Player } from '../interfaces/player.model';
 @Component({
     selector: 'app-players-list',
     templateUrl: './players-list.component.html',
-    styleUrls: ['./players-list.component.scss']
+    styleUrls: ['./players-list.component.scss'],
 })
 export class PlayersListComponent implements OnInit, OnChanges {
     @Input() players: Iplayer[];
@@ -50,7 +50,7 @@ export class PlayersListComponent implements OnInit, OnChanges {
         const playerToMove: ImovingPlayer = {
             player,
             listIndex,
-            newTeam: this.getTeamNumber(this.teamName)
+            newTeam: this.getTeamNumber(this.teamName),
         };
         this.switchPlayerToNewTeam.emit(playerToMove);
     }
@@ -70,7 +70,7 @@ export class PlayersListComponent implements OnInit, OnChanges {
             const playerToMove: ImovingPlayer = {
                 player: data.player,
                 listIndex: data.dropZoneIndex,
-                newTeam: this.getTeamNumber(data.teamList)
+                newTeam: this.getTeamNumber(data.teamList),
             };
             this.switchPlayerToNewTeam.emit(playerToMove);
         }
@@ -85,7 +85,8 @@ export class PlayersListComponent implements OnInit, OnChanges {
         if (!data) {
             return false;
         }
-        const isSurroundingDropZone = isEqual(get(data, 'player.teamPlayerIndex'), index) || isEqual(get(data, 'player.teamPlayerIndex') + 1, index)
+        const isSurroundingDropZone = isEqual(get(data, 'player.teamPlayerIndex'), index)
+            || isEqual(get(data, 'player.teamPlayerIndex') + 1, index);
         return isEqual(get(data, 'player.team'), this.teamId)
             && isSurroundingDropZone;
     }

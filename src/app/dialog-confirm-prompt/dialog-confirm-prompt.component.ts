@@ -4,7 +4,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 @Component({
     selector: 'app-dialog-confirm-prompt',
     templateUrl: './dialog-confirm-prompt.component.html',
-    styleUrls: ['./dialog-confirm-prompt.component.scss']
+    styleUrls: ['./dialog-confirm-prompt.component.scss'],
 })
 export class DialogConfirmPromptComponent {
 

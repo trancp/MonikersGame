@@ -8,7 +8,7 @@ describe('NameTagComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ NameTagComponent ]
+      declarations: [ NameTagComponent ],
     })
     .compileComponents();
   }));

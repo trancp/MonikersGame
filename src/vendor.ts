@@ -4,7 +4,7 @@ import '@angular/core';
 import '@angular/common';
 import '@angular/http';
 import '@angular/router';
-import 'lodash';
+import 'lodash-es';
 import '@angular/platform-browser/animations';
 import '@angular/cdk';
 import '@angular/animations';

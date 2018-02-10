@@ -9,7 +9,7 @@ export class DialogService {
     public openDialogComponent({ component, config = {} }: { component: any, config?: any }): MatDialogRef<any> {
         const matDialogConfig: MatDialogConfig = {
             panelClass: 'mat-dialog-container-padding-0',
-            ...config
+            ...config,
         };
         return this.dialog.open(component, matDialogConfig);
     }

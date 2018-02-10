@@ -8,19 +8,19 @@ import map from 'lodash-es/map';
 import sortBy from 'lodash-es/sortBy';
 
 @Pipe({
-    name: 'SortByTeams'
+    name: 'appSortByTeams',
 })
 export class SortByTeamsPipe implements PipeTransform {
     transform(players: Player[]) {
         const teamOne = {
             players: sortBy(filter(this.appendPlayerIds(players), player => isEqual(1, player.team)), 'teamPlayerIndex'),
             teamName: 'Team 1',
-            listAlignment: 'start'
+            listAlignment: 'start',
         };
         const teamTwo = {
             players: sortBy(filter(this.appendPlayerIds(players), player => isEqual(2, player.team)), 'teamPlayerIndex'),
             teamName: 'Team 2',
-            listAlignment: 'end'
+            listAlignment: 'end',
         };
         return [teamOne, teamTwo];
     }
@@ -29,7 +29,7 @@ export class SortByTeamsPipe implements PipeTransform {
         return map(players, (player: Player, key: string) => {
             return {
                 ...player,
-                id: key
+                id: key,
             };
         });
     }

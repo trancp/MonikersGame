@@ -11,11 +11,11 @@ import { ToastComponent } from './toast.component';
     imports: [
         CommonModule,
         FlexLayoutModule,
-        MatSnackBarModule
+        MatSnackBarModule,
     ],
     declarations: [ToastComponent],
     providers: [ToastService],
-    entryComponents: [ToastComponent]
+    entryComponents: [ToastComponent],
 })
 export class ToastModule {
 }

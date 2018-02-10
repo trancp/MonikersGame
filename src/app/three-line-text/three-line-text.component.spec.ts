@@ -8,7 +8,7 @@ describe('ThreeLineTextComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ThreeLineTextComponent ]
+      declarations: [ ThreeLineTextComponent ],
     })
     .compileComponents();
   }));

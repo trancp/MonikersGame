@@ -5,7 +5,7 @@ import { RouteGuardService } from './router-guards.service';
 describe('RouteGuardService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [RouteGuardService]
+      providers: [RouteGuardService],
     });
   });
 

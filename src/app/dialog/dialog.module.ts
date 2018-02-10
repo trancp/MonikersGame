@@ -13,10 +13,10 @@ import { DialogService } from './dialog.service';
         FlexLayoutModule,
         MatButtonModule,
         MatDialogModule,
-        MatIconModule
+        MatIconModule,
     ],
     providers: [DialogService],
-    entryComponents: []
+    entryComponents: [],
 })
 export class DialogModule {
 }
