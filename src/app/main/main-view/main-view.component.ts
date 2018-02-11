@@ -10,6 +10,7 @@ import { ToastService } from '../../toast/toast.service';
 
 import { AppState } from '../../app.state';
 import { Rooms } from '../../interfaces/rooms.model';
+import { RoomsEffects } from '../../rooms/rooms.effects';
 
 const ERRORS = {
     maxRooms: 'Sorry there are no available rooms!',
@@ -28,13 +29,15 @@ export class MainViewComponent implements OnInit {
                 private roomsService: RoomsService,
                 private router: Router,
                 private store: Store<AppState>,
-                private toastService: ToastService) {
+                private toastService: ToastService,
+                private roomsEffects: RoomsEffects) {
         this.rooms$ = this.store.select('rooms');
         this.roomsService.dispatchGetRooms();
     }
 
     ngOnInit() {
         this.roomService.dispatchResetRoom();
+        // this.roomsEffects.submitMonikerWords();
     }
 
     startAGame(rooms: Rooms) {

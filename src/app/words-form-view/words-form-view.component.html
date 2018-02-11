@@ -1,6 +1,6 @@
 <div *ngIf="room$ | async as room"
      class="u-fontFamily-CircularStd-Black u-height-100">
-    <ng-container *ngIf="!room.loading">
+    <ng-container *ngIf="!room.loading && (wordsState | async)?.isLoaded">
         <ng-container *ngIf="player$ | async as player">
             <div *ngIf="!player.loading"
                  fxLayout="column"
@@ -28,19 +28,18 @@
                         </div>
                     </div>
                 </div>
-                <form #form="ngForm"
-                      fxFlex="100%"
-                      [ngStyle]="{ 'margin': '20px 0' }"
-                      (ngSubmit)="onSubmit(form.value.word, wordIndex)"
-                      novalidate>
-                    <div class="inputLabel">
-                        Enter a Word
-                    </div>
-                    <div class="inputContainer"
-                         [ngClass]="{ 'inputExistsContainer': inputWord, 'inputEmptyContainer': !inputWord }">
-                        <div fxLayout="row"
-                             fxLayoutAlign="center">
-                            <div>
+                <div fxFlex="100%">
+                    <form #form="ngForm"
+                          [ngStyle]="{ 'margin': '20px 0' }"
+                          (ngSubmit)="onSubmit(form.value.word, wordIndex)"
+                          novalidate>
+                        <div class="inputLabel">
+                            Enter a Word
+                        </div>
+                        <div class="inputContainer"
+                             [ngClass]="{ 'inputExistsContainer': inputWord, 'inputEmptyContainer': !inputWord }">
+                            <div fxLayout="row"
+                                 fxLayoutAlign="center">
                                 <input class="input"
                                        name="word"
                                        ngModel
@@ -53,29 +52,40 @@
                                        autofocus
                                        [disabled]="hasEnoughWords()"
                                        placeholder="{{inputPlaceholder}}"/>
-
                             </div>
                         </div>
-                    </div>
-                    <div class="wordsContainer">
-                        <div *ngFor="let word of words; let index = index"
-                             style="margin-bottom: 5px;">
-                            <a (click)="editWord(index)"
-                               [ngStyle]="{ 'display': 'block' }"
-                               mat-button>
-                                <div fxLayout="row"
-                                     class="u-fontFamily-CircularStd-Black"
-                                     [ngClass]="{ 'word': words[index] }">
-                                    <div class="u-fontSize-16"
-                                         style="margin-right: 10px;">
-                                        {{ index + 1 }}
+                        <div class="wordsContainer">
+                            <div *ngFor="let word of (wordsForm.value | appGetValues); let index = index"
+                                 style="margin-bottom: 5px;">
+                                <a (click)="editWord(index)"
+                                   [ngStyle]="{ 'display': 'block' }"
+                                   mat-button>
+                                    <div fxLayout="row"
+                                         class="u-fontFamily-CircularStd-Black"
+                                         [ngClass]="{ 'word': (wordsForm.value | appGetValues)[index] }">
+                                        <div class="u-fontSize-16"
+                                             style="margin-right: 10px;">
+                                            {{ index + 1 }}
+                                        </div>
+                                        <div>{{ word }}</div>
                                     </div>
-                                    <div>{{ word }}</div>
-                                </div>
-                            </a>
+                                </a>
+                            </div>
                         </div>
+                    </form>
+                    <div fxLayout="row"
+                         fxLayoutAlign="center center">
+                        <button mat-raised-button
+                                fxFlex="none"
+                                type="button"
+                                color="accent"
+                                class="c-btn"
+                                (click)="fillInTheBlanks(GLOBAL_WORD_BANK)"
+                                [ngClass]="{ 'c-btn-bottom-border--light-black': !hasEnoughWords(), 'c-btn--grey c-btn--word--disabled': hasEnoughWords() }">
+                            Fill in the blanks
+                        </button>
                     </div>
-                </form>
+                </div>
                 <div *ngIf="room.started"
                      class="u-textAlign-Center">
                     Chill out, a game is currently in progress.
@@ -84,9 +94,9 @@
                     <button mat-raised-button
                             color="accent"
                             class="c-btn u-width-100"
-                            (click)="submitWordList(words, room, player)"
+                            (click)="submitWordList(room, player)"
                             [ngClass]="{ 'c-btn-bottom-border--light-black': hasEnoughWords(), 'c-btn--grey c-btn--word--disabled': !hasEnoughWords() }">
-                        Yep, got five words
+                        {{ 3 <= autoFilledWords.length ? 'Yep, I\'m lazy AF' : 'Yep, got five words' }}
                     </button>
                 </div>
             </div>
@@ -95,7 +105,7 @@
             </div>
         </ng-container>
     </ng-container>
-    <div *ngIf="room.loading">
+    <div *ngIf="room.loading && !(wordsState | async)?.isLoaded">
         <app-loading-view></app-loading-view>
     </div>
 </div>

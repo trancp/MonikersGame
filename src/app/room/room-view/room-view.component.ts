@@ -12,10 +12,13 @@ import { RoomService } from '../room.service';
 import { PlayerService } from '../../player/player.service';
 import { RouteGuardService } from '../../router-guards/router-guards.service';
 
+import { GetWords } from '../../words/words.actions';
+
 import { Room } from '../../interfaces/room.model';
 import { Player } from '../../interfaces/player.model';
 import { AppState } from '../../app.state';
 import { DataTransfer } from '../../interfaces/data-transfer.model';
+import { WordsState } from '../../interfaces/words.interfaces';
 
 interface ImovingPlayer {
     player: Player;
@@ -25,12 +28,17 @@ interface ImovingPlayer {
 
 import every from 'lodash-es/every';
 import filter from 'lodash-es/filter';
+import flatten from 'lodash-es/flatten';
 import findIndex from 'lodash-es/findIndex';
 import get from 'lodash-es/get';
 import isEqual from 'lodash-es/isEqual';
 import map from 'lodash-es/map';
+import pick from 'lodash-es/pick';
 import reduce from 'lodash-es/reduce';
 import slice from 'lodash-es/slice';
+import values from 'lodash-es/values';
+
+const WORD_BANKS = ['custom', 'monikers'];
 
 @Component({
     selector: 'app-room-view',
@@ -42,6 +50,8 @@ export class RoomViewComponent implements OnInit {
     roomState: Observable<Room>;
     playerState: Observable<Player>;
     dataToTransfer: DataTransfer;
+    wordsState = this.store.select('words');
+    GLOBAL_WORD_BANK: string[];
 
     constructor(private routeGuardService: RouteGuardService,
                 public route: ActivatedRoute,
@@ -65,6 +75,14 @@ export class RoomViewComponent implements OnInit {
             });
         this.playerService.dispatchUpdatePlayer({ ready: true });
         this.isJoiningGame = isEqual('join', get(this.route, 'url.value[0].path'));
+        this.store.dispatch(GetWords());
+        this.wordsState.pipe(
+            rxjsFilter((wordsState: WordsState) => wordsState.isLoaded),
+            take(1),
+            rxjsMap((wordsState: WordsState) => {
+                this.GLOBAL_WORD_BANK = flatten(values(pick(wordsState, WORD_BANKS)));
+            }),
+        ).subscribe();
     }
 
     public goBack(code: string): void {
@@ -78,7 +96,7 @@ export class RoomViewComponent implements OnInit {
         if (!this.roomIsReadyToStart(room)) {
             return;
         }
-        this.roomService.dispatchStartGame(user);
+        this.roomService.dispatchStartGame({ user, globalWordBank: this.GLOBAL_WORD_BANK });
         this.router.navigate(['game', room.code, user.name]);
     }
 

@@ -15,6 +15,7 @@ import { Player } from '../interfaces/player.model';
 import { Room } from '../interfaces/room.model';
 import { Rooms } from '../interfaces/rooms.model';
 
+import capitalize from 'lodash-es/capitalize';
 import flatten from 'lodash-es/flatten';
 import includes from 'lodash-es/includes';
 import map from 'lodash-es/map';
@@ -81,7 +82,7 @@ export class RoomService {
     }
 
     public initializeGame(room: Room): any {
-        const words = this.compileShuffledRoomWords(room.players);
+        const words = this.sanitizeWords(this.compileShuffledRoomWords(room.players));
         const startingTeam = random(0, 1);
         const teams = [
             {
@@ -111,6 +112,13 @@ export class RoomService {
             teamToStart: startingTeam + 1,
             word: 0,
         };
+    }
+
+    private sanitizeWords(words: string[]): string[] {
+        return words.map((word: string) => {
+            const wordSplitBySpace = word.split(' ');
+            return wordSplitBySpace.map((wordInSplit: string) => capitalize(wordInSplit)).join(' ');
+        });
     }
 
     public compileShuffledRoomWords(players: Player[]): string[] {
@@ -161,8 +169,8 @@ export class RoomService {
         this.store.dispatch(UpdateRoom(update));
     }
 
-    public dispatchStartGame(player: Player): void {
-        this.store.dispatch(StartGame(player));
+    public dispatchStartGame(payload: { user: Player, globalWordBank: string[] }): void {
+        this.store.dispatch(StartGame(payload));
     }
 
     public dispatchResetRoom(): void {

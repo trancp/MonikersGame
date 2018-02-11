@@ -7,6 +7,7 @@ import { LoadingViewModule } from '../../loading-view/loading-view.module';
 import { PlayersListModule } from '../../players-list/players-list.module';
 import { RouterGuardsModule } from '../../router-guards/router-guards.module';
 import { SortByTeamsModule } from '../../pipes/sort-by-teams-pipe/sort-by-teams.module';
+import { WordsStoreModule } from '../../words/words-store.module';
 
 import { PlayerService } from '../../player/player.service';
 import { RoomService } from '../room.service';
@@ -22,6 +23,7 @@ import { RoomViewComponent } from './room-view.component';
         PlayersListModule,
         RouterGuardsModule,
         SortByTeamsModule,
+        WordsStoreModule,
     ],
     declarations: [RoomViewComponent],
     exports: [RoomViewComponent],

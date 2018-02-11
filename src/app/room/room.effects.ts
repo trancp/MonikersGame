@@ -5,8 +5,6 @@ import { AngularFireDatabase } from 'angularfire2/database';
 import { Observable } from 'rxjs/Observable';
 import { Store } from '@ngrx/store';
 
-import upperCase from 'lodash-es/upperCase';
-
 import { RoomService } from './room.service';
 import {
     GET_ROOM,
@@ -23,10 +21,13 @@ import { filter } from 'rxjs/operators/filter';
 import { map as rxjsMap } from 'rxjs/operators/map';
 import { mergeMap } from 'rxjs/operators/mergeMap';
 import { take } from 'rxjs/operators/take';
-import { tap } from 'rxjs/operators/tap';
 
 import { AppState } from '../app.state';
-import { DEFAULT_ROOM_PROPERTIES, Room } from '../interfaces/room.model';
+import { DEFAULT_ROOM_PROPERTIES } from '../interfaces/room.model';
+
+import capitalize from 'lodash-es/capitalize';
+import includes from 'lodash-es/includes';
+import upperCase from 'lodash-es/upperCase';
 
 @Injectable()
 export class RoomEffects {
@@ -87,7 +88,7 @@ export class RoomEffects {
                     take(1),
                     rxjsMap((room: any) => {
                         const url = `/rooms/${room.pushKey}`;
-                        if (!action.payload.vip) {
+                        if (!action.payload.user.vip) {
                             return {
                                 url,
                                 update: {},
@@ -98,11 +99,11 @@ export class RoomEffects {
                             update: this.roomService.initializeGame(room),
                         };
                     }),
+                    mergeMap(({ url, update }: { url: string, update: any }) => {
+                        this.addToGlobalWordBank(update.words, action.payload.globalWordBank);
+                        return this._updateRoom(url, update);
+                    }),
                 );
-            }),
-            mergeMap(({ url, update }: { url: string, update: any }) => {
-                this.addToGlobalWordBank(update.words);
-                return this._updateRoom(url, update);
             }),
             rxjsMap((room: any) => UpdateRoomSuccess(room)),
         );
@@ -159,9 +160,12 @@ export class RoomEffects {
             .then(() => update);
     }
 
-    private addToGlobalWordBank(words: string[]) {
-        return this.db
-            .list('/words')
-            .push(words);
+    private addToGlobalWordBank(roomWords: string[], globalWordBank: string[]) {
+        const wordsToPush = roomWords.filter((word: string) => !includes(globalWordBank, word));
+        wordsToPush.map((word: string) => {
+            return this.db
+                .list('/words/custom')
+                .push(word);
+        });
     }
 }
