@@ -5,7 +5,13 @@
              fxLayout="column">
             <div fxLayout="row"
                  fxFlex="none">
-                <div fxFlex="100"></div>
+                <div fxFlex="100">
+                    <a (click)="showRules()"
+                       [ngStyle]="{ 'cursor': 'pointer' }"
+                       class="u-textTransform-uppercase u-fontFamily-GoodDog u-fontSize-20">
+                        Rules
+                    </a>
+                </div>
                 <div fxFlex="none"
                      class="u-textAlign-Right u-textTransform-uppercase">
                     <div class="roomCode">

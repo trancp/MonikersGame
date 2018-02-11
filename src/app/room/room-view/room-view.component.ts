@@ -7,10 +7,13 @@ import { map as rxjsMap } from 'rxjs/operators/map';
 import { mergeMap } from 'rxjs/operators/mergeMap';
 import { take } from 'rxjs/operators/take';
 import { tap } from 'rxjs/operators/tap';
+import { FullscreenWindow } from '../../fullscreen-window/fullscreen-window.service';
 
 import { RoomService } from '../room.service';
 import { PlayerService } from '../../player/player.service';
 import { RouteGuardService } from '../../router-guards/router-guards.service';
+
+import { DialogRulesComponent } from '../../dialog/dialog-rules/dialog-rules.component';
 
 import { GetWords } from '../../words/words.actions';
 
@@ -53,7 +56,8 @@ export class RoomViewComponent implements OnInit {
     wordsState = this.store.select('words');
     GLOBAL_WORD_BANK: string[];
 
-    constructor(private routeGuardService: RouteGuardService,
+    constructor(private fullscreenWindow: FullscreenWindow,
+                private routeGuardService: RouteGuardService,
                 public route: ActivatedRoute,
                 private router: Router,
                 private store: Store<AppState>,
@@ -182,5 +186,11 @@ export class RoomViewComponent implements OnInit {
                 );
             }),
         ).subscribe();
+    }
+
+    showRules() {
+        this.fullscreenWindow.open({
+            component: DialogRulesComponent,
+        });
     }
 }
