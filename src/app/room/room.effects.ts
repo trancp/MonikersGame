@@ -25,7 +25,6 @@ import { take } from 'rxjs/operators/take';
 import { AppState } from '../app.state';
 import { DEFAULT_ROOM_PROPERTIES } from '../interfaces/room.model';
 
-import capitalize from 'lodash-es/capitalize';
 import includes from 'lodash-es/includes';
 import upperCase from 'lodash-es/upperCase';
 

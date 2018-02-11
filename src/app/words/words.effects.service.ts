@@ -17,6 +17,8 @@ import mapKeys from 'lodash-es/mapKeys';
 import mapValues from 'lodash-es/mapValues';
 import values from 'lodash-es/values';
 
+import { MONIKERS_WORD_BANK } from './words.helper';
+
 @Injectable()
 export class WordsEffects {
 
@@ -31,7 +33,7 @@ export class WordsEffects {
             map((words: any) => {
                 const mapWordsToKeys = mapKeys(words, (wordsState: any) => wordsState.$key);
                 const sanitizedWordsValues = mapValues(mapWordsToKeys, (wordsState: any) => values(wordsState));
-                return GetWordsSuccess(sanitizedWordsValues);
+                return GetWordsSuccess({ ...sanitizedWordsValues, monikers: MONIKERS_WORD_BANK });
             }),
         );
 
