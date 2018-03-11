@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 import isEqual from 'lodash-es/isEqual';
 import max from 'lodash-es/max';
+import min from 'lodash-es/min';
 
 @Component({
     selector: 'app-timer',
@@ -31,7 +32,7 @@ export class TimerComponent implements OnInit {
         const stopTime = new Date(time);
         const now = new Date();
         const timeLeft = Math.floor((stopTime.getTime() - now.getTime()) / 1000);
-        return max([timeLeft, 0]);
+        return min([max([timeLeft, 0]), 60]);
     }
 
     private setTimerValues(stopTime: string): void {
