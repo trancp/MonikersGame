@@ -57,7 +57,7 @@
                         <div class="wordsContainer">
                             <div *ngFor="let word of (wordsForm.value | appGetValues); let index = index"
                                  style="margin-bottom: 5px;">
-                                <a (click)="editWord(index)"
+                                <a (click)="form.value.word ? onSubmit(form.value.word, wordIndex) : editWord(index)"
                                    [ngStyle]="{ 'display': 'block' }"
                                    mat-button>
                                     <div fxLayout="row"
