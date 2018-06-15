@@ -8,6 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { DialogConfirmPromptModule } from '../../dialog/dialog-confirm-prompt/dialog-confirm-prompt.module';
 import { DialogModule } from '../../dialog/dialog.module';
 import { LoadingViewModule } from '../../loading-view/loading-view.module';
+import { RoomCodeModule } from '../../room-code/room-code.module';
 
 import { PlayerService } from '../../player/player.service';
 import { RoomService } from '../../room/room.service';
@@ -23,6 +24,7 @@ import { CreateViewComponent } from './create-view.component';
         FormsModule,
         LoadingViewModule,
         MatButtonModule,
+        RoomCodeModule,
         RouterModule.forChild([]),
     ],
     declarations: [CreateViewComponent],

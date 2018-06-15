@@ -7,7 +7,7 @@
          fxFlex="100%">
         <div fxLayout="row"
              fxFlex="none">
-            <div fxFlex
+            <div fxFlex="33%"
                  fxLayout="row"
                  fxLayoutAlign="start center">
                 <a href="javascript: void(0)"
@@ -20,12 +20,12 @@
                     </i>
                 </a>
             </div>
-            <div fxFlex="none"
-                 class="u-textAlign-Right u-textTransform-uppercase">
-                <div class="roomCode">
-                    {{room.code}}
-                </div>
+            <div fxFlex="33%">
+                <app-room-code class="u-display-block"
+                               [roomCode]="room.code">
+                </app-room-code>
             </div>
+            <div fxFlex="33%"></div>
         </div>
         <div fxLayout="column"
              fxFlex>

@@ -6,6 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 
 import { GetValuesPipeModule } from '../pipes/get-values-pipe/get-values-pipe.module';
 import { LoadingViewModule } from '../loading-view/loading-view.module';
+import { RoomCodeModule } from '../room-code/room-code.module';
 import { WordsStoreModule } from '../words/words-store.module';
 
 import { PlayerService } from '../player/player.service';
@@ -23,6 +24,7 @@ import { WordsFormViewComponent } from './words-form-view.component';
         LoadingViewModule,
         MatButtonModule,
         ReactiveFormsModule,
+        RoomCodeModule,
         WordsStoreModule,
     ],
     declarations: [WordsFormViewComponent],

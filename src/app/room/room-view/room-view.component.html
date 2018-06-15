@@ -5,19 +5,19 @@
              fxLayout="column">
             <div fxLayout="row"
                  fxFlex="none">
-                <div fxFlex="100">
+                <div fxFlex="33%">
                     <a (click)="showRules()"
                        [ngStyle]="{ 'cursor': 'pointer' }"
                        class="u-textTransform-uppercase u-fontFamily-GoodDog u-fontSize-20">
                         Rules
                     </a>
                 </div>
-                <div fxFlex="none"
-                     class="u-textAlign-Right u-textTransform-uppercase">
-                    <div class="roomCode">
-                        {{room.code}}
-                    </div>
+                <div fxFlex="33%">
+                    <app-room-code class="u-display-block"
+                                   [roomCode]="room.code">
+                    </app-room-code>
                 </div>
+                <div fxFlex="33%"></div>
             </div>
             <div fxFlex="100%"
                  [ngStyle]="{ 'margin': '20px 0' }">

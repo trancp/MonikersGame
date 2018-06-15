@@ -8,6 +8,7 @@ import { DialogRulesModule } from '../../dialog/dialog-rules/dialog-rules.module
 import { FullscreenWindowModule } from '../../fullscreen-window/fullscreen-window.module';
 import { LoadingViewModule } from '../../loading-view/loading-view.module';
 import { PlayersListModule } from '../../players-list/players-list.module';
+import { RoomCodeModule } from '../../room-code/room-code.module';
 import { RouterGuardsModule } from '../../router-guards/router-guards.module';
 import { SortByTeamsModule } from '../../pipes/sort-by-teams-pipe/sort-by-teams.module';
 import { WordsStoreModule } from '../../words/words-store.module';
@@ -27,6 +28,7 @@ import { RoomViewComponent } from './room-view.component';
         MatButtonModule,
         MatDialogModule,
         PlayersListModule,
+        RoomCodeModule,
         RouterGuardsModule,
         SortByTeamsModule,
         WordsStoreModule,
