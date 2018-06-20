@@ -1,4 +1,4 @@
-import {Action} from '@ngrx/store';
+import { Action } from '@ngrx/store';
 
 export const GET_WORDS = '[words] GET';
 export const GET_WORDS_SUCCESS = '[words] GET SUCCESS';

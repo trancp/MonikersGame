@@ -1,8 +1,9 @@
-import { Component, Input, OnInit, Output, EventEmitter, OnChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 
 import { DataTransfer } from '../interfaces/data-transfer.model';
 import get from 'lodash-es/get';
 import isEqual from 'lodash-es/isEqual';
+import { Player } from '../interfaces/player.model';
 
 interface Iplayer {
     id?: string;
@@ -17,8 +18,6 @@ interface ImovingPlayer {
     listIndex: number;
     newTeam?: number;
 }
-
-import { Player } from '../interfaces/player.model';
 
 @Component({
     selector: 'app-players-list',

@@ -1,17 +1,13 @@
 import { Injectable } from '@angular/core';
-import { Effect, Actions } from '@ngrx/effects';
+import { Actions, Effect } from '@ngrx/effects';
 import { Action } from '@ngrx/store';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 
-import {
-    GET_WORDS,
-    GetWordsSuccess,
-} from './words.actions';
+import { GET_WORDS, GetWordsSuccess, } from './words.actions';
 
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
-import { map } from 'rxjs/operators/map';
-import { mergeMap } from 'rxjs/operators/mergeMap';
+import { map, mergeMap } from 'rxjs/operators';
 
 import mapKeys from 'lodash-es/mapKeys';
 import mapValues from 'lodash-es/mapValues';

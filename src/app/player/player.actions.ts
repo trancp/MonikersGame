@@ -1,5 +1,4 @@
 import { Action } from '@ngrx/store';
-import { Player } from '../interfaces/player.model';
 
 export const GET_PLAYER = '[player] GET';
 export const GET_PLAYER_SUCCESS = '[player] GET SUCCESS';

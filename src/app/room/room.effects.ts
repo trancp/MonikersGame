@@ -1,26 +1,22 @@
 import { Injectable } from '@angular/core';
-import { Effect, Actions } from '@ngrx/effects';
-import { Action } from '@ngrx/store';
+import { Actions, Effect } from '@ngrx/effects';
+import { Action, Store } from '@ngrx/store';
 import { AngularFireDatabase } from 'angularfire2/database';
-import { Observable } from 'rxjs/Observable';
-import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
 
 import { RoomService } from './room.service';
 import {
-    GET_ROOM,
-    GetRoomSuccess,
     CREATE_ROOM,
     CreateRoomSuccess,
+    GET_ROOM,
+    GetRoomSuccess,
+    INIT_ROOM_TYPE,
+    START_GAME_TYPE,
     UPDATE_ROOM,
     UpdateRoomSuccess,
-    START_GAME_TYPE,
-    INIT_ROOM_TYPE,
 } from './room.actions';
 
-import { filter } from 'rxjs/operators/filter';
-import { map as rxjsMap } from 'rxjs/operators/map';
-import { mergeMap } from 'rxjs/operators/mergeMap';
-import { take } from 'rxjs/operators/take';
+import { filter, map as rxjsMap, mergeMap, take } from 'rxjs/operators';
 
 import { AppState } from '../app.state';
 import { DEFAULT_ROOM_PROPERTIES } from '../interfaces/room.model';

@@ -1,9 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { filter } from 'rxjs/operators/filter';
-import { take } from 'rxjs/operators/take';
-import { tap } from 'rxjs/operators/tap';
+import { filter, take, tap } from 'rxjs/operators';
 
 import { RoomService } from '../../room/room.service';
 import { PlayerService } from '../../player/player.service';
@@ -11,7 +9,7 @@ import { DialogService } from '../../dialog/dialog.service';
 
 import { DialogConfirmPromptComponent } from '../../dialog/dialog-confirm-prompt/dialog-confirm-prompt.component';
 
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 import find from 'lodash-es/find';
 import get from 'lodash-es/get';

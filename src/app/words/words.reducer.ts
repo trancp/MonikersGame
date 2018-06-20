@@ -1,8 +1,4 @@
-import { WordsActions } from './words.actions';
-
-import {
-    GET_WORDS_SUCCESS,
-} from './words.actions';
+import { GET_WORDS_SUCCESS, WordsActions } from './words.actions';
 
 import { WordsState } from '../interfaces/words.interfaces';
 

@@ -1,15 +1,15 @@
-import { Room, DEFAULT_ROOM_PROPERTIES } from '../interfaces/room.model';
+import { DEFAULT_ROOM_PROPERTIES, Room } from '../interfaces/room.model';
 import {
-    RoomActions,
-    GET_ROOM,
-    GET_ROOM_SUCCESS,
     CREATE_ROOM,
     CREATE_ROOM_SUCCESS,
+    GET_ROOM,
+    GET_ROOM_SUCCESS,
+    RESET_ROOM,
+    RoomActions,
+    START_GAME_SUCCESS_TYPE,
+    START_GAME_TYPE,
     UPDATE_ROOM,
     UPDATE_ROOM_SUCCESS,
-    START_GAME_TYPE,
-    START_GAME_SUCCESS_TYPE,
-    RESET_ROOM,
 } from './room.actions';
 
 export function roomReducer(state: Room, action: RoomActions) {

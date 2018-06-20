@@ -1,15 +1,15 @@
 import {
-    PlayerActions,
     CREATE_PLAYER,
     CREATE_PLAYER_SUCCESS,
-    GET_PLAYER,
-    GET_PLAYER_SUCCESS,
-    UPDATE_PLAYER,
-    UPDATE_PLAYER_SUCCESS,
-    UPDATE_PLAYER_FAIL,
     DELETE_PLAYER,
     DELETE_PLAYER_FAIL,
     DELETE_PLAYER_SUCCESS,
+    GET_PLAYER,
+    GET_PLAYER_SUCCESS,
+    PlayerActions,
+    UPDATE_PLAYER,
+    UPDATE_PLAYER_FAIL,
+    UPDATE_PLAYER_SUCCESS,
 } from './player.actions';
 import { Player } from '../interfaces/player.model';
 

@@ -1,12 +1,11 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import get from 'lodash-es/get';
 
 const ROUND = {
     1: `Say Anything You Want,${'<br>'}but the word.`,
     2: 'One Word.',
     3: 'Charades. No Words.',
 };
-
-import get from 'lodash-es/get';
 
 @Component({
     selector: 'app-word',

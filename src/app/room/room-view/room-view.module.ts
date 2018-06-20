@@ -5,7 +5,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 
 import { DialogRulesModule } from '../../dialog/dialog-rules/dialog-rules.module';
-import { FullscreenWindowModule } from '../../fullscreen-window/fullscreen-window.module';
 import { LoadingViewModule } from '../../loading-view/loading-view.module';
 import { PlayersListModule } from '../../players-list/players-list.module';
 import { RoomCodeModule } from '../../room-code/room-code.module';
@@ -23,7 +22,6 @@ import { RoomViewComponent } from './room-view.component';
         CommonModule,
         DialogRulesModule,
         FlexLayoutModule,
-        FullscreenWindowModule,
         LoadingViewModule,
         MatButtonModule,
         MatDialogModule,

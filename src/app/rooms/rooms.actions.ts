@@ -1,4 +1,4 @@
-import {Action} from '@ngrx/store';
+import { Action } from '@ngrx/store';
 
 export const GET_ROOMS = '[rooms] GET';
 export const GET_ROOMS_SUCCESS = '[rooms] GET SUCCESS';
