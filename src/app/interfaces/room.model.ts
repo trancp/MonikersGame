@@ -1,26 +1,28 @@
 import { Player } from './player.model';
 
 export interface Room {
-    gameOver?: boolean;
-    players: any[];
-    pushKey?: string;
-    loading: boolean;
+    code?: string;
     error?: string;
-    code: string;
-    started: boolean;
+    gameOver?: boolean;
+    loading?: boolean;
+    name?: string;
+    players?: any[];
+    pushKey?: string;
+    round?: number;
+    started?: boolean;
     teams?: Team[];
-    teamToStart: number;
-    timer: string;
-    round: number;
-    turn: number;
-    turnOrder: Player[];
-    words: string[];
+    teamToStart?: number;
+    timer?: string;
+    turn?: number;
+    turnOrder?: Player[];
+    vip?: boolean;
+    words?: string[];
 }
 
 interface Team {
-    name: string;
-    words: string[];
-    isTurn: boolean;
+    name?: string;
+    words?: string[];
+    isTurn?: boolean;
 }
 
 export const DEFAULT_ROOM_PROPERTIES = {

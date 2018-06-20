@@ -1,28 +1,22 @@
-import {Injectable} from '@angular/core';
-import {Effect, Actions} from '@ngrx/effects';
-import {AngularFireDatabase} from 'angularfire2/database';
-import {FirebaseObjectObservable} from 'angularfire2/database';
-import {Action, Store} from '@ngrx/store';
+import { Injectable } from '@angular/core';
+import { Actions, Effect } from '@ngrx/effects';
+import { AngularFireDatabase, FirebaseObjectObservable } from 'angularfire2/database';
+import { Action, Store } from '@ngrx/store';
 
-import {PlayerService} from './player.service';
+import { PlayerService } from './player.service';
 
-import {Observable} from 'rxjs/Observable';
-import {of} from 'rxjs/observable/of';
+import { Observable, of } from 'rxjs';
 
-import {filter} from 'rxjs/operators/filter';
-import {map as rxjsMap} from 'rxjs/operators/map';
-import {mergeMap} from 'rxjs/operators/mergeMap';
-import {take} from 'rxjs/operators/take';
-import {catchError} from 'rxjs/operators/catchError';
+import { catchError, filter, map as rxjsMap, mergeMap, take } from 'rxjs/operators';
 
 import {
-    GET_PLAYER,
-    GetPlayerSuccess,
     CREATE_PLAYER,
     CreatePlayerSuccess,
+    GET_PLAYER,
+    GetPlayerSuccess,
     UPDATE_PLAYER,
-    UpdatePlayerSuccess,
     UpdatePlayerFail,
+    UpdatePlayerSuccess,
 } from './player.actions';
 
 import get from 'lodash-es/get';
@@ -30,7 +24,7 @@ import isEqual from 'lodash-es/isEqual';
 import map from 'lodash-es/map';
 import pick from 'lodash-es/pick';
 
-import {AppState} from '../app.state';
+import { AppState } from '../app.state';
 
 const VALID_UPDATE_KEYS = ['name', 'ready', 'team', 'teamPlayerIndex', 'vip', 'words'];
 

@@ -1,5 +1,5 @@
 import { Rooms } from '../interfaces/rooms.model';
-import { RoomsActions, GET_ROOMS, GET_ROOMS_SUCCESS } from './rooms.actions';
+import { GET_ROOMS, GET_ROOMS_SUCCESS, RoomsActions } from './rooms.actions';
 
 export function roomsReducer(state: Rooms, action: RoomsActions) {
     switch (action.type) {

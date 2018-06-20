@@ -1,14 +1,13 @@
 import { Injectable } from '@angular/core';
-import { Effect, Actions } from '@ngrx/effects';
+import { Actions, Effect } from '@ngrx/effects';
 import { Action } from '@ngrx/store';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 
 import { GET_ROOMS, GetRoomsSuccess } from './rooms.actions';
 
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
-import { map } from 'rxjs/operators/map';
-import { mergeMap } from 'rxjs/operators/mergeMap';
+import { map, mergeMap } from 'rxjs/operators';
 
 import capitalize from 'lodash-es/capitalize';
 

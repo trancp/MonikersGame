@@ -1,14 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 
-import {
-    CreateRoom,
-    GetRoom,
-    UpdateRoom,
-    StartGame,
-    ResetRoom,
-    InitRoom,
-} from './room.actions';
+import { CreateRoom, GetRoom, InitRoom, ResetRoom, StartGame, UpdateRoom, } from './room.actions';
 
 import { AppState } from '../app.state';
 import { Player } from '../interfaces/player.model';

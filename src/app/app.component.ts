@@ -1,9 +1,8 @@
 import { Component } from '@angular/core';
-import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
+import { AngularFireDatabase } from 'angularfire2/database';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { Room } from './interfaces/room.model';
-import * as roomActions from './room/room.actions';
 
 interface AppState {
     room: Room;

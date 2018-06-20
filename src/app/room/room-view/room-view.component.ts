@@ -1,13 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router, ParamMap } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
-import { filter as rxjsFilter } from 'rxjs/operators/filter';
-import { map as rxjsMap } from 'rxjs/operators/map';
-import { mergeMap } from 'rxjs/operators/mergeMap';
-import { take } from 'rxjs/operators/take';
-import { tap } from 'rxjs/operators/tap';
-import { FullscreenWindow } from '../../fullscreen-window/fullscreen-window.service';
+import { Observable } from 'rxjs';
+import { filter as rxjsFilter, map as rxjsMap, mergeMap, take, tap } from 'rxjs/operators';
+import { MatDialog } from '@angular/material/dialog';
 
 import { RoomService } from '../room.service';
 import { PlayerService } from '../../player/player.service';
@@ -22,13 +18,6 @@ import { Player } from '../../interfaces/player.model';
 import { AppState } from '../../app.state';
 import { DataTransfer } from '../../interfaces/data-transfer.model';
 import { WordsState } from '../../interfaces/words.interfaces';
-
-interface ImovingPlayer {
-    player: Player;
-    listIndex: number;
-    newTeam?: number;
-}
-
 import every from 'lodash-es/every';
 import filter from 'lodash-es/filter';
 import flatten from 'lodash-es/flatten';
@@ -40,6 +29,12 @@ import pick from 'lodash-es/pick';
 import reduce from 'lodash-es/reduce';
 import slice from 'lodash-es/slice';
 import values from 'lodash-es/values';
+
+interface ImovingPlayer {
+    player: Player;
+    listIndex: number;
+    newTeam?: number;
+}
 
 const WORD_BANKS = ['custom', 'monikers'];
 
@@ -56,7 +51,7 @@ export class RoomViewComponent implements OnInit {
     wordsState = this.store.select('words');
     GLOBAL_WORD_BANK: string[];
 
-    constructor(private fullscreenWindow: FullscreenWindow,
+    constructor(private dialog: MatDialog,
                 private routeGuardService: RouteGuardService,
                 public route: ActivatedRoute,
                 private router: Router,
@@ -178,7 +173,10 @@ export class RoomViewComponent implements OnInit {
                 return this.roomState.pipe(
                     take(1),
                     rxjsMap((room: any) => {
-                        const roomPlayers = map(room.players, (roomPlayer: Player, key: string) => ({ ...roomPlayer, id: key }));
+                        const roomPlayers = map(room.players, (roomPlayer: Player, key: string) => ({
+                            ...roomPlayer,
+                            id: key,
+                        }));
                         const teamPlayers = filter(roomPlayers, (teamPlayer: Player) => isEqual(teamPlayer.team, newTeam));
                         const teamPlayerIndex = findIndex(teamPlayers, (teamPlayer: Player) => isEqual(teamPlayer.id, player.id));
                         return this.playerService.dispatchUpdatePlayer({ ...player, teamPlayerIndex: teamPlayerIndex });
@@ -189,8 +187,13 @@ export class RoomViewComponent implements OnInit {
     }
 
     showRules() {
-        this.fullscreenWindow.open({
-            component: DialogRulesComponent,
-        });
+        const config = {
+            autoFocus: false,
+            height: '100%',
+            width: '100%',
+            maxWidth: '100vw',
+            maxHeight: '100vh',
+        };
+        this.dialog.open(DialogRulesComponent, config);
     }
 }

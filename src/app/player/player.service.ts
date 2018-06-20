@@ -1,8 +1,8 @@
-import {Injectable} from '@angular/core';
-import {AngularFireDatabase} from 'angularfire2/database';
-import {Store} from '@ngrx/store';
+import { Injectable } from '@angular/core';
+import { AngularFireDatabase } from 'angularfire2/database';
+import { Store } from '@ngrx/store';
 
-import {CreatePlayer, GetPlayer, UpdatePlayer, SetPlayer} from './player.actions';
+import { CreatePlayer, GetPlayer, SetPlayer, UpdatePlayer } from './player.actions';
 
 import findKey from 'lodash-es/findKey';
 import filter from 'lodash-es/filter';
@@ -10,7 +10,7 @@ import get from 'lodash-es/get';
 import isEqual from 'lodash-es/isEqual';
 import sortBy from 'lodash-es/sortBy';
 
-import {AppState} from '../app.state';
+import { AppState } from '../app.state';
 
 @Injectable()
 export class PlayerService {

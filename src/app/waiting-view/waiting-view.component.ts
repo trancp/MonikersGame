@@ -1,7 +1,6 @@
 import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/Subscription';
+import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 
 import { PlayerService } from '../player/player.service';
@@ -12,9 +11,7 @@ import { AppState } from '../app.state';
 import { Player } from '../interfaces/player.model';
 import { Room } from '../interfaces/room.model';
 
-import { filter } from 'rxjs/operators/filter';
-import { take } from 'rxjs/operators/take';
-import { tap } from 'rxjs/operators/tap';
+import { filter, take, tap } from 'rxjs/operators';
 
 import isEmpty from 'lodash-es/isEmpty';
 

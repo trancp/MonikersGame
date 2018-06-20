@@ -1,10 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
-import { filter as rxjsFilter } from 'rxjs/operators/filter';
-import { take } from 'rxjs/operators/take';
-import { tap } from 'rxjs/operators/tap';
+import { Observable } from 'rxjs';
+import { filter as rxjsFilter, take, tap } from 'rxjs/operators';
 
 import { RoomService } from '../../room/room.service';
 import { PlayerService } from '../../player/player.service';

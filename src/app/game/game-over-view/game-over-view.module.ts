@@ -7,7 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { LoadingViewModule } from '../../loading-view/loading-view.module';
 import { ScoreBoardModule } from '../../score-board/score-board.module';
 import { WinningTeamPipeModule } from '../../pipes/winning-team-pipe/winning-team-pipe.module';
-import { RouterGuardsModule} from '../../router-guards/router-guards.module';
+import { RouterGuardsModule } from '../../router-guards/router-guards.module';
 
 import { RoomService } from '../../room/room.service';
 import { PlayerService } from '../../player/player.service';

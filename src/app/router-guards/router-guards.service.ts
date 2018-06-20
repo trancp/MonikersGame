@@ -1,10 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { combineLatest } from 'rxjs/observable/combineLatest';
-import { filter } from 'rxjs/operators/filter';
-import { tap } from 'rxjs/operators/tap';
-import { take } from 'rxjs/operators/take';
+import { combineLatest } from 'rxjs';
+import { filter, take, tap } from 'rxjs/operators';
 
 import isEmpty from 'lodash-es/isEmpty';
 import { AppState } from '../app.state';

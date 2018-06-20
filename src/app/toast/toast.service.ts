@@ -1,12 +1,12 @@
-import {Injectable} from '@angular/core';
+import { Injectable } from '@angular/core';
 import {
     MatSnackBar,
-    MatSnackBarRef,
     MatSnackBarHorizontalPosition,
+    MatSnackBarRef,
     MatSnackBarVerticalPosition,
 } from '@angular/material/snack-bar';
 
-import {ToastComponent} from './toast.component';
+import { ToastComponent } from './toast.component';
 
 interface Itoast {
     message?: string;

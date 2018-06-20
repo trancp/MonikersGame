@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 
 import { PlayerService } from '../../player/player.service';
@@ -11,8 +11,7 @@ import { AppState } from '../../app.state';
 import { Player } from '../../interfaces/player.model';
 import { Room } from '../../interfaces/room.model';
 
-import { take } from 'rxjs/operators/take';
-import { tap } from 'rxjs/operators/tap';
+import { take, tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-game-over-view',

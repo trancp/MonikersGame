@@ -15,8 +15,6 @@
         "forin": true,
         "import-blacklist": [
             true,
-            "rxjs",
-            "rxjs/operators",
             "lodash"
         ],
         "import-spacing": true,
