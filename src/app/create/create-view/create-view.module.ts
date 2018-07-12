@@ -2,8 +2,10 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FlexLayoutModule } from '@angular/flex-layout';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 import { DialogConfirmPromptModule } from '../../dialog/dialog-confirm-prompt/dialog-confirm-prompt.module';
 import { DialogModule } from '../../dialog/dialog.module';
@@ -24,6 +26,9 @@ import { CreateViewComponent } from './create-view.component';
         FormsModule,
         LoadingViewModule,
         MatButtonModule,
+        MatFormFieldModule,
+        MatInputModule,
+        ReactiveFormsModule,
         RoomCodeModule,
         RouterModule.forChild([]),
     ],

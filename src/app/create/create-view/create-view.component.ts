@@ -18,6 +18,7 @@ import random from 'lodash-es/random';
 
 import { AppState } from '../../app.state';
 import { Player } from '../../interfaces/player.model';
+import { FormControl } from '@angular/forms';
 
 const INPUT_PLACEHOLDERS = [
     'Asshat',
@@ -54,9 +55,9 @@ const CONFIRM_AS_EXISTING_USER_PROMPT = {
 
 export class CreateViewComponent implements OnInit {
     inputPlaceholder: string;
-    inputName: string;
     isJoiningGame: boolean;
     room$: Observable<any>;
+    form = new FormControl();
 
     constructor(private dialogService: DialogService,
                 public route: ActivatedRoute,
@@ -74,7 +75,6 @@ export class CreateViewComponent implements OnInit {
 
     ngOnInit(): void {
         this.inputPlaceholder = this._getRandomInputPlaceholder();
-        this.inputName = '';
         this.isJoiningGame = isEqual('join', get(this.route, 'url.value[0].path'));
     }
 
@@ -86,8 +86,9 @@ export class CreateViewComponent implements OnInit {
     }
 
     public onSubmit(formInput: string): void {
-        this.inputName = formInput
+        const inputName = formInput
             || this.inputPlaceholder;
+        this.form.patchValue(inputName);
     }
 
     public onGoToWords(room: any, name: string): void {

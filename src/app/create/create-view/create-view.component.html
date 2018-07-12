@@ -31,8 +31,7 @@
              fxFlex>
             <div fxFlex="15%"></div>
             <div fxFlex="85%">
-                <form #form="ngForm"
-                      (ngSubmit)="onSubmit(form.value.name)"
+                <form (ngSubmit)="onSubmit(form.value)"
                       novalidate
                       class="u-height-100">
                     <div fxLayout="column"
@@ -42,24 +41,23 @@
                             <div class="inputLabel">
                                 What is your fucking name?
                             </div>
-                            <div class="inputContainer"
-                                 [ngClass]="{ 'inputExistsContainer': inputName, 'inputEmptyContainer': !inputName }">
-                                <div fxLayout="row"
-                                     fxLayoutAlign="center">
-                                    <div fxFlex="80%">
-                                        <input class="input"
-                                               name="name"
-                                               ngModel
-                                               #name="ngModel"
-                                               [(ngModel)]="inputName"
-                                               [ngClass]="{ 'inputExists': inputName, 'inputEmpty': !inputName }"
-                                               style="font-family: 'CircularStd-Black'"
+                            <div fxLayout="row"
+                                 fxLayoutAlign="center">
+                                <div fxFlex="0 0 200px"
+                                     fxFlex.gt-sm="0 0 80%">
+                                    <mat-form-field [appearance]="'fill'"
+                                                    [ngStyle]="{ 'width': '100%' }"
+                                                    [color]="'accent'">
+                                        <input matInput
+                                               [formControl]="form"
+                                               [ngStyle]="{ 'font-family': 'CircularStd-Black', 'text-align': 'center', 'font-size': '25px' }"
+                                               [ngStyle.gt-sm]="{ 'font-family': 'CircularStd-Black', 'text-align': 'center', 'font-size': '30px' }"
+                                               [ngClass]="{ 'inputExists': form.value, 'inputEmpty': !form.value }"
                                                type="text"
                                                autocomplete="off"
                                                autofocus
-                                               placeholder="{{inputPlaceholder}}"/>
-
-                                    </div>
+                                               placeholder="ex: {{inputPlaceholder}}"/>
+                                    </mat-form-field>
                                 </div>
                             </div>
                         </div>
@@ -71,8 +69,8 @@
                                         type="submit"
                                         color="accent"
                                         class="c-btn u-width-100"
-                                        (click)="onGoToWords(room, inputName)"
-                                        [ngClass]="{ 'c-btn-bottom-border--light-black': inputName, 'c-btn--grey c-btn--name--disabled': !inputName }">
+                                        (click)="onGoToWords(room, form.value)"
+                                        [ngClass]="{ 'c-btn-bottom-border--light-black': form.value, 'c-btn--grey c-btn--name--disabled': !form.value }">
                                     Yeah, that's my name
                                 </button>
                             </div>
