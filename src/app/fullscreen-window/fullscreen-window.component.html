@@ -1,9 +1,0 @@
-<div [ngStyle]="{ width: '100vw', 'padding-bottom': '20px' }">
-    <div [ngStyle]="{ position: 'fixed', top: '8px', left: '8px', 'z-index': '10' }">
-        <button mat-icon-button
-                (click)="close()">
-            <i class="material-icons">close</i>
-        </button>
-    </div>
-    <ng-container [cdkPortalHost]="childPortal"></ng-container>
-</div>

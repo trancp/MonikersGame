@@ -44,10 +44,6 @@ export function StartGame(payload?: any): RoomActions {
     return new RoomActions(START_GAME_TYPE, payload);
 }
 
-export function StartGameSuccess(payload: any): RoomActions {
-    return new RoomActions(START_GAME_SUCCESS_TYPE, payload);
-}
-
 export function ResetRoom(): RoomActions {
     return new RoomActions(RESET_ROOM);
 }
