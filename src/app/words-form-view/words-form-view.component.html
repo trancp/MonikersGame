@@ -34,26 +34,43 @@
                         <div class="inputLabel">
                             Enter a word or phrase
                         </div>
-                        <div *ngFor="let empty of EMPTY_WORDS_ARRAY; let index = index"
-                             class="u-width-100">
+                        <div>
                             <form novalidate
-                                  (ngSubmit)="onSubmit(getFormControl(index).value, index)">
-                                <mat-form-field [appearance]="formFieldAppearances[index]"
+                                  (ngSubmit)="onSubmit(inputForm.value, editIndex)">
+                                <mat-form-field [appearance]="'fill'"
                                                 [ngStyle]="{ 'width': '100%', 'font-family': 'CircularStd-Black' }"
                                                 [color]="'accent'">
-                                    <mat-label>{{ index + 1}}</mat-label>
                                     <input matInput
-                                           (focus)="setFormFieldAppearance(index, 'fill')"
-                                           (blur)="setFormFieldAppearance(index, 'outline')"
-                                           [formControl]="getFormControl(index)"
-                                           [ngClass]="{ 'inputExists': getFormControl(index).value, 'inputEmpty': !getFormControl(index).value }"
-                                           [ngStyle]="('fill' === formFieldAppearances[index]) ? { 'text-align': 'center' } : { 'text-align': 'left' }"
-                                           [ngStyle.gt-sm]="('fill' === formFieldAppearances[index]) ? { 'text-align': 'center' } : { 'text-align': 'left' }"
-                                           type="text"
-                                           [placeholder]="('fill' === formFieldAppearances[index]) ? ('ex: ' + inputPlaceholder) : ''"
+                                           #input
+                                           [formControl]="inputForm"
+                                           [ngClass]="{ 'inputExists': inputForm.value, 'inputEmpty': !inputForm.value }"
+                                           [ngStyle]="{ 'text-align': 'center', 'font-size': '25px' }"
+                                           [ngStyle.gt-sm]="{ 'text-align': 'center', 'font-size': '30px' }"                                           type="text"
+                                           [placeholder]="inputPlaceholder"
                                            autocomplete="off">
                                 </mat-form-field>
                             </form>
+                        </div>
+                        <div *ngFor="let empty of EMPTY_WORDS_ARRAY; let index = index"
+                             fxLayout="row"
+                             [ngStyle]="{ 'margin-bottom': '5px' }"
+                             class="u-width-100 u-fontFamily-CircularStd-Black">
+                            <button mat-button
+                                    (click)="submitCurrentWord(index);setFormToEdit(index)"
+                                    [ngClass]="{ 'u-border-black u-border-radius bg-color-grey': index === editIndex }"
+                                    class="c-button u-width-100">
+                                <div fxLayout="row">
+                                    <div [ngStyle]="{ 'margin-right': '10px' }"
+                                         fxFlex="0 0 10px"
+                                         class="u-fontSize-16">
+                                        {{ index + 1}}
+                                    </div>
+                                    <div fxFlex="0 0 calc(100% - 10px)"
+                                         class="u-textAlign-Left">
+                                        {{getFormControl(index).value}}
+                                    </div>
+                                </div>
+                            </button>
                         </div>
                     </div>
                     <ng-container *ngIf="!hasEnoughWords()">

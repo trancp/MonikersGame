@@ -6,7 +6,7 @@
 }
 
 .inputEmpty {
-    opacity: 0.36;
+    opacity: 0.15;
 }
 
 .inputExists {
@@ -26,4 +26,15 @@
 
 .c-btn-bottom-border--light-black {
     border-bottom: 5px solid #666 !important;
+}
+
+.u-border-black {
+    border: 2px dashed black;
+}
+
+.u-border-radius {
+    border-radius: 4px;
+}
+.bg-color-grey {
+    background-color: #f6f6f6;
 }

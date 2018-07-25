@@ -161,6 +161,10 @@ html {
     text-align: center;
 }
 
+.u-textAlign-Left {
+    text-align: left;
+}
+
 .u-textTransform-uppercase {
     text-transform: uppercase;
 }
@@ -226,3 +230,18 @@ html {
     background-color: transparent;
 }
 
+.c-button {
+    background: none;
+    border: 0;
+    color: inherit;
+    cursor: pointer;
+    font: inherit;
+    line-height: normal;
+    overflow: visible;
+    text-align: left;
+    padding: 0;
+    -webkit-appearance: button;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}

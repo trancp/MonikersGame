@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
@@ -16,12 +16,13 @@ import { WordsState } from '../interfaces/words.interfaces';
 
 import compact from 'lodash-es/compact';
 import difference from 'lodash-es/difference';
+import findKey from 'lodash-es/findKey';
 import flatten from 'lodash-es/flatten';
 import get from 'lodash-es/get';
 import includes from 'lodash-es/includes';
 import isEmpty from 'lodash-es/isEmpty';
 import isEqual from 'lodash-es/isEqual';
-import mapValues from 'lodash-es/mapValues';
+import isUndefined from 'lodash-es/isUndefined';
 import pick from 'lodash-es/pick';
 import random from 'lodash-es/random';
 import reduce from 'lodash-es/reduce';
@@ -57,6 +58,7 @@ const WORD_BANKS = ['custom', 'monikers'];
     styleUrls: ['./words-form-view.component.scss'],
 })
 export class WordsFormViewComponent implements OnInit, OnDestroy {
+    @ViewChild('input') private inputElement: ElementRef;
     EMPTY_WORDS_ARRAY = EMPTY_WORDS_ARRAY;
     inputPlaceholder: string;
     words: string[];
@@ -71,7 +73,8 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
         return set(result, index, new FormControl(''));
     }, {});
     formGroup = new FormGroup(this.wordsFormGroup);
-    formFieldAppearances = mapValues({ ...this.wordsFormGroup }, () => 'outline');
+    inputForm = new FormControl('');
+    editIndex = 0;
 
     constructor(private formBuilder: FormBuilder,
                 private routeGuardService: RouteGuardService,
@@ -144,6 +147,9 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
         const inputWord = word
             || this.inputPlaceholder;
         this._addWordToList(inputWord, index);
+        this.editIndex = this.getNextEmptyWordForm();
+        this.enableInformFormIfFormHasEmptyValues();
+        this.inputForm.patchValue('');
     }
 
     private _addWordToList(inputWord: string, index: number): void {
@@ -154,11 +160,10 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
     }
 
     public submitWordList(room: any, player: any): void {
-        const wordList = values(this.formGroup.value);
-        if (MAX_WORD_SUBMISSIONS !== compact(wordList).length) {
+        if (isUndefined(this.editIndex)) {
             return;
         }
-        this.playerService.dispatchUpdatePlayer({ words: wordList });
+        this.playerService.dispatchUpdatePlayer({ words: values(this.formGroup.value) });
         this._goToRoom(room.code, player.name);
     }
 
@@ -205,11 +210,41 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
         return globalWordBank[randomWordFromGlobalBankIndex];
     }
 
-    setFormFieldAppearance(index: number, appearance: string) {
-        this.formFieldAppearances[index] = appearance;
-    }
-
     getFormControl(index: number) {
         return this.formGroup.get(`${index}`);
+    }
+
+    setFormToEdit(wordIndex: number) {
+        this.editIndex = wordIndex;
+        this.inputForm.patchValue(this.formGroup.get(`${wordIndex}`).value);
+        this.enableInformFormIfFormHasEmptyValues();
+        this.inputElement.nativeElement.focus();
+    }
+
+    submitCurrentWord() {
+        if (isUndefined(this.editIndex)) {
+            return;
+        }
+        const wordForm = this.formGroup.get(`${this.editIndex}`);
+        const currentWord = get(wordForm, 'value');
+        if (currentWord || !this.inputForm.value) {
+            return;
+        }
+        wordForm.patchValue(this.inputForm.value);
+    }
+
+    getNextEmptyWordForm() {
+        const index = findKey(this.formGroup.value, (word: string) => !word);
+        if (isUndefined(index)) {
+            return index;
+        }
+        return parseInt(index, 10);
+    }
+
+    enableInformFormIfFormHasEmptyValues() {
+        if (isUndefined(this.editIndex)) {
+            return this.inputForm.disable();
+        }
+        return this.inputForm.enable();
     }
 }
