@@ -45,7 +45,7 @@
                                  fxLayoutAlign="center">
                                 <div fxFlex="0 0 200px"
                                      fxFlex.gt-sm="0 0 80%">
-                                    <mat-form-field [appearance]="'fill'"
+                                    <mat-form-field [appearance]="'outline'"
                                                     [ngStyle]="{ 'width': '100%' }"
                                                     [color]="'accent'">
                                         <input matInput
@@ -56,7 +56,7 @@
                                                type="text"
                                                autocomplete="off"
                                                autofocus
-                                               placeholder="ex: {{inputPlaceholder}}"/>
+                                               [placeholder]="inputPlaceholder"/>
                                     </mat-form-field>
                                 </div>
                             </div>
