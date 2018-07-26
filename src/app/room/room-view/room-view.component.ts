@@ -13,11 +13,11 @@ import { RouteGuardService } from '../../router-guards/router-guards.service';
 
 import { DialogRulesComponent } from '../../dialog/dialog-rules/dialog-rules.component';
 
-
 import { Room } from '../../interfaces/room.model';
 import { Player } from '../../interfaces/player.model';
 import { AppState } from '../../app.state';
 import { DataTransfer } from '../../interfaces/data-transfer.model';
+import { getTeamPlayers, getPlayerKey } from '../../player/player.helpers';
 
 import every from 'lodash-es/every';
 import filter from 'lodash-es/filter';
@@ -46,6 +46,7 @@ export class RoomViewComponent implements OnInit {
     dataToTransfer: DataTransfer;
     GLOBAL_WORD_BANK: string[];
     isLoading = false;
+    playerIsLoading = false;
 
     constructor(private dialog: MatDialog,
                 private routeGuardService: RouteGuardService,
@@ -59,11 +60,16 @@ export class RoomViewComponent implements OnInit {
 
     ngOnInit() {
         this.isLoading = true;
+        this.playerIsLoading = true;
+        const name = this.route.snapshot.paramMap.get('name');
+        this.playerState = this.playerService.getPlayerByName(name)
+            .pipe(
+                tap(() => {
+                    this.playerIsLoading = false;
+                }),
+            );
         this.route.paramMap
-            .subscribe((params: ParamMap) => {
-                const name = params.get('name');
-                this.playerService.dispatchGetPlayer(name);
-                this.playerState = this.store.select('player');
+            .subscribe(() => {
                 this.routeGuardService.checkExistingUser();
                 this.goToGameViewOnGameStarted(name);
             });
@@ -115,8 +121,8 @@ export class RoomViewComponent implements OnInit {
         };
         const playersWithoutMovingPlayer = filter(room.players, (player: any) => !isEqual(player.name, movingPlayer.name));
         const playersWithIndexing = map(playersWithoutMovingPlayer, (player: any) => player);
-        const teamOnePlayers = this.playerService.getTeamPlayers(playersWithIndexing, 1);
-        const teamTwoPlayers = this.playerService.getTeamPlayers(playersWithIndexing, 2);
+        const teamOnePlayers = getTeamPlayers(playersWithIndexing, 1);
+        const teamTwoPlayers = getTeamPlayers(playersWithIndexing, 2);
         const teamWithMovingPlayer = isEqual(1, movingPlayerParams.newTeam)
             ? teamOnePlayers
             : teamTwoPlayers;
@@ -133,7 +139,7 @@ export class RoomViewComponent implements OnInit {
 
     private updateTeamPlayerIndexAndPlayerKeyForTeam(team: any[], allPlayers: any[]) {
         return reduce(team, (result: any, player: any, index: number) => {
-            result[this.playerService.getPlayerKey(allPlayers, player.name)] = {
+            result[getPlayerKey(allPlayers, player.name)] = {
                 ...player,
                 teamPlayerIndex: index,
             };

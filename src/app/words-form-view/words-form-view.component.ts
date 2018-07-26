@@ -1,8 +1,8 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
-import { filter, map, take, tap } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 
 import { PlayerService } from '../player/player.service';
@@ -25,6 +25,7 @@ import reduce from 'lodash-es/reduce';
 import set from 'lodash-es/set';
 import values from 'lodash-es/values';
 import { Room } from '../interfaces/room.model';
+import { Player } from '../interfaces/player.model';
 
 const INPUT_PLACEHOLDERS = [
     'A Furry',
@@ -59,7 +60,6 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
     inputPlaceholder: string;
     words: string[];
     isJoiningGame: boolean;
-    player$: Observable<any>;
     GLOBAL_WORD_BANK: string[] = [];
     wordsFormSubscription: Subscription;
     autoFilledWords: string[] = [];
@@ -70,7 +70,9 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
     inputForm = new FormControl('');
     editIndex = 0;
     roomState: Observable<Room>;
+    playerState: Observable<Room>;
     isLoading = false;
+    playerIsLoading = false;
 
     constructor(private formBuilder: FormBuilder,
                 private routeGuardService: RouteGuardService,
@@ -81,15 +83,7 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
                 private store: Store<AppState>,
                 private wordsService: WordsService) {
         this.route.paramMap
-            .subscribe((params: ParamMap) => {
-                const name = params.get('name');
-                this.playerService.dispatchGetPlayer(name);
-                this.player$ = this.store.select('player');
-                this.player$.pipe(
-                    filter((playerState: any) => !isEmpty(playerState) && !playerState.loading && playerState.name),
-                    take(1),
-                    map((playerState: any) => this._initializeForm(get(playerState, 'words', []))),
-                ).subscribe();
+            .subscribe(() => {
                 this.routeGuardService.checkExistingUser();
             });
         this.playerService.dispatchUpdatePlayer({ ready: false });
@@ -97,6 +91,15 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.isLoading = true;
+        this.playerIsLoading = true;
+        const name = this.route.snapshot.paramMap.get('name');
+        this.playerState = this.playerService.getPlayerByName(name)
+            .pipe(
+                tap((player: Player) => {
+                    this._initializeForm(get(player, 'words', []));
+                    this.playerIsLoading = false;
+                }),
+            );
         const roomCode = this.route.snapshot.paramMap.get('code');
         this.roomState = this.roomService.getRoomByCode(roomCode)
             .pipe(

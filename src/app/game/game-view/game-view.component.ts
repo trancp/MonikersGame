@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, ParamMap } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { filter as rxjsFilter, take, tap } from 'rxjs/operators';
@@ -34,6 +34,8 @@ export class GameViewComponent implements OnInit {
     roomState: Observable<Room>;
     playerState: Observable<Player>;
     stopTime: string;
+    isLoading = false;
+    playerIsLoading = false;
 
     constructor(private routeGuardService: RouteGuardService,
                 public route: ActivatedRoute,
@@ -41,10 +43,7 @@ export class GameViewComponent implements OnInit {
                 private roomService: RoomService,
                 private playerService: PlayerService) {
         this.route.paramMap
-            .subscribe((params: ParamMap) => {
-                const name = params.get('name');
-                this.playerService.dispatchGetPlayer(name);
-                this.playerState = this.store.select('player');
+            .subscribe(() => {
                 this.routeGuardService.checkExistingUser();
             });
         this.playerState.pipe(
@@ -55,8 +54,22 @@ export class GameViewComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.isLoading = true;
+        this.playerIsLoading = true;
+        const name = this.route.snapshot.paramMap.get('name');
+        this.playerState = this.playerService.getPlayerByName(name)
+            .pipe(
+                tap(() => {
+                    this.playerIsLoading = false;
+                }),
+            );
         const roomCode = this.route.snapshot.paramMap.get('code');
-        this.roomState = this.roomService.getRoomByCode(roomCode);
+        this.roomState = this.roomService.getRoomByCode(roomCode)
+            .pipe(
+                tap(() => {
+                    this.isLoading = false;
+                }),
+            );
         this.routeGuardService.goToGameOverViewOnGameOverStatus();
     }
 

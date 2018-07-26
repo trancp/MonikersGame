@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Actions, Effect } from '@ngrx/effects';
-import { AngularFireDatabase, FirebaseObjectObservable } from 'angularfire2/database';
+import { AngularFireDatabase } from 'angularfire2/database';
 import { Action, Store } from '@ngrx/store';
 
 import { PlayerService } from './player.service';
@@ -12,12 +12,11 @@ import { catchError, filter, map as rxjsMap, mergeMap, take } from 'rxjs/operato
 import {
     CREATE_PLAYER,
     CreatePlayerSuccess,
-    GET_PLAYER,
-    GetPlayerSuccess,
     UPDATE_PLAYER,
     UpdatePlayerFail,
     UpdatePlayerSuccess,
 } from './player.actions';
+import { getAvailableTeam, getPlayerIndexForTeam } from './player.helpers';
 
 import get from 'lodash-es/get';
 import isEqual from 'lodash-es/isEqual';
@@ -37,25 +36,6 @@ export class PlayerEffects {
     }
 
     @Effect()
-    getPlayer: Observable<Action> = this.actions.ofType(GET_PLAYER)
-        .pipe(
-            mergeMap((action: any) => {
-                return this.store.select('room').pipe(
-                    filter((room: any) => room.code),
-                    take(1),
-                    rxjsMap((room: any) => {
-                        const playerKey = this.playerService.getPlayerKey(room.players, action.payload);
-                        const url = `/rooms/${room.pushKey}/players/${playerKey}`;
-                        this.playerService.dispatchSetPlayer({pushKey: url, id: playerKey});
-                        return url;
-                    }),
-                );
-            }),
-            mergeMap((url: string) => this._getPlayer(url)),
-            rxjsMap((player: any) => GetPlayerSuccess(player)),
-        );
-
-    @Effect()
     createPlayer: Observable<Action> = this.actions.ofType(CREATE_PLAYER)
         .pipe(
             mergeMap((action: any) => {
@@ -63,7 +43,7 @@ export class PlayerEffects {
                     filter((room: any) => room.code),
                     take(1),
                     rxjsMap((room: any) => {
-                        const teamToJoin = this.playerService.getAvailableTeam(room);
+                        const teamToJoin = getAvailableTeam(room);
                         const playersLength = get(map(room.players, (player: any) => player), 'length', 0);
                         const isVip = isEqual(0, playersLength);
                         return {
@@ -71,7 +51,7 @@ export class PlayerEffects {
                             player: {
                                 name: action.payload,
                                 ready: false,
-                                teamPlayerIndex: this.playerService.getPlayerIndexForTeam(teamToJoin, room.players),
+                                teamPlayerIndex: getPlayerIndexForTeam(teamToJoin, room.players),
                                 team: teamToJoin,
                                 vip: isVip,
                                 words: [],
@@ -103,10 +83,6 @@ export class PlayerEffects {
             rxjsMap((player: any) => UpdatePlayerSuccess(player)),
             catchError((err: any) => of(UpdatePlayerFail())),
         );
-
-    private _getPlayer(url): FirebaseObjectObservable<any> {
-        return this.db.object(url);
-    }
 
     private _updatePlayer(url: string, update: any): any {
         return this.db

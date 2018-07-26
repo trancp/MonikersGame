@@ -32,6 +32,7 @@ export class WaitingViewComponent implements OnDestroy, OnInit {
     roomSubscription: Subscription;
     paramMapSubscription: Subscription;
     isLoading = false;
+    playerIsLoading = false;
 
     constructor(private routeGuardService: RouteGuardService,
                 public route: ActivatedRoute,
@@ -41,15 +42,12 @@ export class WaitingViewComponent implements OnDestroy, OnInit {
                 private store: Store<AppState>) {
         this.paramMapSubscription = this.route.paramMap
             .subscribe((params: ParamMap) => {
-                const name = params.get('name');
-                this.playerService.dispatchGetPlayer(name);
                 this.roomSubscription = this.roomState.pipe(
                     filter((room: Room) => room.started),
                     take(1),
                     tap((room: Room) => this.router.navigate(['game', room.code, name])),
                 ).subscribe();
                 this.routeGuardService.checkExistingUser();
-                this.playerState = this.store.select('player');
             });
         this.playerState.pipe(
             filter((playerState: Player) => !isEmpty(playerState) && !playerState.ready && !playerState.loading),
@@ -60,6 +58,14 @@ export class WaitingViewComponent implements OnDestroy, OnInit {
 
     ngOnInit() {
         this.isLoading = true;
+        this.playerIsLoading = true;
+        const name = this.route.snapshot.paramMap.get('name');
+        this.playerState = this.playerService.getPlayerByName(name)
+            .pipe(
+                tap((player: Player) => {
+                    this.playerIsLoading = false;
+                }),
+            );
         const roomCode = this.route.snapshot.paramMap.get('code');
         this.roomState = this.roomService.getRoomByCode(roomCode)
             .pipe(

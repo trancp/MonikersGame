@@ -1,13 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, ParamMap } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { Store } from '@ngrx/store';
 
 import { PlayerService } from '../../player/player.service';
 import { RoomService } from '../../room/room.service';
 import { RouteGuardService } from '../../router-guards/router-guards.service';
 
-import { AppState } from '../../app.state';
 import { Player } from '../../interfaces/player.model';
 import { Room } from '../../interfaces/room.model';
 
@@ -19,21 +17,18 @@ import { take, tap } from 'rxjs/operators';
     styleUrls: ['./game-over-view.component.scss'],
 })
 export class GameOverViewComponent implements OnInit {
-    playerState: Observable<Player> = this.store.select('player');
+    playerState: Observable<Player>;
     roomState: Observable<Room>;
     isLoading = false;
+    playerIsLoading = false;
 
     constructor(private routeGuardService: RouteGuardService,
                 public route: ActivatedRoute,
                 private playerService: PlayerService,
-                private roomService: RoomService,
-                private store: Store<AppState>) {
+                private roomService: RoomService) {
         this.route.paramMap.pipe(
             take(1),
-            tap((params: ParamMap) => {
-                const name = params.get('name');
-                this.playerService.dispatchGetPlayer(name);
-                this.playerState.subscribe();
+            tap(() => {
                 this.routeGuardService.returnToWordsFormViewOnPlayAgain();
             }),
         ).subscribe();
@@ -41,6 +36,14 @@ export class GameOverViewComponent implements OnInit {
 
     ngOnInit() {
         this.isLoading = true;
+        this.playerIsLoading = true;
+        const name = this.route.snapshot.paramMap.get('name');
+        this.playerState = this.playerService.getPlayerByName(name)
+            .pipe(
+                tap(() => {
+                    this.playerIsLoading = false;
+                }),
+            );
         const roomCode = this.route.snapshot.paramMap.get('code');
         this.roomState = this.roomService.getRoomByCode(roomCode)
             .pipe(
