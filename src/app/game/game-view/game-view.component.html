@@ -40,7 +40,7 @@
                                 <div class="u-marginBottom-20 alt-theme">
                                     <button mat-raised-button
                                             color="primary"
-                                            (click)="startTimer(room.turnOrder[room.turn].id === user.id)"
+                                            (click)="startTimer(room, room.turnOrder[room.turn].id === user.id)"
                                             [ngClass]="{ 'u-opacity-50': room.turnOrder[room.turn].id !== user.id }"
                                             class="u-width-100 c-btn c-btn-bottom-border--light-blue">
                                         <div [innerHTML]="'Ready, start timer!'"></div>
@@ -57,7 +57,7 @@
                                   [round]="room.round"
                                   [ngStyle]="{ 'margin': '20px auto', 'max-width': '330px' }"
                                   (onScoreWord)="score($event, room)"
-                                  (onSkipWord)="skip($event, room.words)"
+                                  (onSkipWord)="skip(room, $event, room.words)"
                                   class="u-display-block u-width-100 u-height-100">
                         </app-word>
                     </ng-container>

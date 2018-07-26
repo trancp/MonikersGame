@@ -128,7 +128,7 @@ export class RoomViewComponent implements OnInit {
             ...this.updateTeamPlayerIndexAndPlayerKeyForTeam(updatedTeamArray, room.players),
             ...this.updateTeamPlayerIndexAndPlayerKeyForTeam(teamWithoutMovingPlayer, room.players),
         };
-        this.roomService.dispatchUpdateRoom({ players: playersWithPlayerKeys });
+        this.roomService.updateRoomProperties(room, { players: playersWithPlayerKeys });
     }
 
     private updateTeamPlayerIndexAndPlayerKeyForTeam(team: any[], allPlayers: any[]) {

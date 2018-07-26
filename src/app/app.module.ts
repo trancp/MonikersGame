@@ -48,10 +48,9 @@ const firebaseConfig = {
         AngularFireDatabaseModule,
         RouterModule.forRoot(appRoutes),
         BrowserAnimationsModule,
-        EffectsModule.forRoot([RoomsEffects, RoomEffects, PlayerEffects]),
+        EffectsModule.forRoot([RoomsEffects, PlayerEffects]),
         StoreModule.forRoot({
             rooms: roomsReducer,
-            room: roomReducer,
             player: playerReducer,
         }),
         StoreDevtoolsModule.instrument({

@@ -60,14 +60,14 @@ export class GameViewComponent implements OnInit {
         this.routeGuardService.goToGameOverViewOnGameOverStatus();
     }
 
-    public startTimer(isTurn: boolean): void {
+    public startTimer(room: Room, isTurn: boolean): void {
         if (!isTurn) {
             return;
         }
         const stopTime = new Date();
         stopTime.setMinutes(stopTime.getMinutes() + 1);
         this.stopTime = stopTime.toString();
-        this.roomService.dispatchUpdateRoom({ timer: this.stopTime });
+        this.roomService.updateRoomProperties(room, { timer: this.stopTime });
     }
 
     public onTimerEnd(user: Player, room: Room): void {
@@ -78,11 +78,11 @@ export class GameViewComponent implements OnInit {
         this.handleNextTurn(room);
     }
 
-    public skip(wordIndex: number, remainingWords: string[]): void {
+    public skip(room: Room, wordIndex: number, remainingWords: string[]): void {
         const incrementedWordIndex = (wordIndex + 1) > (remainingWords.length - 1)
             ? 0
             : wordIndex + 1;
-        this.roomService.dispatchUpdateRoom({ word: incrementedWordIndex });
+        this.roomService.updateRoomProperties(room, { word: incrementedWordIndex });
     }
 
     public score(wordIndex: number, room: Room): void {
@@ -107,7 +107,7 @@ export class GameViewComponent implements OnInit {
             word: incrementedWordIndex,
             words: updatedWordsList,
         };
-        this.roomService.dispatchUpdateRoom(update);
+        this.roomService.updateRoomProperties(room, update);
     }
 
     private handleNextTurn(room: Room) {
@@ -138,7 +138,7 @@ export class GameViewComponent implements OnInit {
             turnOrder: isRoundOver ? this.initTurnOrderForNewRound(room.players, nextTeamToStart) : room.turnOrder,
             words: isRoundOver ? compileShuffledRoomWords(room.players) : shuffle(room.words),
         };
-        this.roomService.dispatchUpdateRoom(update);
+        this.roomService.updateRoomProperties(room, update);
     }
 
     private initTurnOrderForNewRound(players: Player[], teamToStart: number) {
