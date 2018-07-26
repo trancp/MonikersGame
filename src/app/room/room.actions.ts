@@ -1,7 +1,5 @@
 import { Action } from '@ngrx/store';
 
-export const GET_ROOM = '[room] Get';
-export const GET_ROOM_SUCCESS = '[room] Get Success';
 export const CREATE_ROOM = '[room] CREATE';
 export const CREATE_ROOM_SUCCESS = '[room] CREATE SUCCESS';
 export const UPDATE_ROOM = '[room] UPDATE';
@@ -14,14 +12,6 @@ export const INIT_ROOM_TYPE = '[room] Init';
 export class RoomActions implements Action {
     constructor(public type: string = '', public payload: any = {}) {
     }
-}
-
-export function GetRoom(payload: any): RoomActions {
-    return new RoomActions(GET_ROOM, payload);
-}
-
-export function GetRoomSuccess(payload: any): RoomActions {
-    return new RoomActions(GET_ROOM_SUCCESS, payload);
 }
 
 export function CreateRoom(payload: any): RoomActions {

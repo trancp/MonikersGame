@@ -1,6 +1,6 @@
-<div *ngIf="room$ | async as room"
+<div *ngIf="roomState | async as room"
      class="u-fontFamily-CircularStd-Black u-height-100">
-    <ng-container *ngIf="!room.loading && GLOBAL_WORD_BANK.length">
+    <ng-container *ngIf="!isLoading && GLOBAL_WORD_BANK.length">
         <ng-container *ngIf="player$ | async as player">
             <div *ngIf="!player.loading"
                  fxLayout="column"
@@ -106,7 +106,7 @@
             </div>
         </ng-container>
     </ng-container>
-    <div *ngIf="room.loading && !GLOBAL_WORD_BANK.length">
+    <div *ngIf="isLoading && !GLOBAL_WORD_BANK.length">
         <app-loading-view></app-loading-view>
     </div>
 </div>

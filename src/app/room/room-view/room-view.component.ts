@@ -45,6 +45,7 @@ export class RoomViewComponent implements OnInit {
     playerState: Observable<Player>;
     dataToTransfer: DataTransfer;
     GLOBAL_WORD_BANK: string[];
+    isLoading = false;
 
     constructor(private dialog: MatDialog,
                 private routeGuardService: RouteGuardService,
@@ -57,17 +58,22 @@ export class RoomViewComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.isLoading = true;
         this.route.paramMap
             .subscribe((params: ParamMap) => {
-                const code = params.get('code');
                 const name = params.get('name');
-                this.roomService.dispatchGetRoom(code);
                 this.playerService.dispatchGetPlayer(name);
-                this.roomState = this.store.select('room');
                 this.playerState = this.store.select('player');
                 this.routeGuardService.checkExistingUser();
                 this.goToGameViewOnGameStarted(name);
             });
+        const roomCode = this.route.snapshot.paramMap.get('code');
+        this.roomState = this.roomService.getRoomByCode(roomCode)
+            .pipe(
+                tap(() => {
+                   this.isLoading = false;
+                }),
+            );
         this.playerService.dispatchUpdatePlayer({ ready: true });
         this.isJoiningGame = isEqual('join', get(this.route, 'url.value[0].path'));
         this.wordsService.getAllWordsFromDb()

@@ -3,23 +3,20 @@ import { Actions, Effect } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { Observable } from 'rxjs';
+import { filter, map, mergeMap, take } from 'rxjs/operators';
 
 import { RoomService } from './room.service';
 import {
     CREATE_ROOM,
     CreateRoomSuccess,
-    GET_ROOM,
-    GetRoomSuccess,
     INIT_ROOM_TYPE,
     START_GAME_TYPE,
     UPDATE_ROOM,
     UpdateRoomSuccess,
 } from './room.actions';
-
-import { filter, map as rxjsMap, mergeMap, take } from 'rxjs/operators';
-
 import { AppState } from '../app.state';
 import { DEFAULT_ROOM_PROPERTIES } from '../interfaces/room.model';
+import { initializeGame, initializeRoomForGame } from './room.helpers';
 
 import includes from 'lodash-es/includes';
 import upperCase from 'lodash-es/upperCase';
@@ -32,27 +29,31 @@ export class RoomEffects {
                 private store: Store<AppState>) {
     }
 
-    @Effect()
-    getRoom: Observable<Action> = this.actions.ofType(GET_ROOM)
-        .pipe(
-            rxjsMap((action: any) => action.payload),
-            mergeMap((code: string) => this._findRoomByCode(code)),
-            rxjsMap(([room]: any) => {
-                const foundRoom = {
-                    ...room,
-                    words: room.words ? room.words : [],
-                    pushKey: room.$key,
-                };
-                return GetRoomSuccess(foundRoom);
-            }),
-        );
+    getRoomByCode(code: string) {
+        return this.db
+            .list('/rooms', {
+                query: {
+                    orderByChild: 'code',
+                    equalTo: upperCase(code),
+                },
+            })
+            .pipe(
+                map(([room]: any) => {
+                    return {
+                        ...room,
+                        words: room.words || [],
+                        pushKey: room.$key,
+                    };
+                }),
+            );
+    }
 
     @Effect()
     createRoom: Observable<Action> = this.actions.ofType(CREATE_ROOM)
         .pipe(
-            rxjsMap((action: any) => action.payload),
+            map((action: any) => action.payload),
             mergeMap((payload: any) => this._createRoom(payload)),
-            rxjsMap((room: any) => CreateRoomSuccess(room)),
+            map((room: any) => CreateRoomSuccess(room)),
         );
 
     @Effect()
@@ -62,7 +63,7 @@ export class RoomEffects {
                 return this.store.select('room').pipe(
                     filter((room: any) => room.code),
                     take(1),
-                    rxjsMap((room: any) => {
+                    map((room: any) => {
                         return {
                             url: `/rooms/${room.pushKey}`,
                             update: action.payload,
@@ -71,7 +72,7 @@ export class RoomEffects {
                 );
             }),
             mergeMap(({ url, update }: { url: string, update: any }) => this._updateRoom(url, update)),
-            rxjsMap((room: any) => UpdateRoomSuccess(room)),
+            map((room: any) => UpdateRoomSuccess(room)),
         );
 
     @Effect()
@@ -81,7 +82,7 @@ export class RoomEffects {
                 return this.store.select('room').pipe(
                     filter((room: any) => room.code),
                     take(1),
-                    rxjsMap((room: any) => {
+                    map((room: any) => {
                         const url = `/rooms/${room.pushKey}`;
                         if (!action.payload.user.vip) {
                             return {
@@ -91,7 +92,7 @@ export class RoomEffects {
                         }
                         return {
                             url,
-                            update: this.roomService.initializeGame(room),
+                            update: initializeGame(room),
                         };
                     }),
                     mergeMap(({ url, update }: { url: string, update: any }) => {
@@ -100,7 +101,7 @@ export class RoomEffects {
                     }),
                 );
             }),
-            rxjsMap((room: any) => UpdateRoomSuccess(room)),
+            map((room: any) => UpdateRoomSuccess(room)),
         );
 
     @Effect()
@@ -110,17 +111,17 @@ export class RoomEffects {
                 return this.store.select('room').pipe(
                     filter((room: any) => room.code),
                     take(1),
-                    rxjsMap((room: any) => {
+                    map((room: any) => {
                         const url = `/rooms/${room.pushKey}`;
                         return {
                             url,
-                            update: this.roomService.initializeRoom(room),
+                            update: initializeRoomForGame(room),
                         };
                     }),
                 );
             }),
             mergeMap(({ url, update }: { url: string, update: any }) => this._updateRoom(url, update)),
-            rxjsMap((room: any) => UpdateRoomSuccess(room)),
+            map((room: any) => UpdateRoomSuccess(room)),
         );
 
     private _findRoomByCode(code: string) {

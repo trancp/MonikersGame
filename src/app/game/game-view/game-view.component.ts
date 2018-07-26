@@ -11,6 +11,7 @@ import { RouteGuardService } from '../../router-guards/router-guards.service';
 import { Room } from '../../interfaces/room.model';
 import { Player } from '../../interfaces/player.model';
 import { AppState } from '../../app.state';
+import { compileShuffledRoomWords, sortPlayersByStartingTeam } from '../../room/room.helpers';
 
 import concat from 'lodash-es/concat';
 import flatten from 'lodash-es/flatten';
@@ -41,11 +42,8 @@ export class GameViewComponent implements OnInit {
                 private playerService: PlayerService) {
         this.route.paramMap
             .subscribe((params: ParamMap) => {
-                const code = params.get('code');
                 const name = params.get('name');
-                this.roomService.dispatchGetRoom(code);
                 this.playerService.dispatchGetPlayer(name);
-                this.roomState = this.store.select('room');
                 this.playerState = this.store.select('player');
                 this.routeGuardService.checkExistingUser();
             });
@@ -57,6 +55,8 @@ export class GameViewComponent implements OnInit {
     }
 
     ngOnInit() {
+        const roomCode = this.route.snapshot.paramMap.get('code');
+        this.roomState = this.roomService.getRoomByCode(roomCode);
         this.routeGuardService.goToGameOverViewOnGameOverStatus();
     }
 
@@ -136,15 +136,15 @@ export class GameViewComponent implements OnInit {
             timer: '',
             turn: isRoundOver ? 0 : room.turn + 1,
             turnOrder: isRoundOver ? this.initTurnOrderForNewRound(room.players, nextTeamToStart) : room.turnOrder,
-            words: isRoundOver ? this.roomService.compileShuffledRoomWords(room.players) : shuffle(room.words),
+            words: isRoundOver ? compileShuffledRoomWords(room.players) : shuffle(room.words),
         };
         this.roomService.dispatchUpdateRoom(update);
     }
 
     private initTurnOrderForNewRound(players: Player[], teamToStart: number) {
         const readyPlayers = pickBy(players, (player: Player) => player.ready);
-        const sortPlayersByStartingTeam = this.roomService.sortPlayersByStartingTeam(readyPlayers, teamToStart);
-        const shuffledReadyPlayers = map(sortPlayersByStartingTeam, (team: Player[]) => shuffle(team));
+        const playersSortedByStartingTeam = sortPlayersByStartingTeam(readyPlayers, teamToStart);
+        const shuffledReadyPlayers = map(playersSortedByStartingTeam, (team: Player[]) => shuffle(team));
         return flatten(zip(...shuffledReadyPlayers));
     }
 

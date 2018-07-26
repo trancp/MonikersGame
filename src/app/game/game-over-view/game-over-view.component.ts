@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
@@ -18,9 +18,10 @@ import { take, tap } from 'rxjs/operators';
     templateUrl: './game-over-view.component.html',
     styleUrls: ['./game-over-view.component.scss'],
 })
-export class GameOverViewComponent {
+export class GameOverViewComponent implements OnInit {
     playerState: Observable<Player> = this.store.select('player');
-    roomState: Observable<Room> = this.store.select('room');
+    roomState: Observable<Room>;
+    isLoading = false;
 
     constructor(private routeGuardService: RouteGuardService,
                 public route: ActivatedRoute,
@@ -30,15 +31,23 @@ export class GameOverViewComponent {
         this.route.paramMap.pipe(
             take(1),
             tap((params: ParamMap) => {
-                const code = params.get('code');
                 const name = params.get('name');
-                this.roomService.dispatchGetRoom(code);
                 this.playerService.dispatchGetPlayer(name);
                 this.playerState.subscribe();
-                this.roomState.subscribe();
                 this.routeGuardService.returnToWordsFormViewOnPlayAgain();
             }),
         ).subscribe();
+    }
+
+    ngOnInit() {
+        this.isLoading = true;
+        const roomCode = this.route.snapshot.paramMap.get('code');
+        this.roomState = this.roomService.getRoomByCode(roomCode)
+            .pipe(
+                tap(() => {
+                   this.isLoading = false;
+                }),
+            );
     }
 
     playerAgain() {

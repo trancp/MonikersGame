@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { Store } from '@ngrx/store';
+import { ActivatedRoute, Router } from '@angular/router';
 import { filter, take, tap } from 'rxjs/operators';
 
 import { RoomService } from '../../room/room.service';
@@ -16,9 +15,9 @@ import get from 'lodash-es/get';
 import isEqual from 'lodash-es/isEqual';
 import random from 'lodash-es/random';
 
-import { AppState } from '../../app.state';
 import { Player } from '../../interfaces/player.model';
 import { FormControl } from '@angular/forms';
+import { Room } from '../../interfaces/room.model';
 
 const INPUT_PLACEHOLDERS = [
     'Asshat',
@@ -56,24 +55,26 @@ const CONFIRM_AS_EXISTING_USER_PROMPT = {
 export class CreateViewComponent implements OnInit {
     inputPlaceholder: string;
     isJoiningGame: boolean;
-    room$: Observable<any>;
     form = new FormControl();
+    roomState: Observable<Room>;
+    isLoading = false;
 
     constructor(private dialogService: DialogService,
                 public route: ActivatedRoute,
                 private router: Router,
                 private roomService: RoomService,
-                private playerService: PlayerService,
-                private store: Store<AppState>) {
-        this.route.paramMap
-            .subscribe((params: ParamMap) => {
-                const code = params.get('code');
-                this.roomService.dispatchGetRoom(code);
-                this.room$ = this.store.select('room');
-            });
+                private playerService: PlayerService) {
     }
 
     ngOnInit(): void {
+        this.isLoading = true;
+        const roomCode = this.route.snapshot.paramMap.get('code');
+        this.roomState = this.roomService.getRoomByCode(roomCode)
+            .pipe(
+                tap(() => {
+                    this.isLoading = false;
+                }),
+            );
         this.inputPlaceholder = this._getRandomInputPlaceholder();
         this.isJoiningGame = isEqual('join', get(this.route, 'url.value[0].path'));
     }

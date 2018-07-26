@@ -1,7 +1,8 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
+import { filter, take, tap } from 'rxjs/operators';
 
 import { PlayerService } from '../player/player.service';
 import { RoomService } from '../room/room.service';
@@ -10,8 +11,6 @@ import { RouteGuardService } from '../router-guards/router-guards.service';
 import { AppState } from '../app.state';
 import { Player } from '../interfaces/player.model';
 import { Room } from '../interfaces/room.model';
-
-import { filter, take, tap } from 'rxjs/operators';
 
 import isEmpty from 'lodash-es/isEmpty';
 
@@ -26,12 +25,13 @@ const WAITING_TEXT = [
     templateUrl: './waiting-view.component.html',
     styleUrls: ['./waiting-view.component.scss'],
 })
-export class WaitingViewComponent implements OnDestroy {
+export class WaitingViewComponent implements OnDestroy, OnInit {
     playerState: Observable<Player>;
     roomState: Observable<Room>;
     WAITING_TEXT: string[] = WAITING_TEXT;
     roomSubscription: Subscription;
     paramMapSubscription: Subscription;
+    isLoading = false;
 
     constructor(private routeGuardService: RouteGuardService,
                 public route: ActivatedRoute,
@@ -41,11 +41,8 @@ export class WaitingViewComponent implements OnDestroy {
                 private store: Store<AppState>) {
         this.paramMapSubscription = this.route.paramMap
             .subscribe((params: ParamMap) => {
-                const code = params.get('code');
                 const name = params.get('name');
-                this.roomService.dispatchGetRoom(code);
                 this.playerService.dispatchGetPlayer(name);
-                this.roomState = this.store.select('room');
                 this.roomSubscription = this.roomState.pipe(
                     filter((room: Room) => room.started),
                     take(1),
@@ -59,6 +56,17 @@ export class WaitingViewComponent implements OnDestroy {
             take(1),
             tap(() => this.playerService.dispatchUpdatePlayer({ ready: true })),
         ).subscribe();
+    }
+
+    ngOnInit() {
+        this.isLoading = true;
+        const roomCode = this.route.snapshot.paramMap.get('code');
+        this.roomState = this.roomService.getRoomByCode(roomCode)
+            .pipe(
+                tap(() => {
+                   this.isLoading = false;
+                }),
+            );
     }
 
     ngOnDestroy(): void {

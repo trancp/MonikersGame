@@ -2,7 +2,7 @@ import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/co
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
-import { filter, map, take } from 'rxjs/operators';
+import { filter, map, take, tap } from 'rxjs/operators';
 import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 
 import { PlayerService } from '../player/player.service';
@@ -24,6 +24,7 @@ import random from 'lodash-es/random';
 import reduce from 'lodash-es/reduce';
 import set from 'lodash-es/set';
 import values from 'lodash-es/values';
+import { Room } from '../interfaces/room.model';
 
 const INPUT_PLACEHOLDERS = [
     'A Furry',
@@ -58,7 +59,6 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
     inputPlaceholder: string;
     words: string[];
     isJoiningGame: boolean;
-    room$: Observable<any>;
     player$: Observable<any>;
     GLOBAL_WORD_BANK: string[] = [];
     wordsFormSubscription: Subscription;
@@ -69,6 +69,8 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
     formGroup = new FormGroup(this.wordsFormGroup);
     inputForm = new FormControl('');
     editIndex = 0;
+    roomState: Observable<Room>;
+    isLoading = false;
 
     constructor(private formBuilder: FormBuilder,
                 private routeGuardService: RouteGuardService,
@@ -80,10 +82,7 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
                 private wordsService: WordsService) {
         this.route.paramMap
             .subscribe((params: ParamMap) => {
-                const code = params.get('code');
                 const name = params.get('name');
-                this.roomService.dispatchGetRoom(code);
-                this.room$ = this.store.select('room');
                 this.playerService.dispatchGetPlayer(name);
                 this.player$ = this.store.select('player');
                 this.player$.pipe(
@@ -97,6 +96,14 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
+        this.isLoading = true;
+        const roomCode = this.route.snapshot.paramMap.get('code');
+        this.roomState = this.roomService.getRoomByCode(roomCode)
+            .pipe(
+                tap(() => {
+                    this.isLoading = false;
+                }),
+            );
         this.wordsService.getAllWordsFromDb()
             .pipe(
                 map((words: string[]) => {

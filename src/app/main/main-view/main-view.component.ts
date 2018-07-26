@@ -10,6 +10,7 @@ import { ToastService } from '../../toast/toast.service';
 
 import { AppState } from '../../app.state';
 import { Rooms } from '../../interfaces/rooms.model';
+import { findNewRoomCode } from '../../room/room.helpers';
 
 const ERRORS = {
     maxRooms: 'Sorry there are no available rooms!',
@@ -38,7 +39,7 @@ export class MainViewComponent implements OnInit {
     }
 
     startAGame(rooms: Rooms) {
-        const newRoomCode = this.roomService.findNewRoomCode(rooms);
+        const newRoomCode = findNewRoomCode(rooms);
         if (!newRoomCode) {
             return this.toastService.showError(ERRORS.maxRooms);
         }
