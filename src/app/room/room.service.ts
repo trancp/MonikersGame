@@ -3,10 +3,11 @@ import { AngularFireDatabase } from 'angularfire2/database';
 import { Store } from '@ngrx/store';
 import { map } from 'rxjs/operators';
 
-import { CreateRoom, GetRoom, InitRoom, ResetRoom, StartGame, UpdateRoom, } from './room.actions';
+import { InitRoom, ResetRoom, StartGame, UpdateRoom, } from './room.actions';
 
 import { AppState } from '../app.state';
 import { Player } from '../interfaces/player.model';
+import { DEFAULT_ROOM_PROPERTIES } from '../interfaces/room.model';
 
 import upperCase from 'lodash-es/upperCase';
 
@@ -36,8 +37,20 @@ export class RoomService {
             );
     }
 
-    public dispatchCreateRoom(code: string): void {
-        this.store.dispatch(CreateRoom(code));
+    createRoom(code: string) {
+        return this.db
+            .list('/rooms')
+            .push({
+                code,
+                created_at: new Date().toString(),
+                ...DEFAULT_ROOM_PROPERTIES,
+            })
+            .then((roomRef: any) => {
+                return {
+                    code,
+                    pushKey: roomRef.key,
+                };
+            });
     }
 
     public dispatchUpdateRoom(update: any): void {

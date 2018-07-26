@@ -1,7 +1,5 @@
 import { DEFAULT_ROOM_PROPERTIES, Room } from '../interfaces/room.model';
 import {
-    CREATE_ROOM,
-    CREATE_ROOM_SUCCESS,
     RESET_ROOM,
     RoomActions,
     START_GAME_SUCCESS_TYPE,
@@ -12,19 +10,6 @@ import {
 
 export function roomReducer(state: Room, action: RoomActions) {
     switch (action.type) {
-
-        case CREATE_ROOM:
-            return {
-                ...state,
-                loading: true,
-            };
-
-        case CREATE_ROOM_SUCCESS:
-            return {
-                ...state,
-                ...action.payload,
-                loading: false,
-            };
 
         case UPDATE_ROOM:
             return {

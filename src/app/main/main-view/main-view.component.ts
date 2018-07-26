@@ -43,7 +43,7 @@ export class MainViewComponent implements OnInit {
         if (!newRoomCode) {
             return this.toastService.showError(ERRORS.maxRooms);
         }
-        this.roomService.dispatchCreateRoom(newRoomCode);
+        this.roomService.createRoom(newRoomCode);
         return this.router.navigate([`/create/${newRoomCode}`]);
     }
 }

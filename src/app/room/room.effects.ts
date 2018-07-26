@@ -7,8 +7,6 @@ import { filter, map, mergeMap, take } from 'rxjs/operators';
 
 import { RoomService } from './room.service';
 import {
-    CREATE_ROOM,
-    CreateRoomSuccess,
     INIT_ROOM_TYPE,
     START_GAME_TYPE,
     UPDATE_ROOM,
@@ -28,33 +26,6 @@ export class RoomEffects {
                 private roomService: RoomService,
                 private store: Store<AppState>) {
     }
-
-    getRoomByCode(code: string) {
-        return this.db
-            .list('/rooms', {
-                query: {
-                    orderByChild: 'code',
-                    equalTo: upperCase(code),
-                },
-            })
-            .pipe(
-                map(([room]: any) => {
-                    return {
-                        ...room,
-                        words: room.words || [],
-                        pushKey: room.$key,
-                    };
-                }),
-            );
-    }
-
-    @Effect()
-    createRoom: Observable<Action> = this.actions.ofType(CREATE_ROOM)
-        .pipe(
-            map((action: any) => action.payload),
-            mergeMap((payload: any) => this._createRoom(payload)),
-            map((room: any) => CreateRoomSuccess(room)),
-        );
 
     @Effect()
     updateRoom: Observable<Action> = this.actions.ofType(UPDATE_ROOM)
@@ -131,22 +102,6 @@ export class RoomEffects {
                 equalTo: upperCase(code),
             },
         });
-    }
-
-    private _createRoom(code) {
-        return this.db
-            .list('/rooms')
-            .push({
-                code,
-                created_at: new Date().toString(),
-                ...DEFAULT_ROOM_PROPERTIES,
-            })
-            .then(roomRef => {
-                return {
-                    code,
-                    pushKey: roomRef.key,
-                };
-            });
     }
 
     private _updateRoom(url: string, update: any) {
