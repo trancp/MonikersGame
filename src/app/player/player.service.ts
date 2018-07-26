@@ -3,11 +3,15 @@ import { AngularFireDatabase } from 'angularfire2/database';
 import { Store } from '@ngrx/store';
 import { map } from 'rxjs/operators';
 
-import { CreatePlayer, UpdatePlayer } from './player.actions';
+import { UpdatePlayer } from './player.actions';
 
 import { AppState } from '../app.state';
-import { getPlayerKey } from './player.helpers';
+import { getAvailableTeam, getPlayerIndexForTeam, getPlayerKey } from './player.helpers';
 import { Room } from '../interfaces/room.model';
+
+import get from 'lodash-es/get';
+import isEqual from 'lodash-es/isEqual';
+import values from 'lodash-es/values';
 
 @Injectable()
 export class PlayerService {
@@ -31,11 +35,33 @@ export class PlayerService {
             );
     }
 
-    public dispatchUpdatePlayer(update: any): void {
-        this.store.dispatch(UpdatePlayer(update));
+    createPlayer(room: Room, name: string) {
+        const roomPlayers = values(get(room, 'players', []));
+        const teamToJoin = getAvailableTeam(room);
+        const playersLength = get(roomPlayers, 'length', 0);
+        const isVip = isEqual(0, playersLength);
+        const url = `/rooms/${room.pushKey}/players`;
+        const player = {
+            name,
+            ready: false,
+            teamPlayerIndex: getPlayerIndexForTeam(teamToJoin, room.players),
+            team: teamToJoin,
+            vip: isVip,
+            words: [],
+        };
+        return this.db
+            .list(url)
+            .push(player)
+            .then((playerRef: any) => {
+                return {
+                    ...player,
+                    id: playerRef.key,
+                    pushKey: `${url}/${playerRef.key}`,
+                };
+            });
     }
 
-    public dispatchCreatePlayer(name: string): void {
-        this.store.dispatch(CreatePlayer(name));
+    public dispatchUpdatePlayer(update: any): void {
+        this.store.dispatch(UpdatePlayer(update));
     }
 }

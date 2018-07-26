@@ -10,17 +10,11 @@ import { Observable, of } from 'rxjs';
 import { catchError, filter, map as rxjsMap, mergeMap, take } from 'rxjs/operators';
 
 import {
-    CREATE_PLAYER,
-    CreatePlayerSuccess,
     UPDATE_PLAYER,
     UpdatePlayerFail,
     UpdatePlayerSuccess,
 } from './player.actions';
-import { getAvailableTeam, getPlayerIndexForTeam } from './player.helpers';
 
-import get from 'lodash-es/get';
-import isEqual from 'lodash-es/isEqual';
-import map from 'lodash-es/map';
 import pick from 'lodash-es/pick';
 
 import { AppState } from '../app.state';
@@ -34,35 +28,6 @@ export class PlayerEffects {
                 private playerService: PlayerService,
                 private store: Store<AppState>) {
     }
-
-    @Effect()
-    createPlayer: Observable<Action> = this.actions.ofType(CREATE_PLAYER)
-        .pipe(
-            mergeMap((action: any) => {
-                return this.store.select('room').pipe(
-                    filter((room: any) => room.code),
-                    take(1),
-                    rxjsMap((room: any) => {
-                        const teamToJoin = getAvailableTeam(room);
-                        const playersLength = get(map(room.players, (player: any) => player), 'length', 0);
-                        const isVip = isEqual(0, playersLength);
-                        return {
-                            url: `/rooms/${room.pushKey}/players`,
-                            player: {
-                                name: action.payload,
-                                ready: false,
-                                teamPlayerIndex: getPlayerIndexForTeam(teamToJoin, room.players),
-                                team: teamToJoin,
-                                vip: isVip,
-                                words: [],
-                            },
-                        };
-                    }),
-                );
-            }),
-            mergeMap(({url, player}: { url: string, player: any }) => this._createPlayer(url, player)),
-            rxjsMap((player: any) => CreatePlayerSuccess(player)),
-        );
 
     @Effect()
     updatePlayer: Observable<Action> = this.actions.ofType(UPDATE_PLAYER)
@@ -88,18 +53,5 @@ export class PlayerEffects {
         return this.db
             .object(url)
             .update(pick(update, VALID_UPDATE_KEYS));
-    }
-
-    private _createPlayer(url: string, player: any) {
-        return this.db
-            .list(url)
-            .push(player)
-            .then(playerRef => {
-                return {
-                    ...player,
-                    id: playerRef.key,
-                    pushKey: `${url}/${playerRef.key}`,
-                };
-            });
     }
 }

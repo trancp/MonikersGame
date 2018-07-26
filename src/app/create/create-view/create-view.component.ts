@@ -118,7 +118,7 @@ export class CreateViewComponent implements OnInit {
             ).subscribe();
             return;
         }
-        this.playerService.dispatchCreatePlayer(name);
+        this.playerService.createPlayer(room, name);
         this.router.navigate([nextStateUrl]);
     }
 
