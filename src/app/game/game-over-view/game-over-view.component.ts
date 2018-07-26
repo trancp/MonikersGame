@@ -50,7 +50,7 @@ export class GameOverViewComponent implements OnInit {
             );
     }
 
-    playerAgain() {
-        this.roomService.dispatchInitializeRoom();
+    playAgain(room: Room) {
+        this.roomService.initializeRoom(room);
     }
 }

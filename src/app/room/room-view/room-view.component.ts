@@ -95,7 +95,8 @@ export class RoomViewComponent implements OnInit {
         if (!this.roomIsReadyToStart(room)) {
             return;
         }
-        this.roomService.dispatchStartGame({ user, globalWordBank: this.GLOBAL_WORD_BANK });
+        this.roomService.addToGlobalWordBank(room.words, this.GLOBAL_WORD_BANK);
+        this.roomService.startGame(room);
         this.router.navigate(['game', room.code, user.name]);
     }
 

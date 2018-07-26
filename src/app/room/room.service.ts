@@ -3,12 +3,13 @@ import { AngularFireDatabase } from 'angularfire2/database';
 import { Store } from '@ngrx/store';
 import { map } from 'rxjs/operators';
 
-import { InitRoom, StartGame, UpdateRoom, } from './room.actions';
+import { UpdateRoom, } from './room.actions';
 
 import { AppState } from '../app.state';
-import { Player } from '../interfaces/player.model';
-import { DEFAULT_ROOM_PROPERTIES } from '../interfaces/room.model';
+import { DEFAULT_ROOM_PROPERTIES, Room } from '../interfaces/room.model';
+import { initializeGame, initializeRoomForGame } from './room.helpers';
 
+import includes from 'lodash-es/includes';
 import upperCase from 'lodash-es/upperCase';
 
 @Injectable()
@@ -53,15 +54,33 @@ export class RoomService {
             });
     }
 
-    public dispatchUpdateRoom(update: any): void {
+    initializeRoom(room: Room) {
+        const url = `/rooms/${room.pushKey}`;
+        return this.updateRoom(url, initializeRoomForGame(room));
+    }
+
+    updateRoom(url: string, update: any) {
+        return this.db
+            .object(url)
+            .update(update)
+            .then(() => update);
+    }
+
+    startGame(room: Room) {
+        const url = `/rooms/${room.pushKey}`;
+        return this.updateRoom(url, initializeGame(room));
+    }
+
+    dispatchUpdateRoom(update: any): void {
         this.store.dispatch(UpdateRoom(update));
     }
 
-    public dispatchStartGame(payload: { user: Player, globalWordBank: string[] }): void {
-        this.store.dispatch(StartGame(payload));
-    }
-
-    public dispatchInitializeRoom(): void {
-        this.store.dispatch(InitRoom());
+    addToGlobalWordBank(roomWords: string[], globalWordBank: string[]) {
+        const wordsToPush = roomWords.filter((word: string) => !includes(globalWordBank, word));
+        wordsToPush.map((word: string) => {
+            return this.db
+                .list('/words/custom')
+                .push(word);
+        });
     }
 }

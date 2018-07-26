@@ -20,7 +20,7 @@ const ERRORS = {
     styleUrls: ['./main-view.component.scss'],
 })
 export class MainViewComponent implements OnInit {
-    isLoading: boolean;
+    isLoading = false;
     rooms$ = this.store.select('rooms');
 
     constructor(private roomService: RoomService,
