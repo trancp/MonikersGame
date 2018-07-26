@@ -1,18 +1,14 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
-import { Store } from '@ngrx/store';
 import { filter, take, tap } from 'rxjs/operators';
 
 import { PlayerService } from '../player/player.service';
 import { RoomService } from '../room/room.service';
 import { RouteGuardService } from '../router-guards/router-guards.service';
 
-import { AppState } from '../app.state';
 import { Player } from '../interfaces/player.model';
 import { Room } from '../interfaces/room.model';
-
-import isEmpty from 'lodash-es/isEmpty';
 
 const WAITING_TEXT = [
     `${'<div>'}Hey,${'</div>'}${'<div>'}sit back and${'</div>'}${'<div>'}fucking chill...${'</div>'}`,
@@ -31,17 +27,16 @@ export class WaitingViewComponent implements OnDestroy, OnInit {
     WAITING_TEXT: string[] = WAITING_TEXT;
     roomSubscription: Subscription;
     paramMapSubscription: Subscription;
-    isLoading = false;
-    playerIsLoading = false;
+    isLoading = true;
+    playerIsLoading = true;
 
     constructor(private routeGuardService: RouteGuardService,
                 public route: ActivatedRoute,
                 private playerService: PlayerService,
                 private roomService: RoomService,
-                private router: Router,
-                private store: Store<AppState>) {
+                private router: Router) {
         this.paramMapSubscription = this.route.paramMap
-            .subscribe((params: ParamMap) => {
+            .subscribe(() => {
                 this.roomSubscription = this.roomState.pipe(
                     filter((room: Room) => room.started),
                     take(1),
@@ -52,7 +47,6 @@ export class WaitingViewComponent implements OnDestroy, OnInit {
     }
 
     ngOnInit() {
-        this.isLoading = true;
         const name = this.route.snapshot.paramMap.get('name');
         const roomCode = this.route.snapshot.paramMap.get('code');
         this.roomState = this.roomService.getRoomByCode(roomCode)
@@ -70,7 +64,6 @@ export class WaitingViewComponent implements OnDestroy, OnInit {
     }
 
     getPlayerByNameForRoom(room: Room, name: string) {
-        this.playerIsLoading = true;
         this.playerState = this.playerService.getPlayerByName(room, name)
             .pipe(
                 tap((player: Player) => {

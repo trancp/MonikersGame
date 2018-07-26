@@ -19,8 +19,8 @@ import { take, tap } from 'rxjs/operators';
 export class GameOverViewComponent implements OnInit {
     playerState: Observable<Player>;
     roomState: Observable<Room>;
-    isLoading = false;
-    playerIsLoading = false;
+    isLoading = true;
+    playerIsLoading = true;
 
     constructor(private routeGuardService: RouteGuardService,
                 public route: ActivatedRoute,
@@ -35,7 +35,6 @@ export class GameOverViewComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.isLoading = true;
         const name = this.route.snapshot.paramMap.get('name');
         const roomCode = this.route.snapshot.paramMap.get('code');
         this.roomState = this.roomService.getRoomByCode(roomCode)
@@ -52,7 +51,6 @@ export class GameOverViewComponent implements OnInit {
     }
 
     getPlayerByNameForRoom(room: Room, name: string) {
-        this.playerIsLoading = true;
         this.playerState = this.playerService.getPlayerByName(room, name)
             .pipe(
                 tap(() => {

@@ -45,8 +45,8 @@ export class RoomViewComponent implements OnInit {
     playerState: Observable<Player>;
     dataToTransfer: DataTransfer;
     GLOBAL_WORD_BANK: string[];
-    isLoading = false;
-    playerIsLoading = false;
+    isLoading = true;
+    playerIsLoading = true;
 
     constructor(private dialog: MatDialog,
                 private routeGuardService: RouteGuardService,
@@ -59,19 +59,18 @@ export class RoomViewComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.isLoading = true;
         const name = this.route.snapshot.paramMap.get('name');
         this.route.paramMap
             .subscribe(() => {
                 this.routeGuardService.checkExistingUser();
-                this.goToGameViewOnGameStarted(name);
             });
         const roomCode = this.route.snapshot.paramMap.get('code');
         this.roomState = this.roomService.getRoomByCode(roomCode)
             .pipe(
                 tap((room: Room) => {
-                   this.isLoading = false;
-                   this.getPlayerByNameForRoom(room, name);
+                    this.isLoading = false;
+                    this.getPlayerByNameForRoom(room, name);
+                    this.goToGameViewOnGameStarted(name);
                 }),
             );
         this.isJoiningGame = isEqual('join', get(this.route, 'url.value[0].path'));
@@ -179,7 +178,10 @@ export class RoomViewComponent implements OnInit {
                         }));
                         const teamPlayers = filter(roomPlayers, (teamPlayer: Player) => isEqual(teamPlayer.team, newTeam));
                         const teamPlayerIndex = findIndex(teamPlayers, (teamPlayer: Player) => isEqual(teamPlayer.id, player.id));
-                        return this.playerService.updatePlayerProperties(player, { ...player, teamPlayerIndex: teamPlayerIndex });
+                        return this.playerService.updatePlayerProperties(player, {
+                            ...player,
+                            teamPlayerIndex: teamPlayerIndex
+                        });
                     }),
                 );
             }),
@@ -198,7 +200,6 @@ export class RoomViewComponent implements OnInit {
     }
 
     getPlayerByNameForRoom(room: Room, name: string) {
-        this.playerIsLoading = true;
         this.playerState = this.playerService.getPlayerByName(room, name)
             .pipe(
                 tap((player: Player) => {

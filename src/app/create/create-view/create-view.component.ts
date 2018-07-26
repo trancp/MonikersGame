@@ -57,7 +57,7 @@ export class CreateViewComponent implements OnInit {
     isJoiningGame: boolean;
     form = new FormControl();
     roomState: Observable<Room>;
-    isLoading = false;
+    isLoading = true;
 
     constructor(private dialogService: DialogService,
                 public route: ActivatedRoute,
@@ -67,7 +67,6 @@ export class CreateViewComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.isLoading = true;
         const roomCode = this.route.snapshot.paramMap.get('code');
         this.roomState = this.roomService.getRoomByCode(roomCode)
             .pipe(

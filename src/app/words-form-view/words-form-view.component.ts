@@ -71,8 +71,8 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
     editIndex = 0;
     roomState: Observable<Room>;
     playerState: Observable<Room>;
-    isLoading = false;
-    playerIsLoading = false;
+    isLoading = true;
+    playerIsLoading = true;
 
     constructor(private formBuilder: FormBuilder,
                 private routeGuardService: RouteGuardService,
@@ -89,7 +89,6 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        this.isLoading = true;
         const name = this.route.snapshot.paramMap.get('name');
         const roomCode = this.route.snapshot.paramMap.get('code');
         this.roomState = this.roomService.getRoomByCode(roomCode)
@@ -247,7 +246,6 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
     }
 
     getPlayerByNameForRoom(room: Room, name: string) {
-        this.playerIsLoading = true;
         this.playerState = this.playerService.getPlayerByName(room, name)
             .pipe(
                 tap((player: Player) => {

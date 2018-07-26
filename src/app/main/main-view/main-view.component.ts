@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
+import { tap } from 'rxjs/operators';
 
 import { RoomService } from '../../room/room.service';
 import { RoomsService } from '../../rooms/rooms.service';
@@ -21,7 +22,7 @@ const ERRORS = {
     styleUrls: ['./main-view.component.scss'],
 })
 export class MainViewComponent implements OnInit {
-    isLoading = false;
+    isLoading = true;
     roomsState: Observable<Room[]>;
 
     constructor(private roomService: RoomService,
@@ -32,7 +33,12 @@ export class MainViewComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.roomsState = this.roomsService.getAllRooms();
+        this.roomsState = this.roomsService.getAllRooms()
+            .pipe(
+                tap(() => {
+                    this.isLoading = false;
+                }),
+            );
     }
 
     startAGame(rooms: Room[]) {

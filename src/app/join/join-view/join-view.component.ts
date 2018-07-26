@@ -23,7 +23,7 @@ export class JoinViewComponent implements OnInit {
     inputCode: string;
     inputFocused: boolean;
     roomsState: Observable<Room[]>;
-    isLoading = false;
+    isLoading = true;
 
     constructor(private router: Router,
                 private roomsService: RoomsService,
@@ -34,7 +34,6 @@ export class JoinViewComponent implements OnInit {
     ngOnInit() {
         this.inputFocused = false;
         this.inputCode = '';
-        this.isLoading = true;
         this.roomsState = this.roomsService.getAllRooms()
             .pipe(
                 tap(() => {
