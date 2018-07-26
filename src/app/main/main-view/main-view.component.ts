@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs/Observable';
 
 import { RoomService } from '../../room/room.service';
 import { RoomsService } from '../../rooms/rooms.service';
 import { ToastService } from '../../toast/toast.service';
 
 import { AppState } from '../../app.state';
-import { Rooms } from '../../interfaces/rooms.model';
+import { Room } from '../../interfaces/room.model';
 import { findNewRoomCode } from '../../room/room.helpers';
 
 const ERRORS = {
@@ -21,7 +22,7 @@ const ERRORS = {
 })
 export class MainViewComponent implements OnInit {
     isLoading = false;
-    rooms$ = this.store.select('rooms');
+    roomsState: Observable<Room[]>;
 
     constructor(private roomService: RoomService,
                 private roomsService: RoomsService,
@@ -31,10 +32,10 @@ export class MainViewComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.roomsService.dispatchGetRooms();
+        this.roomsState = this.roomsService.getAllRooms();
     }
 
-    startAGame(rooms: Rooms) {
+    startAGame(rooms: Room[]) {
         const newRoomCode = findNewRoomCode(rooms);
         if (!newRoomCode) {
             return this.toastService.showError(ERRORS.maxRooms);

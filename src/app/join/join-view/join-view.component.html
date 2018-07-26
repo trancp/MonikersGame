@@ -2,7 +2,7 @@
     [ngStyle]="{ 'padding': '20px 20px 30px 20px' }"
      class="u-fontFamily-CircularStd-Black u-height-100"
      fxLayout="column">
-    <ng-container *ngIf="!rooms.loading">
+    <ng-container *ngIf="!isLoading">
         <div fxLayout="row"
              fxFlex="none">
             <div fxFlex
@@ -23,7 +23,7 @@
             <div fxFlex="15%"></div>
             <div fxFlex="85%">
                 <form #form="ngForm"
-                      (ngSubmit)="goToCreate(rooms.items, form.value.code)"
+                      (ngSubmit)="goToCreate(rooms, form.value.code)"
                       novalidate
                       class="u-height-100">
                     <div fxLayout="column"
@@ -75,7 +75,7 @@
             </div>
         </div>
     </ng-container>
-    <ng-container *ngIf="rooms.loading">
+    <ng-container *ngIf="isLoading">
         <app-loading-view></app-loading-view>
     </ng-container>
 </div>

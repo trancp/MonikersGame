@@ -2,12 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
+import { tap } from 'rxjs/operators';
 
 import { RoomsService } from '../../rooms/rooms.service';
 import { ToastService } from '../../toast/toast.service';
 
 import { AppState } from '../../app.state';
-import { Rooms } from '../../interfaces/rooms.model';
+import { Room } from '../../interfaces/room.model';
+import { roomExists } from '../../rooms/rooms.helpers';
 
 const INPUT_CODE_LENGTH = 4;
 const ERROR_ROOM_DOES_NOT_EXIST = 'Wrong code bro.';
@@ -20,25 +22,32 @@ const ERROR_ROOM_DOES_NOT_EXIST = 'Wrong code bro.';
 export class JoinViewComponent implements OnInit {
     inputCode: string;
     inputFocused: boolean;
-    roomsState: Observable<Rooms> = this.store.select('rooms');
+    roomsState: Observable<Room[]>;
+    isLoading = false;
 
     constructor(private router: Router,
                 private roomsService: RoomsService,
                 private store: Store<AppState>,
                 private toastService: ToastService) {
-        this.roomsService.dispatchGetRooms();
     }
 
     ngOnInit() {
         this.inputFocused = false;
         this.inputCode = '';
+        this.isLoading = true;
+        this.roomsState = this.roomsService.getAllRooms()
+            .pipe(
+                tap(() => {
+                    this.isLoading = false;
+                }),
+            );
     }
 
-    goToCreate(rooms: Rooms, inputCode: string) {
+    goToCreate(rooms: Room[], inputCode: string) {
         if (!inputCode) {
             return;
         }
-        if (!this.roomsService.roomExists(rooms, inputCode)) {
+        if (!roomExists(rooms, inputCode)) {
             return this.toastService.showError(ERROR_ROOM_DOES_NOT_EXIST);
         }
         return this.router.navigate([`/join/${inputCode}`]);

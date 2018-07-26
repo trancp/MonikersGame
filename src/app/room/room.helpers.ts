@@ -1,4 +1,3 @@
-import { Rooms } from '../interfaces/rooms.model';
 import { Player } from '../interfaces/player.model';
 import { Room } from '../interfaces/room.model';
 
@@ -54,7 +53,7 @@ function buildNewRoomCode(existingCodes: string[]): string {
         : code;
 }
 
-export function findNewRoomCode(rooms: Rooms): string {
+export function findNewRoomCode(rooms: Room[]): string {
     const existingCodes = map(rooms, (room: any) => room.code);
     const noAvailableRooms = existingCodes.length >= MAX_NUM_ROOMS;
     return noAvailableRooms

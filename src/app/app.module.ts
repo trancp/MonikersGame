@@ -18,11 +18,7 @@ import { PlayerService } from './player/player.service';
 
 import { AppComponent } from './app.component';
 
-import { roomReducer } from './room/room.reducer';
-import { roomsReducer } from './rooms/rooms.reducer';
 import { playerReducer } from './player/player.reducer';
-import { RoomEffects } from './room/room.effects';
-import { RoomsEffects } from './rooms/rooms.effects';
 import { PlayerEffects } from './player/player.effects';
 
 import { appRoutes } from './app.routes';
@@ -48,9 +44,8 @@ const firebaseConfig = {
         AngularFireDatabaseModule,
         RouterModule.forRoot(appRoutes),
         BrowserAnimationsModule,
-        EffectsModule.forRoot([RoomsEffects, PlayerEffects]),
+        EffectsModule.forRoot([PlayerEffects]),
         StoreModule.forRoot({
-            rooms: roomsReducer,
             player: playerReducer,
         }),
         StoreDevtoolsModule.instrument({

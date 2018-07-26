@@ -30,11 +30,11 @@
                      fxFlex.xs="20%">
                 </div>
             </div>
-            <div *ngIf="rooms$ | async as rooms">
+            <div *ngIf="roomsState | async as rooms">
                 <div class="u-marginBottom-20">
                     <button mat-raised-button
                             color="accent"
-                            (click)="startAGame(rooms.items)"
+                            (click)="startAGame(rooms)"
                             class="c-btn u-width-100 c-btn-bottom-border--light-black">
                         Start a game
                     </button>
