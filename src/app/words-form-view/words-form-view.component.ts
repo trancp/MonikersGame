@@ -154,7 +154,7 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
     }
 
     public submitWordList(room: any, player: any): void {
-        if (isUndefined(this.editIndex)) {
+        if (!this.hasEnoughWords()) {
             return;
         }
         this.playerService.updatePlayerProperties(player, { words: values(this.formGroup.value) });
