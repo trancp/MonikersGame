@@ -4,7 +4,6 @@ export const UPDATE_ROOM = '[room] UPDATE';
 export const UPDATE_ROOM_SUCCESS = '[room] UPDATE SUCCESS';
 export const START_GAME_TYPE = '[room] Start Game';
 export const START_GAME_SUCCESS_TYPE = '[room] Start Game Success';
-export const RESET_ROOM = '[room] Reset';
 export const INIT_ROOM_TYPE = '[room] Init';
 
 export class RoomActions implements Action {
@@ -22,10 +21,6 @@ export function UpdateRoomSuccess(payload: any): RoomActions {
 
 export function StartGame(payload?: any): RoomActions {
     return new RoomActions(START_GAME_TYPE, payload);
-}
-
-export function ResetRoom(): RoomActions {
-    return new RoomActions(RESET_ROOM);
 }
 
 export function InitRoom(): RoomActions {

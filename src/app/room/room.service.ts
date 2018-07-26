@@ -3,7 +3,7 @@ import { AngularFireDatabase } from 'angularfire2/database';
 import { Store } from '@ngrx/store';
 import { map } from 'rxjs/operators';
 
-import { InitRoom, ResetRoom, StartGame, UpdateRoom, } from './room.actions';
+import { InitRoom, StartGame, UpdateRoom, } from './room.actions';
 
 import { AppState } from '../app.state';
 import { Player } from '../interfaces/player.model';
@@ -59,10 +59,6 @@ export class RoomService {
 
     public dispatchStartGame(payload: { user: Player, globalWordBank: string[] }): void {
         this.store.dispatch(StartGame(payload));
-    }
-
-    public dispatchResetRoom(): void {
-        this.store.dispatch(ResetRoom());
     }
 
     public dispatchInitializeRoom(): void {

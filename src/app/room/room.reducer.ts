@@ -1,6 +1,5 @@
-import { DEFAULT_ROOM_PROPERTIES, Room } from '../interfaces/room.model';
+import { Room } from '../interfaces/room.model';
 import {
-    RESET_ROOM,
     RoomActions,
     START_GAME_SUCCESS_TYPE,
     START_GAME_TYPE,
@@ -35,11 +34,6 @@ export function roomReducer(state: Room, action: RoomActions) {
                 ...state,
                 loading: false,
                 ...action.payload,
-            };
-
-        case RESET_ROOM:
-            return {
-                ...DEFAULT_ROOM_PROPERTIES,
             };
 
         default:

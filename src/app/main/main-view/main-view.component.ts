@@ -2,8 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 
-import { Observable } from 'rxjs';
-
 import { RoomService } from '../../room/room.service';
 import { RoomsService } from '../../rooms/rooms.service';
 import { ToastService } from '../../toast/toast.service';
@@ -23,19 +21,17 @@ const ERRORS = {
 })
 export class MainViewComponent implements OnInit {
     isLoading: boolean;
-    rooms$: Observable<any>;
+    rooms$ = this.store.select('rooms');
 
     constructor(private roomService: RoomService,
                 private roomsService: RoomsService,
                 private router: Router,
                 private store: Store<AppState>,
                 private toastService: ToastService) {
-        this.rooms$ = this.store.select('rooms');
-        this.roomsService.dispatchGetRooms();
     }
 
     ngOnInit() {
-        this.roomService.dispatchResetRoom();
+        this.roomsService.dispatchGetRooms();
     }
 
     startAGame(rooms: Rooms) {
