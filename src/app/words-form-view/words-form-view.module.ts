@@ -9,8 +9,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { GetValuesPipeModule } from '../pipes/get-values-pipe/get-values-pipe.module';
 import { LoadingViewModule } from '../loading-view/loading-view.module';
 import { RoomCodeModule } from '../room-code/room-code.module';
-import { WordsStoreModule } from '../words/words-store.module';
 
+import { WordsService } from '../words/words.service';
 import { PlayerService } from '../player/player.service';
 import { RoomService } from '../room/room.service';
 import { RouteGuardService } from '../router-guards/router-guards.service';
@@ -29,7 +29,6 @@ import { WordsFormViewComponent } from './words-form-view.component';
         MatInputModule,
         ReactiveFormsModule,
         RoomCodeModule,
-        WordsStoreModule,
     ],
     declarations: [WordsFormViewComponent],
     exports: [WordsFormViewComponent],
@@ -37,6 +36,7 @@ import { WordsFormViewComponent } from './words-form-view.component';
         PlayerService,
         RoomService,
         RouteGuardService,
+        WordsService,
     ],
 })
 export class WordsFormViewModule {

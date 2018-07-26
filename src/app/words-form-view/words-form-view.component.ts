@@ -8,22 +8,18 @@ import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 import { PlayerService } from '../player/player.service';
 import { RoomService } from '../room/room.service';
 import { RouteGuardService } from '../router-guards/router-guards.service';
-
-import { GetWords } from '../words/words.actions';
+import { WordsService } from '../words/words.service';
 
 import { AppState } from '../app.state';
-import { WordsState } from '../interfaces/words.interfaces';
 
 import compact from 'lodash-es/compact';
 import difference from 'lodash-es/difference';
 import findKey from 'lodash-es/findKey';
-import flatten from 'lodash-es/flatten';
 import get from 'lodash-es/get';
 import includes from 'lodash-es/includes';
 import isEmpty from 'lodash-es/isEmpty';
 import isEqual from 'lodash-es/isEqual';
 import isUndefined from 'lodash-es/isUndefined';
-import pick from 'lodash-es/pick';
 import random from 'lodash-es/random';
 import reduce from 'lodash-es/reduce';
 import set from 'lodash-es/set';
@@ -50,7 +46,6 @@ const INPUT_PLACEHOLDERS = [
 ];
 const MAX_WORD_SUBMISSIONS = 5;
 const EMPTY_WORDS_ARRAY = new Array(MAX_WORD_SUBMISSIONS);
-const WORD_BANKS = ['custom', 'monikers'];
 
 @Component({
     selector: 'app-words-form-view',
@@ -65,7 +60,6 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
     isJoiningGame: boolean;
     room$: Observable<any>;
     player$: Observable<any>;
-    wordsState = this.store.select('words');
     GLOBAL_WORD_BANK: string[] = [];
     wordsFormSubscription: Subscription;
     autoFilledWords: string[] = [];
@@ -82,7 +76,8 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
                 private roomService: RoomService,
                 private route: ActivatedRoute,
                 private router: Router,
-                private store: Store<AppState>) {
+                private store: Store<AppState>,
+                private wordsService: WordsService) {
         this.route.paramMap
             .subscribe((params: ParamMap) => {
                 const code = params.get('code');
@@ -102,14 +97,12 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        this.store.dispatch(GetWords());
-        this.wordsState.pipe(
-            filter((wordsState: WordsState) => wordsState.isLoaded),
-            take(1),
-            map((wordsState: WordsState) => {
-                this.GLOBAL_WORD_BANK = flatten(values(pick(wordsState, WORD_BANKS)));
-            }),
-        ).subscribe();
+        this.wordsService.getAllWordsFromDb()
+            .pipe(
+                map((words: string[]) => {
+                    this.GLOBAL_WORD_BANK = words;
+                }),
+            ).subscribe();
     }
 
     ngOnDestroy() {

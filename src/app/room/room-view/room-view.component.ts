@@ -5,38 +5,34 @@ import { Observable } from 'rxjs';
 import { filter as rxjsFilter, map as rxjsMap, mergeMap, take, tap } from 'rxjs/operators';
 import { MatDialog } from '@angular/material/dialog';
 
+import { WordsService } from '../../words/words.service';
+
 import { RoomService } from '../room.service';
 import { PlayerService } from '../../player/player.service';
 import { RouteGuardService } from '../../router-guards/router-guards.service';
 
 import { DialogRulesComponent } from '../../dialog/dialog-rules/dialog-rules.component';
 
-import { GetWords } from '../../words/words.actions';
 
 import { Room } from '../../interfaces/room.model';
 import { Player } from '../../interfaces/player.model';
 import { AppState } from '../../app.state';
 import { DataTransfer } from '../../interfaces/data-transfer.model';
-import { WordsState } from '../../interfaces/words.interfaces';
+
 import every from 'lodash-es/every';
 import filter from 'lodash-es/filter';
-import flatten from 'lodash-es/flatten';
 import findIndex from 'lodash-es/findIndex';
 import get from 'lodash-es/get';
 import isEqual from 'lodash-es/isEqual';
 import map from 'lodash-es/map';
-import pick from 'lodash-es/pick';
 import reduce from 'lodash-es/reduce';
 import slice from 'lodash-es/slice';
-import values from 'lodash-es/values';
 
 interface ImovingPlayer {
     player: Player;
     listIndex: number;
     newTeam?: number;
 }
-
-const WORD_BANKS = ['custom', 'monikers'];
 
 @Component({
     selector: 'app-room-view',
@@ -48,7 +44,6 @@ export class RoomViewComponent implements OnInit {
     roomState: Observable<Room>;
     playerState: Observable<Player>;
     dataToTransfer: DataTransfer;
-    wordsState = this.store.select('words');
     GLOBAL_WORD_BANK: string[];
 
     constructor(private dialog: MatDialog,
@@ -57,7 +52,8 @@ export class RoomViewComponent implements OnInit {
                 private router: Router,
                 private store: Store<AppState>,
                 private roomService: RoomService,
-                private playerService: PlayerService) {
+                private playerService: PlayerService,
+                private wordsService: WordsService) {
     }
 
     ngOnInit() {
@@ -74,14 +70,12 @@ export class RoomViewComponent implements OnInit {
             });
         this.playerService.dispatchUpdatePlayer({ ready: true });
         this.isJoiningGame = isEqual('join', get(this.route, 'url.value[0].path'));
-        this.store.dispatch(GetWords());
-        this.wordsState.pipe(
-            rxjsFilter((wordsState: WordsState) => wordsState.isLoaded),
-            take(1),
-            rxjsMap((wordsState: WordsState) => {
-                this.GLOBAL_WORD_BANK = flatten(values(pick(wordsState, WORD_BANKS)));
-            }),
-        ).subscribe();
+        this.wordsService.getAllWordsFromDb()
+            .pipe(
+                rxjsMap((words: string[]) => {
+                    this.GLOBAL_WORD_BANK = words;
+                }),
+            ).subscribe();
     }
 
     public goBack(code: string): void {
