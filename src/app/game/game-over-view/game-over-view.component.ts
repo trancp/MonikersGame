@@ -36,24 +36,28 @@ export class GameOverViewComponent implements OnInit {
 
     ngOnInit() {
         this.isLoading = true;
-        this.playerIsLoading = true;
         const name = this.route.snapshot.paramMap.get('name');
-        this.playerState = this.playerService.getPlayerByName(name)
-            .pipe(
-                tap(() => {
-                    this.playerIsLoading = false;
-                }),
-            );
         const roomCode = this.route.snapshot.paramMap.get('code');
         this.roomState = this.roomService.getRoomByCode(roomCode)
             .pipe(
-                tap(() => {
-                   this.isLoading = false;
+                tap((room: Room) => {
+                    this.getPlayerByNameForRoom(room, name);
+                    this.isLoading = false;
                 }),
             );
     }
 
     playAgain(room: Room) {
         this.roomService.initializeRoom(room);
+    }
+
+    getPlayerByNameForRoom(room: Room, name: string) {
+        this.playerIsLoading = true;
+        this.playerState = this.playerService.getPlayerByName(room, name)
+            .pipe(
+                tap(() => {
+                    this.playerIsLoading = false;
+                }),
+            );
     }
 }

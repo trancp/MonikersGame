@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { filter as rxjsFilter, take, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 
 import { RoomService } from '../../room/room.service';
 import { PlayerService } from '../../player/player.service';
@@ -46,27 +46,16 @@ export class GameViewComponent implements OnInit {
             .subscribe(() => {
                 this.routeGuardService.checkExistingUser();
             });
-        this.playerState.pipe(
-            rxjsFilter((playerState: Player) => !isEmpty(playerState) && !playerState.ready && !playerState.loading),
-            take(1),
-            tap(() => this.playerService.dispatchUpdatePlayer({ ready: true })),
-        ).subscribe();
     }
 
     ngOnInit() {
         this.isLoading = true;
-        this.playerIsLoading = true;
         const name = this.route.snapshot.paramMap.get('name');
-        this.playerState = this.playerService.getPlayerByName(name)
-            .pipe(
-                tap(() => {
-                    this.playerIsLoading = false;
-                }),
-            );
         const roomCode = this.route.snapshot.paramMap.get('code');
         this.roomState = this.roomService.getRoomByCode(roomCode)
             .pipe(
-                tap(() => {
+                tap((room: Room) => {
+                    this.getPlayerByNameForRoom(room, name);
                     this.isLoading = false;
                 }),
             );
@@ -163,5 +152,16 @@ export class GameViewComponent implements OnInit {
 
     public calculateRemainingWordsProgress(room: Room) {
         return (get(room, 'words.length', 0) / (keys(get(room, 'players', [])).length * 5)) * 100;
+    }
+
+    getPlayerByNameForRoom(room: Room, name: string) {
+        this.playerIsLoading = true;
+        this.playerState = this.playerService.getPlayerByName(room, name)
+            .pipe(
+                tap((player: Player) => {
+                    this.playerService.updatePlayerProperties(player, { ready: true });
+                    this.playerIsLoading = false;
+                }),
+            );
     }
 }

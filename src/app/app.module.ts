@@ -6,7 +6,6 @@ import { RouterModule } from '@angular/router';
 import { AngularFireModule } from 'angularfire2';
 import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
@@ -17,9 +16,6 @@ import { RoomsService } from './rooms/rooms.service';
 import { PlayerService } from './player/player.service';
 
 import { AppComponent } from './app.component';
-
-import { playerReducer } from './player/player.reducer';
-import { PlayerEffects } from './player/player.effects';
 
 import { appRoutes } from './app.routes';
 
@@ -44,10 +40,7 @@ const firebaseConfig = {
         AngularFireDatabaseModule,
         RouterModule.forRoot(appRoutes),
         BrowserAnimationsModule,
-        EffectsModule.forRoot([PlayerEffects]),
-        StoreModule.forRoot({
-            player: playerReducer,
-        }),
+        StoreModule.forRoot({}),
         StoreDevtoolsModule.instrument({
             maxAge: 25,
         }),

@@ -6,6 +6,8 @@ import get from 'lodash-es/get';
 import isEqual from 'lodash-es/isEqual';
 import sortBy from 'lodash-es/sortBy';
 
+export const VALID_UPDATE_KEYS = ['name', 'ready', 'team', 'teamPlayerIndex', 'vip', 'words'];
+
 export function getTeamPlayers(players: Player[], team: number) {
     return sortBy(filter(players, player => isEqual(team, player.team)), 'teamPlayerIndex');
 }

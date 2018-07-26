@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { filter as rxjsFilter, map as rxjsMap, mergeMap, take, tap } from 'rxjs/operators';
@@ -60,14 +60,7 @@ export class RoomViewComponent implements OnInit {
 
     ngOnInit() {
         this.isLoading = true;
-        this.playerIsLoading = true;
         const name = this.route.snapshot.paramMap.get('name');
-        this.playerState = this.playerService.getPlayerByName(name)
-            .pipe(
-                tap(() => {
-                    this.playerIsLoading = false;
-                }),
-            );
         this.route.paramMap
             .subscribe(() => {
                 this.routeGuardService.checkExistingUser();
@@ -76,11 +69,11 @@ export class RoomViewComponent implements OnInit {
         const roomCode = this.route.snapshot.paramMap.get('code');
         this.roomState = this.roomService.getRoomByCode(roomCode)
             .pipe(
-                tap(() => {
+                tap((room: Room) => {
                    this.isLoading = false;
+                   this.getPlayerByNameForRoom(room, name);
                 }),
             );
-        this.playerService.dispatchUpdatePlayer({ ready: true });
         this.isJoiningGame = isEqual('join', get(this.route, 'url.value[0].path'));
         this.wordsService.getAllWordsFromDb()
             .pipe(
@@ -172,7 +165,7 @@ export class RoomViewComponent implements OnInit {
         const newTeam = 1 === user.team
             ? 2
             : 1;
-        this.playerService.dispatchUpdatePlayer({ ...user, team: newTeam });
+        this.playerService.updatePlayerProperties(user, { ...user, team: newTeam });
         this.playerState.pipe(
             rxjsFilter((playerState: any) => !isEqual(user.team, playerState.team)),
             take(1),
@@ -186,7 +179,7 @@ export class RoomViewComponent implements OnInit {
                         }));
                         const teamPlayers = filter(roomPlayers, (teamPlayer: Player) => isEqual(teamPlayer.team, newTeam));
                         const teamPlayerIndex = findIndex(teamPlayers, (teamPlayer: Player) => isEqual(teamPlayer.id, player.id));
-                        return this.playerService.dispatchUpdatePlayer({ ...player, teamPlayerIndex: teamPlayerIndex });
+                        return this.playerService.updatePlayerProperties(player, { ...player, teamPlayerIndex: teamPlayerIndex });
                     }),
                 );
             }),
@@ -202,5 +195,16 @@ export class RoomViewComponent implements OnInit {
             maxHeight: '100vh',
         };
         this.dialog.open(DialogRulesComponent, config);
+    }
+
+    getPlayerByNameForRoom(room: Room, name: string) {
+        this.playerIsLoading = true;
+        this.playerState = this.playerService.getPlayerByName(room, name)
+            .pipe(
+                tap((player: Player) => {
+                    this.playerService.updatePlayerProperties(player, { ready: true });
+                    this.playerIsLoading = false;
+                }),
+            );
     }
 }

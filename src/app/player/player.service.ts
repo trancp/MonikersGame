@@ -1,23 +1,20 @@
 import { Injectable } from '@angular/core';
 import { AngularFireDatabase } from 'angularfire2/database';
-import { Store } from '@ngrx/store';
 import { map } from 'rxjs/operators';
 
-import { UpdatePlayer } from './player.actions';
-
-import { AppState } from '../app.state';
-import { getAvailableTeam, getPlayerIndexForTeam, getPlayerKey } from './player.helpers';
+import { getAvailableTeam, getPlayerIndexForTeam, getPlayerKey, VALID_UPDATE_KEYS } from './player.helpers';
 import { Room } from '../interfaces/room.model';
+import { Player } from '../interfaces/player.model';
 
 import get from 'lodash-es/get';
 import isEqual from 'lodash-es/isEqual';
+import pick from 'lodash-es/pick';
 import values from 'lodash-es/values';
 
 @Injectable()
 export class PlayerService {
 
-    constructor(private db: AngularFireDatabase,
-                private store: Store<AppState>) {
+    constructor(private db: AngularFireDatabase) {
     }
 
     getPlayerByName(room: Room, name: string) {
@@ -61,7 +58,9 @@ export class PlayerService {
             });
     }
 
-    public dispatchUpdatePlayer(update: any): void {
-        this.store.dispatch(UpdatePlayer(update));
+    updatePlayerProperties(player: Player, update: any) {
+        return this.db
+            .object(player.pushKey)
+            .update(pick(update, VALID_UPDATE_KEYS));
     }
 }

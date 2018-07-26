@@ -86,24 +86,16 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
             .subscribe(() => {
                 this.routeGuardService.checkExistingUser();
             });
-        this.playerService.dispatchUpdatePlayer({ ready: false });
     }
 
     ngOnInit() {
         this.isLoading = true;
-        this.playerIsLoading = true;
         const name = this.route.snapshot.paramMap.get('name');
-        this.playerState = this.playerService.getPlayerByName(name)
-            .pipe(
-                tap((player: Player) => {
-                    this._initializeForm(get(player, 'words', []));
-                    this.playerIsLoading = false;
-                }),
-            );
         const roomCode = this.route.snapshot.paramMap.get('code');
         this.roomState = this.roomService.getRoomByCode(roomCode)
             .pipe(
-                tap(() => {
+                tap((room: Room) => {
+                    this.getPlayerByNameForRoom(room, name);
                     this.isLoading = false;
                 }),
             );
@@ -166,7 +158,7 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
         if (isUndefined(this.editIndex)) {
             return;
         }
-        this.playerService.dispatchUpdatePlayer({ words: values(this.formGroup.value) });
+        this.playerService.updatePlayerProperties(player, { words: values(this.formGroup.value) });
         this._goToRoom(room.code, player.name);
     }
 
@@ -192,7 +184,10 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
             return;
         }
         const currentWords = values(this.formGroup.value);
-        const emptyWords = currentWords.map((word: string, index: number) => ({ value: word, index })).filter((word: any) => !word.value);
+        const emptyWords = currentWords.map((word: string, index: number) => ({
+            value: word,
+            index,
+        })).filter((word: any) => !word.value);
         const newWords = reduce(emptyWords, (result: any, emptyWord: any) => {
             result[emptyWord.index] = this.getUniqueRandomWord(globalWordBank, [...currentWords, ...result]);
             return result;
@@ -249,5 +244,17 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
             return this.inputForm.disable();
         }
         return this.inputForm.enable();
+    }
+
+    getPlayerByNameForRoom(room: Room, name: string) {
+        this.playerIsLoading = true;
+        this.playerState = this.playerService.getPlayerByName(room, name)
+            .pipe(
+                tap((player: Player) => {
+                    this._initializeForm(get(player, 'words', []));
+                    this.playerIsLoading = false;
+                    this.playerService.updatePlayerProperties(player, { ready: false });
+                }),
+            );
     }
 }
