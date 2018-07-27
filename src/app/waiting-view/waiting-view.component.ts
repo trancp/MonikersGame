@@ -1,7 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable, Subscription } from 'rxjs';
-import { filter, take, tap } from 'rxjs/operators';
+import { filter, take, takeUntil, tap } from 'rxjs/operators';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Subject } from 'rxjs/Subject';
 
 import { PlayerService } from '../player/player.service';
 import { RoomService } from '../room/room.service';
@@ -22,52 +23,53 @@ const WAITING_TEXT = [
     styleUrls: ['./waiting-view.component.scss'],
 })
 export class WaitingViewComponent implements OnDestroy, OnInit {
-    playerState: Observable<Player>;
-    roomState: Observable<Room>;
+    playerState: BehaviorSubject<Player> = new BehaviorSubject({ loading: true });
+    roomState: BehaviorSubject<Room> = new BehaviorSubject({ loading: true });
     WAITING_TEXT: string[] = WAITING_TEXT;
-    roomSubscription: Subscription;
-    paramMapSubscription: Subscription;
-    isLoading = true;
-    playerIsLoading = true;
+    componentDestroy = new Subject();
 
     constructor(private routeGuardService: RouteGuardService,
                 public route: ActivatedRoute,
                 private playerService: PlayerService,
                 private roomService: RoomService,
                 private router: Router) {
-        this.paramMapSubscription = this.route.paramMap
-            .subscribe(() => {
-                this.roomSubscription = this.roomState.pipe(
-                    filter((room: Room) => room.started),
-                    take(1),
-                    tap((room: Room) => this.router.navigate(['game', room.code, name])),
-                ).subscribe();
-                this.routeGuardService.checkExistingUser();
-            });
     }
 
     ngOnInit() {
         const name = this.route.snapshot.paramMap.get('name');
         const roomCode = this.route.snapshot.paramMap.get('code');
-        this.roomState = this.roomService.getRoomByCode(roomCode)
+        this.roomService.getRoomByCode(roomCode)
             .pipe(
+                takeUntil(this.componentDestroy),
                 tap((room: Room) => {
-                    this.getPlayerByNameForRoom(room, name);
-                   this.isLoading = false;
+                    this.roomState.next(room);
+                    this.getPlayerByNameForRoom(room, name)
+                        .pipe(
+                            takeUntil(this.componentDestroy),
+                            tap((player: Player) => {
+                                this.playerState.next(player);
+                            }),
+                        )
+                        .subscribe();
                 }),
-            );
+            )
+            .subscribe();
+        this.roomState.pipe(
+            filter((room: Room) => room.started),
+            take(1),
+            tap((room: Room) => this.router.navigate(['game', room.code, name])),
+        ).subscribe();
     }
 
     ngOnDestroy(): void {
-        this.roomSubscription.unsubscribe();
-        this.paramMapSubscription.unsubscribe();
+        this.componentDestroy.next();
+        this.componentDestroy.complete();
     }
 
     getPlayerByNameForRoom(room: Room, name: string) {
-        this.playerState = this.playerService.getPlayerByName(room, name)
+        return this.playerService.getPlayerByName(room, name)
             .pipe(
                 tap((player: Player) => {
-                    this.playerIsLoading = false;
                     this.playerService.updatePlayerProperties(player, { ready: true });
                 }),
             );

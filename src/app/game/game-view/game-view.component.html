@@ -2,7 +2,7 @@
      fxLayout="column"
      class="bg-color-blue u-height-100 u-fontFamily-CircularStd-Black">
     <ng-container *ngIf="playerState | async as user">
-        <div *ngIf="!isLoading"
+        <div *ngIf="!room.loading"
              fxLayout="column"
              [ngStyle]="{ 'padding': '20px 20px 30px 20px', 'position': 'relative' }"
              fxFlex="100%">
@@ -86,7 +86,7 @@
             </div>
         </div>
     </ng-container>
-    <div *ngIf="!isLoading && room.timer"
+    <div *ngIf="!room.loading && room.timer"
          fxLayout="row"
          fxLayoutAlign="center center"
          class="progress-bar-color"
@@ -95,7 +95,7 @@
                           [ngStyle]="{ 'width': '50%' }">
         </mat-progress-bar>
     </div>
-    <div *ngIf="isLoading"
+    <div *ngIf="room.loading"
          class="alt-theme">
         <app-loading-view color="accent"></app-loading-view>
     </div>

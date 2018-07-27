@@ -1,16 +1,17 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Store } from '@ngrx/store';
-import { Observable, Subscription } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { map, takeUntil, tap } from 'rxjs/operators';
 import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Subject } from 'rxjs/Subject';
 
 import { PlayerService } from '../player/player.service';
 import { RoomService } from '../room/room.service';
 import { RouteGuardService } from '../router-guards/router-guards.service';
 import { WordsService } from '../words/words.service';
 
-import { AppState } from '../app.state';
+import { Room } from '../interfaces/room.model';
+import { Player } from '../interfaces/player.model';
 
 import compact from 'lodash-es/compact';
 import difference from 'lodash-es/difference';
@@ -24,8 +25,6 @@ import random from 'lodash-es/random';
 import reduce from 'lodash-es/reduce';
 import set from 'lodash-es/set';
 import values from 'lodash-es/values';
-import { Room } from '../interfaces/room.model';
-import { Player } from '../interfaces/player.model';
 
 const INPUT_PLACEHOLDERS = [
     'A Furry',
@@ -61,7 +60,6 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
     words: string[];
     isJoiningGame: boolean;
     GLOBAL_WORD_BANK: string[] = [];
-    wordsFormSubscription: Subscription;
     autoFilledWords: string[] = [];
     wordsFormGroup = reduce(EMPTY_WORDS_ARRAY, (result: any, value: any, index: number) => {
         return set(result, index, new FormControl(''));
@@ -69,10 +67,9 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
     formGroup = new FormGroup(this.wordsFormGroup);
     inputForm = new FormControl('');
     editIndex = 0;
-    roomState: Observable<Room>;
-    playerState: Observable<Room>;
-    isLoading = true;
-    playerIsLoading = true;
+    roomState: BehaviorSubject<Room> = new BehaviorSubject({ loading: true });
+    playerState: BehaviorSubject<Player> = new BehaviorSubject({ loading: true });
+    componentDestroy = new Subject();
 
     constructor(private formBuilder: FormBuilder,
                 private routeGuardService: RouteGuardService,
@@ -80,26 +77,35 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
                 private roomService: RoomService,
                 private route: ActivatedRoute,
                 private router: Router,
-                private store: Store<AppState>,
                 private wordsService: WordsService) {
-        this.route.paramMap
-            .subscribe(() => {
-                this.routeGuardService.checkExistingUser();
-            });
     }
 
     ngOnInit() {
+        this.route.paramMap
+            .subscribe(() => {
+                this.routeGuardService.checkExistingUser(this.playerState);
+            });
         const name = this.route.snapshot.paramMap.get('name');
         const roomCode = this.route.snapshot.paramMap.get('code');
-        this.roomState = this.roomService.getRoomByCode(roomCode)
+        this.roomService.getRoomByCode(roomCode)
             .pipe(
+                takeUntil(this.componentDestroy),
                 tap((room: Room) => {
-                    this.getPlayerByNameForRoom(room, name);
-                    this.isLoading = false;
+                    this.roomState.next(room);
+                    this.getPlayerByNameForRoom(room, name)
+                        .pipe(
+                            takeUntil(this.componentDestroy),
+                            tap((player: Player) => {
+                                this.playerState.next(player);
+                            }),
+                        )
+                        .subscribe();
                 }),
-            );
+            )
+            .subscribe();
         this.wordsService.getAllWordsFromDb()
             .pipe(
+                takeUntil(this.componentDestroy),
                 map((words: string[]) => {
                     this.GLOBAL_WORD_BANK = words;
                 }),
@@ -107,16 +113,22 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        this.wordsFormSubscription.unsubscribe();
+        this.componentDestroy.next();
+        this.componentDestroy.complete();
     }
 
     private _initializeForm(words: string[]): void {
         this.inputPlaceholder = this.getRandomInputPlaceholder();
         this.initializeWordsForm(words);
-        this.wordsFormSubscription = this.formGroup.valueChanges.subscribe((wordsForm: any) => {
-            this.inputPlaceholder = this.getRandomInputPlaceholder();
-            this.autoFilledWords = this.autoFilledWords.filter((autoFilledWord: string) => includes(values(wordsForm), autoFilledWord));
-        });
+        this.formGroup.valueChanges
+            .pipe(
+                takeUntil(this.componentDestroy),
+                tap((wordsForm: any) => {
+                    this.inputPlaceholder = this.getRandomInputPlaceholder();
+                    this.autoFilledWords = this.autoFilledWords.filter((autoFilledWord: string) => includes(values(wordsForm), autoFilledWord));
+                }),
+            )
+            .subscribe();
         this.isJoiningGame = isEqual('join', get(this.route, 'url.value[0].path'));
     }
 
@@ -246,11 +258,10 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
     }
 
     getPlayerByNameForRoom(room: Room, name: string) {
-        this.playerState = this.playerService.getPlayerByName(room, name)
+        return this.playerService.getPlayerByName(room, name)
             .pipe(
                 tap((player: Player) => {
                     this._initializeForm(get(player, 'words', []));
-                    this.playerIsLoading = false;
                     this.playerService.updatePlayerProperties(player, { ready: false });
                 }),
             );

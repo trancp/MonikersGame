@@ -1,5 +1,5 @@
 <ng-container *ngIf="roomState | async as room">
-    <ng-container *ngIf="!isLoading">
+    <ng-container *ngIf="!room.loading">
         <div [ngStyle]="{ 'padding': '20px 20px 30px 20px' }"
              class="u-fontFamily-CircularStd-Black u-height-100"
              fxLayout="column">
@@ -48,7 +48,7 @@
             </div>
             <div fxFlex="none">
                 <ng-container *ngIf="playerState | async as user">
-                    <ng-container *ngIf="user.vip && !playerIsLoading">
+                    <ng-container *ngIf="user.vip && !user.loading">
                         <div class="color-grey u-textAlign-Center"
                              [ngClass]="{ 'color-black': roomIsReadyToStart(room), 'color-grey': !roomIsReadyToStart(room) }"
                              style="margin-bottom: 10px;">
@@ -69,7 +69,7 @@
                             to start the game.
                         </div>
                     </ng-container>
-                    <ng-container *ngIf="!user.vip && !playerIsLoading">
+                    <ng-container *ngIf="!user.vip && !user.loading">
                         <div class="u-textAlign-Center u-fontFamily-CircularStd-Black u-fontSize-20"
                              [ngStyle]="{ 'margin': '20px 0' }">
                             Sit back, and fucking chill.
@@ -79,7 +79,7 @@
             </div>
         </div>
     </ng-container>
-    <ng-container *ngIf="isLoading">
+    <ng-container *ngIf="room.loading">
         <app-loading-view></app-loading-view>
     </ng-container>
 </ng-container>

@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Observable } from 'rxjs';
+import { take, takeUntil, tap } from 'rxjs/operators';
+import { Subject } from 'rxjs/Subject';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { PlayerService } from '../../player/player.service';
 import { RoomService } from '../../room/room.service';
@@ -9,53 +11,55 @@ import { RouteGuardService } from '../../router-guards/router-guards.service';
 import { Player } from '../../interfaces/player.model';
 import { Room } from '../../interfaces/room.model';
 
-import { take, tap } from 'rxjs/operators';
-
 @Component({
     selector: 'app-game-over-view',
     templateUrl: './game-over-view.component.html',
     styleUrls: ['./game-over-view.component.scss'],
 })
-export class GameOverViewComponent implements OnInit {
-    playerState: Observable<Player>;
-    roomState: Observable<Room>;
-    isLoading = true;
-    playerIsLoading = true;
+export class GameOverViewComponent implements OnInit, OnDestroy {
+    playerState: BehaviorSubject<Player> = new BehaviorSubject({ loading: true });
+    roomState: BehaviorSubject<Room> = new BehaviorSubject({ loading: true });
+    componentDestroy = new Subject();
 
     constructor(private routeGuardService: RouteGuardService,
                 public route: ActivatedRoute,
                 private playerService: PlayerService,
                 private roomService: RoomService) {
-        this.route.paramMap.pipe(
-            take(1),
-            tap(() => {
-                this.routeGuardService.returnToWordsFormViewOnPlayAgain();
-            }),
-        ).subscribe();
     }
 
     ngOnInit() {
+        this.route.paramMap.pipe(
+            take(1),
+            tap(() => {
+                this.routeGuardService.returnToWordsFormViewOnPlayAgain(this.roomState, this.playerState);
+            }),
+        ).subscribe();
         const name = this.route.snapshot.paramMap.get('name');
         const roomCode = this.route.snapshot.paramMap.get('code');
-        this.roomState = this.roomService.getRoomByCode(roomCode)
+        this.roomService.getRoomByCode(roomCode)
             .pipe(
+                takeUntil(this.componentDestroy),
                 tap((room: Room) => {
-                    this.getPlayerByNameForRoom(room, name);
-                    this.isLoading = false;
+                    this.roomState.next(room);
+                    this.playerService.getPlayerByName(room, name)
+                        .pipe(
+                            takeUntil(this.componentDestroy),
+                            tap((player: Player) => {
+                                this.playerState.next(player);
+                            }),
+                        )
+                        .subscribe();
                 }),
-            );
+            )
+            .subscribe();
+    }
+
+    ngOnDestroy() {
+        this.componentDestroy.next();
+        this.componentDestroy.complete();
     }
 
     playAgain(room: Room) {
         this.roomService.initializeRoom(room);
-    }
-
-    getPlayerByNameForRoom(room: Room, name: string) {
-        this.playerState = this.playerService.getPlayerByName(room, name)
-            .pipe(
-                tap(() => {
-                    this.playerIsLoading = false;
-                }),
-            );
     }
 }

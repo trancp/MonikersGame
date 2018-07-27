@@ -1,8 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Store } from '@ngrx/store';
 import { AngularFireDatabase } from 'angularfire2/database';
-
-import { AppState } from '../app.state';
 
 import capitalize from 'lodash-es/capitalize';
 
@@ -11,8 +8,7 @@ const WORDS_TO_ADD_TO_DEFAULT_MONIKERS_WORD_BANK = [];
 @Injectable()
 export class RoomsService {
 
-    constructor(private store: Store<AppState>,
-                private db: AngularFireDatabase) {
+    constructor(private db: AngularFireDatabase) {
     }
 
     getAllRooms() {

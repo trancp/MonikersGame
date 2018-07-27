@@ -1,14 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { filter, take, tap } from 'rxjs/operators';
+import { filter, take, takeUntil, tap } from 'rxjs/operators';
+import { Subject } from 'rxjs/Subject';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { RoomService } from '../../room/room.service';
 import { PlayerService } from '../../player/player.service';
 import { DialogService } from '../../dialog/dialog.service';
 
 import { DialogConfirmPromptComponent } from '../../dialog/dialog-confirm-prompt/dialog-confirm-prompt.component';
-
-import { Observable } from 'rxjs';
 
 import find from 'lodash-es/find';
 import get from 'lodash-es/get';
@@ -52,12 +52,13 @@ const CONFIRM_AS_EXISTING_USER_PROMPT = {
     styleUrls: ['./create-view.component.scss'],
 })
 
-export class CreateViewComponent implements OnInit {
+export class CreateViewComponent implements OnInit, OnDestroy {
     inputPlaceholder: string;
     isJoiningGame: boolean;
     form = new FormControl();
-    roomState: Observable<Room>;
+    roomState = new BehaviorSubject([]);
     isLoading = true;
+    componentDestroy = new Subject();
 
     constructor(private dialogService: DialogService,
                 public route: ActivatedRoute,
@@ -68,14 +69,22 @@ export class CreateViewComponent implements OnInit {
 
     ngOnInit(): void {
         const roomCode = this.route.snapshot.paramMap.get('code');
-        this.roomState = this.roomService.getRoomByCode(roomCode)
+        this.roomService.getRoomByCode(roomCode)
             .pipe(
-                tap(() => {
+                takeUntil(this.componentDestroy),
+                tap((room: Room[]) => {
+                    this.roomState.next(room);
                     this.isLoading = false;
                 }),
-            );
+            )
+            .subscribe();
         this.inputPlaceholder = this._getRandomInputPlaceholder();
         this.isJoiningGame = isEqual('join', get(this.route, 'url.value[0].path'));
+    }
+
+    ngOnDestroy() {
+        this.componentDestroy.next();
+        this.componentDestroy.complete();
     }
 
     public goBack(): void {

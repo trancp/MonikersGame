@@ -1,4 +1,4 @@
-<div *ngIf="player.ready"
+<div *ngIf="player?.ready"
      fxLayout="row"
      [fxLayoutAlign]="alignment + ' center'"
      [attr.id]="id"
@@ -12,9 +12,9 @@
     <div
         style="font-size: 26px; padding-left: 5px; height: 35px;  border-top-left-radius: 8px; border-bottom-left-radius: 8px;"
         class="color-black u-textTruncate transition-bg-color nameTag">
-        {{player.name}}
+        {{player?.name}}
     </div>
-    <div *ngIf="player.vip"
+    <div *ngIf="player?.vip"
          class="u-fontFamily-GoodDog transition-bg-color vipTag"
          style="color: #007EFF; font-size: 30px; padding-left: 5px; height: 35px;">
         Vip
@@ -30,9 +30,9 @@
     <div
         style="font-size: 26px; padding-left: 5px; height: 35px;  border-top-left-radius: 8px; border-bottom-left-radius: 8px;"
         class="color-black u-textTruncate transition-bg-color nameTag">
-        {{player.name}}
+        {{player?.name}}
     </div>
-    <div *ngIf="player.vip"
+    <div *ngIf="player?.vip"
          class="u-fontFamily-GoodDog transition-bg-color vipTag"
          style="color: #007EFF; font-size: 30px; padding-left: 5px; height: 35px;">
         Vip
@@ -41,7 +41,7 @@
          class="closeNameTag transition-bg-color">
     </div>
 </div>
-<div *ngIf="!player.ready"
+<div *ngIf="!player?.ready"
      fxLayout="row"
      [fxLayoutAlign]="alignment + ' center'"
      style="cursor: pointer;">

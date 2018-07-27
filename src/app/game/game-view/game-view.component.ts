@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { takeUntil, tap } from 'rxjs/operators';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Subject } from 'rxjs/Subject';
 
 import { RoomService } from '../../room/room.service';
 import { PlayerService } from '../../player/player.service';
@@ -10,7 +10,6 @@ import { RouteGuardService } from '../../router-guards/router-guards.service';
 
 import { Room } from '../../interfaces/room.model';
 import { Player } from '../../interfaces/player.model';
-import { AppState } from '../../app.state';
 import { compileShuffledRoomWords, sortPlayersByStartingTeam } from '../../room/room.helpers';
 
 import concat from 'lodash-es/concat';
@@ -30,35 +29,47 @@ import zip from 'lodash-es/zip';
     templateUrl: './game-view.component.html',
     styleUrls: ['./game-view.component.scss'],
 })
-export class GameViewComponent implements OnInit {
-    roomState: Observable<Room>;
-    playerState: Observable<Player>;
+export class GameViewComponent implements OnInit, OnDestroy {
+    roomState: BehaviorSubject<Room> = new BehaviorSubject({ loading: true });
+    playerState: BehaviorSubject<Player> = new BehaviorSubject({ loading: true });
     stopTime: string;
-    isLoading = true;
-    playerIsLoading = true;
+    componentDestroy = new Subject();
 
     constructor(private routeGuardService: RouteGuardService,
                 public route: ActivatedRoute,
-                private store: Store<AppState>,
                 private roomService: RoomService,
                 private playerService: PlayerService) {
-        this.route.paramMap
-            .subscribe(() => {
-                this.routeGuardService.checkExistingUser();
-            });
     }
 
     ngOnInit() {
+        this.route.paramMap
+            .subscribe(() => {
+                this.routeGuardService.checkExistingUser(this.playerState);
+            });
         const name = this.route.snapshot.paramMap.get('name');
         const roomCode = this.route.snapshot.paramMap.get('code');
-        this.roomState = this.roomService.getRoomByCode(roomCode)
+        this.roomService.getRoomByCode(roomCode)
             .pipe(
+                takeUntil(this.componentDestroy),
                 tap((room: Room) => {
-                    this.getPlayerByNameForRoom(room, name);
-                    this.isLoading = false;
+                    this.roomState.next(room);
+                    this.getPlayerByNameForRoom(room, name)
+                        .pipe(
+                            takeUntil(this.componentDestroy),
+                            tap((player: Player) => {
+                                this.playerState.next(player);
+                            }),
+                        )
+                        .subscribe();
                 }),
-            );
-        this.routeGuardService.goToGameOverViewOnGameOverStatus();
+            )
+            .subscribe();
+        this.routeGuardService.goToGameOverViewOnGameOverStatus(this.roomState, this.playerState);
+    }
+
+    ngOnDestroy() {
+        this.componentDestroy.next();
+        this.componentDestroy.complete();
     }
 
     public startTimer(room: Room, isTurn: boolean): void {
@@ -67,7 +78,7 @@ export class GameViewComponent implements OnInit {
         }
         const stopTime = new Date();
         stopTime.setMinutes(stopTime.getMinutes() + 1);
-        this.stopTime = stopTime.toString();
+        this.stopTime = stopTime.toISOString();
         this.roomService.updateRoomProperties(room, { timer: this.stopTime });
     }
 
@@ -154,11 +165,10 @@ export class GameViewComponent implements OnInit {
     }
 
     getPlayerByNameForRoom(room: Room, name: string) {
-        this.playerState = this.playerService.getPlayerByName(room, name)
+        return this.playerService.getPlayerByName(room, name)
             .pipe(
                 tap((player: Player) => {
                     this.playerService.updatePlayerProperties(player, { ready: true });
-                    this.playerIsLoading = false;
                 }),
             );
     }

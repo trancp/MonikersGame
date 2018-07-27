@@ -1,16 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
-import { filter, take, tap } from 'rxjs/operators';
+import { filter, take, takeUntil, tap } from 'rxjs/operators';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { combineLatest } from 'rxjs';
+import { Subject } from 'rxjs/Subject';
 
 import { RoomService } from '../../room/room.service';
 import { RoomsService } from '../../rooms/rooms.service';
 import { ToastService } from '../../toast/toast.service';
 
-import { AppState } from '../../app.state';
 import { Room } from '../../interfaces/room.model';
 import { findNewRoomCode } from '../../room/room.helpers';
 
@@ -23,25 +21,33 @@ const ERRORS = {
     templateUrl: './main-view.component.html',
     styleUrls: ['./main-view.component.scss'],
 })
-export class MainViewComponent implements OnInit {
+export class MainViewComponent implements OnInit, OnDestroy {
     roomsLoaded = new BehaviorSubject(false);
     isLoading = false;
-    roomsState: Observable<Room[]>;
+    roomsState = new BehaviorSubject([]);
+    componentDestroy = new Subject();
 
     constructor(private roomService: RoomService,
                 private roomsService: RoomsService,
                 private router: Router,
-                private store: Store<AppState>,
                 private toastService: ToastService) {
     }
 
     ngOnInit() {
-        this.roomsState = this.roomsService.getAllRooms()
+         this.roomsService.getAllRooms()
             .pipe(
-                tap(() => {
+                takeUntil(this.componentDestroy),
+                tap((rooms: Room[]) => {
+                    this.roomsState.next(rooms);
                     this.roomsLoaded.next(true);
                 }),
-            );
+            )
+             .subscribe();
+    }
+
+    ngOnDestroy() {
+        this.componentDestroy.next();
+        this.componentDestroy.complete();
     }
 
     startAGame() {

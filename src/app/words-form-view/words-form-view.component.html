@@ -1,8 +1,8 @@
 <div *ngIf="roomState | async as room"
      class="u-fontFamily-CircularStd-Black u-height-100">
-    <ng-container *ngIf="!isLoading && GLOBAL_WORD_BANK.length">
+    <ng-container *ngIf="!room.loading && GLOBAL_WORD_BANK.length">
         <ng-container *ngIf="playerState | async as player">
-            <div *ngIf="!playerIsLoading"
+            <div *ngIf="!player.loading"
                  fxLayout="column"
                  fxFlex="100%"
                  [ngStyle]="{ 'padding': '20px 20px 30px 20px' }">
@@ -102,12 +102,12 @@
                     </button>
                 </div>
             </div>
-            <div *ngIf="playerIsLoading">
+            <div *ngIf="player.loading">
                 <app-loading-view></app-loading-view>
             </div>
         </ng-container>
     </ng-container>
-    <div *ngIf="isLoading && !GLOBAL_WORD_BANK.length">
+    <div *ngIf="room.loading && !GLOBAL_WORD_BANK.length">
         <app-loading-view></app-loading-view>
     </div>
 </div>

@@ -28,6 +28,7 @@ export class RoomService {
                         ...room,
                         words: room.words || [],
                         pushKey: room.$key,
+                        loading: false,
                     };
                 }),
             );

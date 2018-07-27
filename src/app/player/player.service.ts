@@ -27,6 +27,7 @@ export class PlayerService {
                         ...player,
                         pushKey: url,
                         id: playerKey,
+                        loading: false,
                     };
                 }),
             );
