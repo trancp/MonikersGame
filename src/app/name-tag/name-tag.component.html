@@ -22,6 +22,12 @@
     <div style="padding-right: 5px; height: 35px; border-top-right-radius: 8px; border-bottom-right-radius: 8px;"
          class="closeNameTag transition-bg-color">
     </div>
+    <div *ngIf="!player?.vip && user.vip">
+        <button mat-icon-button
+                (click)="removePlayer(player)">
+            <i class="material-icons">close</i>
+        </button>
+    </div>
 </div>
 <div *ngIf="dragStart && dataToTransfer"
      [ngStyle]="{ 'opacity': '0.5' }"
@@ -49,4 +55,10 @@
        style="font-size: 40px;">
         more_horiz
     </i>
+    <div *ngIf="!player?.vip && user.vip">
+        <button mat-icon-button
+                (click)="removePlayer(player)">
+            <i class="material-icons">close</i>
+        </button>
+    </div>
 </div>

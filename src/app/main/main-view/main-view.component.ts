@@ -62,7 +62,7 @@ export class MainViewComponent implements OnInit, OnDestroy {
                     return this.toastService.showError(ERRORS.maxRooms);
                 }
                 this.roomService.createRoom(newRoomCode);
-                return this.router.navigate([`/create/${newRoomCode}`]);
+                return this.router.navigate([`/${newRoomCode}`]);
             }),
         ).subscribe();
     }

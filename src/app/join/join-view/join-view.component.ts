@@ -20,7 +20,7 @@ const ERROR_ROOM_DOES_NOT_EXIST = 'Wrong code bro.';
     styleUrls: ['./join-view.component.scss'],
 })
 export class JoinViewComponent implements OnInit, OnDestroy {
-    roomsState = new BehaviorSubject([]);
+    roomsState = new BehaviorSubject<Room[]>([]);
     isLoading = true;
     componentDestroy = new Subject();
     form = new FormControl('');
@@ -34,8 +34,8 @@ export class JoinViewComponent implements OnInit, OnDestroy {
         this.roomsService.getAllRooms()
             .pipe(
                 takeUntil(this.componentDestroy),
-                tap((room: Room[]) => {
-                    this.roomsState.next(room);
+                tap((rooms: Room[]) => {
+                    this.roomsState.next(rooms);
                     this.isLoading = false;
                 }),
             )
@@ -47,14 +47,15 @@ export class JoinViewComponent implements OnInit, OnDestroy {
         this.componentDestroy.complete();
     }
 
-    goToCreate(rooms: Room[], inputCode: string) {
+    goToCreate(inputCode: string) {
         if (!inputCode) {
             return;
         }
+        const rooms = this.roomsState.getValue();
         if (!roomExists(rooms, inputCode)) {
             return this.toastService.showError(ERROR_ROOM_DOES_NOT_EXIST);
         }
-        return this.router.navigate([`/join/${inputCode}`]);
+        return this.router.navigate([`/${inputCode}`]);
     }
 
     hasInputCode() {

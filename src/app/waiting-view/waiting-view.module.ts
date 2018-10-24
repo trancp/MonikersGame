@@ -17,22 +17,7 @@ import { WaitingViewComponent } from './waiting-view.component';
         FlexLayoutModule,
         LoadingViewModule,
         RouterGuardsModule,
-        RouterModule.forChild([
-            {
-                path: '',
-                children: [
-                    {
-                        path: ':code',
-                        children: [
-                            {
-                                path: ':name',
-                                component: WaitingViewComponent,
-                            },
-                        ],
-                    },
-                ],
-            },
-        ]),
+        RouterModule.forChild([]),
     ],
     declarations: [WaitingViewComponent],
     exports: [WaitingViewComponent],

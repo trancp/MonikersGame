@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { takeUntil, tap } from 'rxjs/operators';
+import {catchError, filter as rxjsFilter, takeUntil, tap} from 'rxjs/operators';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subject } from 'rxjs/Subject';
 
@@ -23,6 +23,7 @@ import pickBy from 'lodash-es/pickBy';
 import shuffle from 'lodash-es/shuffle';
 import slice from 'lodash-es/slice';
 import zip from 'lodash-es/zip';
+import {EMPTY} from 'rxjs';
 
 @Component({
     selector: 'app-game-view',
@@ -42,18 +43,14 @@ export class GameViewComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        this.route.paramMap
-            .subscribe(() => {
-                this.routeGuardService.checkExistingUser(this.playerState);
-            });
-        const name = this.route.snapshot.paramMap.get('name');
+        const slug = this.route.snapshot.paramMap.get('slug');
         const roomCode = this.route.snapshot.paramMap.get('code');
         this.roomService.getRoomByCode(roomCode)
             .pipe(
                 takeUntil(this.componentDestroy),
                 tap((room: Room) => {
                     this.roomState.next(room);
-                    this.getPlayerByNameForRoom(room, name)
+                    this.getPlayerByNameForRoom(room, slug)
                         .pipe(
                             takeUntil(this.componentDestroy),
                             tap((player: Player) => {
@@ -164,12 +161,13 @@ export class GameViewComponent implements OnInit, OnDestroy {
         return (get(room, 'words.length', 0) / (keys(get(room, 'players', [])).length * 5)) * 100;
     }
 
-    getPlayerByNameForRoom(room: Room, name: string) {
-        return this.playerService.getPlayerByName(room, name)
+    getPlayerByNameForRoom(room: Room, slug: string) {
+        return this.playerService.getPlayerByName(room, slug)
             .pipe(
                 tap((player: Player) => {
                     this.playerService.updatePlayerProperties(player, { ready: true });
                 }),
+                this.routeGuardService.invalidUserError(),
             );
     }
 }

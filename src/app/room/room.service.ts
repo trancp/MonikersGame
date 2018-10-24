@@ -7,6 +7,7 @@ import { initializeGame, initializeRoomForGame } from './room.helpers';
 
 import includes from 'lodash-es/includes';
 import upperCase from 'lodash-es/upperCase';
+import {Player} from '../interfaces/player.model';
 
 @Injectable()
 export class RoomService {
@@ -23,7 +24,7 @@ export class RoomService {
                 },
             })
             .pipe(
-                map(([room]: any) => {
+                map(([room = {}]: any) => {
                     return {
                         ...room,
                         words: room.words || [],
@@ -48,6 +49,11 @@ export class RoomService {
                     pushKey: roomRef.key,
                 };
             });
+    }
+
+    removePlayerFromRoom(room: Room, player: Player) {
+        const url = `/rooms/${room.pushKey}/players/${player.id}`;
+        return this.db.object(url).remove();
     }
 
     initializeRoom(room: Room) {

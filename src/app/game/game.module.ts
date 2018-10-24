@@ -18,7 +18,7 @@ import { GameViewComponent } from './game-view/game-view.component';
                 path: ':code',
                 children: [
                     {
-                        path: ':name',
+                        path: ':slug',
                         children: [
                             {
                                 path: '',

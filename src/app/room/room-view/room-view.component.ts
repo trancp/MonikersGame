@@ -1,8 +1,11 @@
+declare let window: any;
+
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { filter as rxjsFilter, map as rxjsMap, mergeMap, take, takeUntil, tap } from 'rxjs/operators';
 import { MatDialog } from '@angular/material/dialog';
+import {Location} from '@angular/common';
 
 import { WordsService } from '../../words/words.service';
 
@@ -39,7 +42,6 @@ interface ImovingPlayer {
     styleUrls: ['./room-view.component.scss'],
 })
 export class RoomViewComponent implements OnInit, OnDestroy {
-    isJoiningGame: boolean;
     roomState: BehaviorSubject<Room> = new BehaviorSubject({ loading: true });
     playerState: BehaviorSubject<Player> = new BehaviorSubject({ loading: true });
     dataToTransfer: DataTransfer;
@@ -47,6 +49,7 @@ export class RoomViewComponent implements OnInit, OnDestroy {
     componentDestroy = new Subject();
 
     constructor(private dialog: MatDialog,
+                private location: Location,
                 private routeGuardService: RouteGuardService,
                 public route: ActivatedRoute,
                 private router: Router,
@@ -56,15 +59,15 @@ export class RoomViewComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        const name = this.route.snapshot.paramMap.get('name');
+        const slug = this.route.snapshot.paramMap.get('slug');
         const roomCode = this.route.snapshot.paramMap.get('code');
         this.roomService.getRoomByCode(roomCode)
             .pipe(
                 takeUntil(this.componentDestroy),
                 tap((room: Room) => {
                     this.roomState.next(room);
-                    this.goToGameViewOnGameStarted(name);
-                    this.getPlayerByNameForRoom(room, name)
+                    this.goToGameViewOnGameStarted(slug);
+                    this.getPlayerByNameForRoom(room, slug)
                         .pipe(
                             takeUntil(this.componentDestroy),
                             tap((player: Player) => {
@@ -74,7 +77,6 @@ export class RoomViewComponent implements OnInit, OnDestroy {
                         .subscribe();
                 }),
             ).subscribe();
-        this.isJoiningGame = isEqual('join', get(this.route, 'url.value[0].path'));
         this.wordsService.getAllWordsFromDb()
             .pipe(
                 takeUntil(this.componentDestroy),
@@ -89,11 +91,10 @@ export class RoomViewComponent implements OnInit, OnDestroy {
         this.componentDestroy.complete();
     }
 
-    public goBack(code: string): void {
-        const backState = this.isJoiningGame
-            ? `/join/${code}`
-            : '/create';
-        this.router.navigate([backState]);
+    public goBack() {
+        return 1 === window.history.length
+            ? this.router.navigate(['/'])
+            : this.location.back();
     }
 
     public goToGame(room: any, user: Player): void {
@@ -102,14 +103,14 @@ export class RoomViewComponent implements OnInit, OnDestroy {
         }
         this.roomService.addToGlobalWordBank(room.words, this.GLOBAL_WORD_BANK);
         this.roomService.startGame(room);
-        this.router.navigate(['game', room.code, user.name]);
+        this.router.navigate([room.code, user.slug, 'game']);
     }
 
-    public goToGameViewOnGameStarted(name: string) {
+    public goToGameViewOnGameStarted(slug: string) {
         this.roomState.pipe(
             rxjsFilter((room: Room) => room.started),
             take(1),
-            tap((room: Room) => this.router.navigate(['game', room.code, name])),
+            tap((room: Room) => this.router.navigate([room.code, slug, 'game'])),
         ).subscribe();
     }
 
@@ -118,7 +119,7 @@ export class RoomViewComponent implements OnInit, OnDestroy {
             ...movingPlayerParams.player,
             team: movingPlayerParams.newTeam,
         };
-        const playersWithoutMovingPlayer = filter(room.players, (player: any) => !isEqual(player.name, movingPlayer.name));
+        const playersWithoutMovingPlayer = filter(room.players, (player: any) => !isEqual(player.slug, movingPlayer.slug));
         const playersWithIndexing = map(playersWithoutMovingPlayer, (player: any) => player);
         const teamOnePlayers = getTeamPlayers(playersWithIndexing, 1);
         const teamTwoPlayers = getTeamPlayers(playersWithIndexing, 2);
@@ -138,7 +139,7 @@ export class RoomViewComponent implements OnInit, OnDestroy {
 
     private updateTeamPlayerIndexAndPlayerKeyForTeam(team: any[], allPlayers: any[]) {
         return reduce(team, (result: any, player: any, index: number) => {
-            result[getPlayerKey(allPlayers, player.name)] = {
+            result[getPlayerKey(allPlayers, player.slug)] = {
                 ...player,
                 teamPlayerIndex: index,
             };
@@ -156,7 +157,7 @@ export class RoomViewComponent implements OnInit, OnDestroy {
     }
 
     private removeFromTeam(players, playerToRemove) {
-        return filter(players, player => !isEqual(player.name, playerToRemove));
+        return filter(players, player => !isEqual(player.slug, playerToRemove));
     }
 
     private addToIndexOfTeam(players, playerToAdd, index) {
@@ -206,12 +207,18 @@ export class RoomViewComponent implements OnInit, OnDestroy {
         this.dialog.open(DialogRulesComponent, config);
     }
 
-    getPlayerByNameForRoom(room: Room, name: string) {
-        return this.playerService.getPlayerByName(room, name)
+    getPlayerByNameForRoom(room: Room, slug: string) {
+        return this.playerService.getPlayerByName(room, slug)
             .pipe(
                 tap((player: Player) => {
                     this.playerService.updatePlayerProperties(player, { ready: true });
                 }),
+                this.routeGuardService.invalidUserError(),
             );
+    }
+
+    removePlayerFromRoom(player: Player) {
+        const room = this.roomState.getValue();
+        return this.roomService.removePlayerFromRoom(room, player);
     }
 }
