@@ -90,7 +90,7 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
                 takeUntil(this.componentDestroy),
                 tap((room: Room) => {
                     this.roomState.next(room);
-                    this.getPlayerByNameForRoom(room, slug)
+                    this.playerService.getPlayerByName(room, slug)
                         .pipe(
                             takeUntil(this.componentDestroy),
                             tap((player: Player) => {
@@ -244,16 +244,6 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
             return this.inputForm.disable();
         }
         return this.inputForm.enable();
-    }
-
-    getPlayerByNameForRoom(room: Room, slug: string) {
-        return this.playerService.getPlayerByName(room, slug)
-            .pipe(
-                tap((player: Player) => {
-                    this.playerService.updatePlayerProperties(player, { ready: false });
-                }),
-                this.playerService.catchErrorInvalidUser(),
-            );
     }
 
     removeWord(editIndex: number) {
