@@ -10,6 +10,7 @@ import { RoomViewModule } from '../room/room-view/room-view.module';
 import { WaitingViewModule } from '../waiting-view/waiting-view.module';
 
 import { InGameUserGuardService } from '../guards/in-game-user-guard.service';
+import { ReadyUserGuardService } from '../guards/ready-user-guard.service';
 
 import { CreateViewComponent } from './create-view/create-view.component';
 import { WordsFormViewComponent } from '../words-form-view/words-form-view.component';
@@ -50,10 +51,12 @@ import { WaitingViewComponent } from '../waiting-view/waiting-view.component';
                             {
                                 path: 'room',
                                 component: RoomViewComponent,
+                                canActivate: [ReadyUserGuardService],
                             },
                             {
                                 path: 'game',
                                 component: GameViewComponent,
+                                canActivate: [ReadyUserGuardService],
                             },
                             {
                                 path: 'waiting',
@@ -69,7 +72,10 @@ import { WaitingViewComponent } from '../waiting-view/waiting-view.component';
             },
         ]),
     ],
-    providers: [InGameUserGuardService],
+    providers: [
+        InGameUserGuardService,
+        ReadyUserGuardService,
+    ],
 })
 export class CreateModule {
 }

@@ -67,7 +67,7 @@ export class RoomViewComponent implements OnInit, OnDestroy {
                 tap((room: Room) => {
                     this.roomState.next(room);
                     this.goToGameViewOnGameStarted(slug);
-                    this.playerService.getPlayerByNameForRoom(room, slug)
+                    this.playerService.getPlayerByName(room, slug)
                         .pipe(
                             takeUntil(this.componentDestroy),
                             tap((player: Player) => {

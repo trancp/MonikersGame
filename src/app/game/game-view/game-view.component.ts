@@ -49,7 +49,7 @@ export class GameViewComponent implements OnInit, OnDestroy {
                 takeUntil(this.componentDestroy),
                 tap((room: Room) => {
                     this.roomState.next(room);
-                    this.playerService.getPlayerByNameForRoom(room, slug)
+                    this.playerService.getPlayerByName(room, slug)
                         .pipe(
                             takeUntil(this.componentDestroy),
                             tap((player: Player) => {

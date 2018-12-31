@@ -1,10 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFireDatabase } from 'angularfire2/database';
-import { catchError, map, tap } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { throwError } from 'rxjs';
-import { Router } from '@angular/router';
-
-import { ToastService } from '../toast/toast.service';
 
 import { buildPlayerSlug, getAvailableTeam, getPlayerIndexForTeam, getPlayerKey, VALID_UPDATE_KEYS } from './player.helpers';
 import { Room } from '../interfaces/room.model';
@@ -18,9 +15,7 @@ import values from 'lodash-es/values';
 @Injectable()
 export class PlayerService {
 
-    constructor(private db: AngularFireDatabase,
-                private router: Router,
-                private toastService: ToastService) {
+    constructor(private db: AngularFireDatabase) {
     }
 
     getPlayerByName(room: Room, slug: string) {
@@ -73,29 +68,5 @@ export class PlayerService {
         return this.db
             .object(player.pushKey)
             .update(pick(update, VALID_UPDATE_KEYS));
-    }
-
-    getPlayerByNameForRoom(room: Room, slug: string) {
-        return this.getPlayerByName(room, slug)
-            .pipe(
-                tap((player: Player) => {
-                    if (player.ready) {
-                        return;
-                    }
-                    if (get(player, 'words.length', 0)) {
-                        this.updatePlayerProperties(player, { ready: true });
-                    } else {
-                        this.router.navigate([room.code, player.slug, 'words']);
-                    }
-                }),
-                this.catchErrorInvalidUser(),
-            );
-    }
-
-    catchErrorInvalidUser() {
-        return catchError(() => {
-            this.toastService.showError('Player does not exist!');
-            return this.router.navigate(['/']);
-        });
     }
 }
