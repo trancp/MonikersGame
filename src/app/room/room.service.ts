@@ -1,18 +1,21 @@
 import { Injectable } from '@angular/core';
 import { AngularFireDatabase } from 'angularfire2/database';
-import { map } from 'rxjs/operators';
+import { filter, map, take, tap } from 'rxjs/operators';
+import { Router } from '@angular/router';
+import { BehaviorSubject } from 'rxjs';
 
 import { DEFAULT_ROOM_PROPERTIES, Room } from '../interfaces/room.model';
 import { initializeGame, initializeRoomForGame } from './room.helpers';
+import { Player } from '../interfaces/player.model';
 
 import includes from 'lodash-es/includes';
 import upperCase from 'lodash-es/upperCase';
-import {Player} from '../interfaces/player.model';
 
 @Injectable()
 export class RoomService {
 
-    constructor(private db: AngularFireDatabase) {
+    constructor(private db: AngularFireDatabase,
+                private router: Router) {
     }
 
     getRoomByCode(code: string) {
@@ -85,5 +88,13 @@ export class RoomService {
                 .list('/words/custom')
                 .push(word);
         });
+    }
+
+    goToGameViewOnGameStarted(roomState: BehaviorSubject<Room>, slug) {
+        return roomState.pipe(
+            filter((room: Room) => room.started),
+            take(1),
+            tap((room: Room) => this.router.navigate([room.code, slug, 'game'])),
+        );
     }
 }

@@ -66,7 +66,7 @@ export class RoomViewComponent implements OnInit, OnDestroy {
                 takeUntil(this.componentDestroy),
                 tap((room: Room) => {
                     this.roomState.next(room);
-                    this.goToGameViewOnGameStarted(slug);
+                    this.roomService.goToGameViewOnGameStarted(this.roomState, slug).subscribe();
                     this.playerService.getPlayerByName(room, slug)
                         .pipe(
                             takeUntil(this.componentDestroy),
@@ -104,14 +104,6 @@ export class RoomViewComponent implements OnInit, OnDestroy {
         this.roomService.addToGlobalWordBank(room.words, this.GLOBAL_WORD_BANK);
         this.roomService.startGame(room);
         this.router.navigate([room.code, user.slug, 'game']);
-    }
-
-    public goToGameViewOnGameStarted(slug: string) {
-        this.roomState.pipe(
-            rxjsFilter((room: Room) => room.started),
-            take(1),
-            tap((room: Room) => this.router.navigate([room.code, slug, 'game'])),
-        ).subscribe();
     }
 
     public switchPlayerToNewTeam(movingPlayerParams: ImovingPlayer, room: any): void {
