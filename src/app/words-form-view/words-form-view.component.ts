@@ -94,6 +94,9 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
                         .pipe(
                             takeUntil(this.componentDestroy),
                             tap((player: Player) => {
+                                this._initializeForm(get(player, 'words', []));
+                                this.editIndex = this.getNextEmptyWordForm();
+                                this.toggleInputForm(this.editIndex);
                                 this.playerState.next(player);
                             }),
                         )
@@ -116,8 +119,8 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
     }
 
     private _initializeForm(words: string[]): void {
-        this.inputPlaceholder = this.getRandomInputPlaceholder();
         this.initializeWordsForm(words);
+        this.inputPlaceholder = this.getRandomInputPlaceholder();
         this.formGroup.valueChanges
             .pipe(
                 takeUntil(this.componentDestroy),
@@ -150,7 +153,7 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
             || this.inputPlaceholder;
         this.formGroup.get(`${index}`).patchValue(inputWord);
         this.editIndex = this.getNextEmptyWordForm();
-        this.enableInformFormIfFormHasEmptyValues();
+        this.toggleInputForm(this.editIndex);
         this.inputForm.patchValue('');
     }
 
@@ -212,7 +215,7 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
     setFormToEdit(wordIndex: number) {
         this.editIndex = wordIndex;
         this.inputForm.patchValue(this.formGroup.get(`${wordIndex}`).value);
-        this.enableInformFormIfFormHasEmptyValues();
+        this.toggleInputForm(this.editIndex);
         this.inputElement.nativeElement.focus();
     }
 
@@ -231,13 +234,13 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
     getNextEmptyWordForm() {
         const index = findKey(this.formGroup.value, (word: string) => !word);
         if (isUndefined(index)) {
-            return index;
+            return;
         }
         return parseInt(index, 10);
     }
 
-    enableInformFormIfFormHasEmptyValues() {
-        if (isUndefined(this.editIndex)) {
+    toggleInputForm(nextEmptyWordIndex: any) {
+        if (isUndefined(nextEmptyWordIndex)) {
             return this.inputForm.disable();
         }
         return this.inputForm.enable();
@@ -247,7 +250,6 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
         return this.playerService.getPlayerByName(room, slug)
             .pipe(
                 tap((player: Player) => {
-                    this._initializeForm(get(player, 'words', []));
                     this.playerService.updatePlayerProperties(player, { ready: false });
                 }),
                 this.playerService.catchErrorInvalidUser(),
