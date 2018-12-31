@@ -18,7 +18,7 @@ import { RoomViewComponent } from './room-view/room-view.component';
                         path: ':code',
                         children: [
                             {
-                                path: ':name',
+                                path: ':slug',
                                 component: RoomViewComponent,
                             },
                         ],

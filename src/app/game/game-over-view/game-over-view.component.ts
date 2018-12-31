@@ -34,14 +34,14 @@ export class GameOverViewComponent implements OnInit, OnDestroy {
                 this.routeGuardService.returnToWordsFormViewOnPlayAgain(this.roomState, this.playerState);
             }),
         ).subscribe();
-        const name = this.route.snapshot.paramMap.get('name');
+        const slug = this.route.snapshot.paramMap.get('slug');
         const roomCode = this.route.snapshot.paramMap.get('code');
         this.roomService.getRoomByCode(roomCode)
             .pipe(
                 takeUntil(this.componentDestroy),
                 tap((room: Room) => {
                     this.roomState.next(room);
-                    this.playerService.getPlayerByName(room, name)
+                    this.playerService.getPlayerByName(room, slug)
                         .pipe(
                             takeUntil(this.componentDestroy),
                             tap((player: Player) => {

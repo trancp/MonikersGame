@@ -1,9 +1,12 @@
 import { Injectable } from '@angular/core';
 import { AngularFireDatabase } from 'angularfire2/database';
-import { map } from 'rxjs/operators';
+import { filter, map, take, tap } from 'rxjs/operators';
+import { Router } from '@angular/router';
+import { BehaviorSubject } from 'rxjs';
 
 import { DEFAULT_ROOM_PROPERTIES, Room } from '../interfaces/room.model';
 import { initializeGame, initializeRoomForGame } from './room.helpers';
+import { Player } from '../interfaces/player.model';
 
 import includes from 'lodash-es/includes';
 import upperCase from 'lodash-es/upperCase';
@@ -11,7 +14,8 @@ import upperCase from 'lodash-es/upperCase';
 @Injectable()
 export class RoomService {
 
-    constructor(private db: AngularFireDatabase) {
+    constructor(private db: AngularFireDatabase,
+                private router: Router) {
     }
 
     getRoomByCode(code: string) {
@@ -23,7 +27,7 @@ export class RoomService {
                 },
             })
             .pipe(
-                map(([room]: any) => {
+                map(([room = {}]: any) => {
                     return {
                         ...room,
                         words: room.words || [],
@@ -48,6 +52,11 @@ export class RoomService {
                     pushKey: roomRef.key,
                 };
             });
+    }
+
+    removePlayerFromRoom(room: Room, player: Player) {
+        const url = `/rooms/${room.pushKey}/players/${player.id}`;
+        return this.db.object(url).remove();
     }
 
     initializeRoom(room: Room) {
@@ -79,5 +88,13 @@ export class RoomService {
                 .list('/words/custom')
                 .push(word);
         });
+    }
+
+    goToGameViewOnGameStarted(roomState: BehaviorSubject<Room>, slug) {
+        return roomState.pipe(
+            filter((room: Room) => room.started),
+            take(1),
+            tap((room: Room) => this.router.navigate([room.code, slug, 'game'])),
+        );
     }
 }

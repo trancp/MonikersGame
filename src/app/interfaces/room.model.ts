@@ -6,6 +6,7 @@ export interface Room {
     gameOver?: boolean;
     loading?: boolean;
     name?: string;
+    numOfWords?: number;
     players?: any[];
     pushKey?: string;
     round?: number;

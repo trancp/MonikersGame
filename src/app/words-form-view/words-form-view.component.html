@@ -1,18 +1,17 @@
-<div *ngIf="roomState | async as room"
-     class="u-fontFamily-CircularStd-Black u-height-100">
-    <ng-container *ngIf="!room.loading && GLOBAL_WORD_BANK.length">
+<div class="u-fontFamily-CircularStd-Black u-height-100">
+    <ng-container *ngIf="!(roomState | async).loading && GLOBAL_WORD_BANK.length">
         <ng-container *ngIf="playerState | async as player">
             <div *ngIf="!player.loading"
                  fxLayout="column"
                  fxFlex="100%"
                  [ngStyle]="{ 'padding': '20px 20px 30px 20px' }">
                 <div fxLayout="row"
-                     fxFlex="none">
+                     fxFlex="0 0 58px">
                     <div fxFlex="0 0 33%"
                          fxLayout="row"
                          fxLayoutAlign="start center">
                         <a href="javascript: void(0)"
-                           (click)="goBack(room.code)"
+                           (click)="goBack()"
                            mat-icon-button
                            class="color-black">
                             <i class="material-icons"
@@ -23,14 +22,27 @@
                     </div>
                     <div fxFlex="0 0 33%">
                         <app-room-code class="u-display-block"
-                                       [roomCode]="room.code">
+                                       [roomCode]="roomState.getValue().code">
                         </app-room-code>
                     </div>
-                    <div fxFlex="0 0 33%"></div>
+                    <div fxFlex="33%"
+                         fxLayout="row"
+                         fxLayoutAlign="end center">
+                        <button (click)="goToHome()"
+                                mat-icon-button
+                                class="color-black">
+                            <i class="material-icons"
+                               style="font-size: 40px;">
+                                home
+                            </i>
+                        </button>
+                    </div>
                 </div>
                 <div fxFlex="0 0 calc(100% - 111px)"
+                     fxLayout="column"
                      [ngStyle]="{ 'max-width': '550px' }">
-                    <div [ngStyle]="{ 'margin': '20px 0' }">
+                    <div [ngStyle]="{ 'padding': '20px 0' }"
+                         fxFlex="0 0 377px">
                         <div class="inputLabel">
                             Enter a word or phrase
                         </div>
@@ -46,7 +58,7 @@
                                            [formControl]="inputForm"
                                            [ngClass]="{ 'inputExists': inputForm.value, 'inputEmpty': !inputForm.value }"
                                            [ngStyle]="{ 'text-align': 'center', 'font-size': '25px' }"
-                                           [ngStyle.gt-sm]="{ 'text-align': 'center', 'font-size': '30px' }"                                           type="text"
+                                           [ngStyle.gt-sm]="{ 'text-align': 'center', 'font-size': '30px' }" type="text"
                                            [placeholder]="inputPlaceholder"
                                            autocomplete="off">
                                 </mat-form-field>
@@ -66,16 +78,27 @@
                                          class="u-fontSize-16">
                                         {{ index + 1}}
                                     </div>
-                                    <div fxFlex="0 0 calc(100% - 10px)"
+                                    <div [fxFlex]="!!getFormControl(index).value ? '0 0 calc(100% - 34px)' : '0 0 calc(100% - 10px)'"
                                          class="u-textAlign-Left">
                                         {{getFormControl(index).value}}
                                     </div>
+                                    <ng-container *ngIf="!!getFormControl(index).value">
+                                        <div fxFlex="0 0 24px"
+                                             fxLayout="row"
+                                             fxLayoutAlign="center center">
+                                            <button mat-icon-button
+                                                    (click)="removeWord(index)">
+                                                <mat-icon>close</mat-icon>
+                                            </button>
+                                        </div>
+                                    </ng-container>
                                 </div>
                             </button>
                         </div>
                     </div>
                     <ng-container *ngIf="!hasEnoughWords()">
                         <div fxLayout="row"
+                             fxFlex="0 0 calc(100% - 377px)"
                              fxLayoutAlign="center center">
                             <button mat-raised-button
                                     fxFlex="none"
@@ -88,15 +111,16 @@
                         </div>
                     </ng-container>
                 </div>
-                <div *ngIf="room.started"
+                <div *ngIf="(roomState | async).started"
                      class="u-textAlign-Center">
                     Chill out, a game is currently in progress.
                 </div>
-                <div *ngIf="!room.started">
+                <div *ngIf="!(roomState | async).started"
+                     fxFlex="0 0 53px">
                     <button mat-raised-button
                             color="accent"
                             class="c-btn u-width-100"
-                            (click)="submitWordList(room, player)"
+                            (click)="submitWordList(player)"
                             [ngClass]="{ 'c-btn-bottom-border--light-black': hasEnoughWords(), 'c-btn--grey c-btn--word--disabled': !hasEnoughWords() }">
                         {{ 3 <= autoFilledWords.length ? 'Yep, I\'m lazy AF' : 'Yep, got five words' }}
                     </button>
@@ -107,7 +131,7 @@
             </div>
         </ng-container>
     </ng-container>
-    <div *ngIf="room.loading && !GLOBAL_WORD_BANK.length">
+    <div *ngIf="(roomState | async).loading && !GLOBAL_WORD_BANK.length">
         <app-loading-view></app-loading-view>
     </div>
 </div>

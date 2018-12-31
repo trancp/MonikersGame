@@ -1,10 +1,9 @@
-<div *ngIf="roomsState | async as rooms"
-     [ngStyle]="{ 'padding': '20px 20px 30px 20px' }"
+<div [ngStyle]="{ 'padding': '20px 20px 30px 20px' }"
      class="u-fontFamily-CircularStd-Black u-height-100"
      fxLayout="column">
     <ng-container *ngIf="!isLoading">
         <div fxLayout="row"
-             fxFlex="none">
+             fxFlex="0 0 40px">
             <div fxFlex
                  fxLayout="row"
                  fxLayoutAlign="start center">
@@ -19,10 +18,10 @@
             </div>
         </div>
         <div fxLayout="column"
-             fxFlex>
+             fxFlex="0 0 calc(100% - 40px)">
             <div fxFlex="15%"></div>
             <div fxFlex="85%">
-                <form (ngSubmit)="goToCreate(rooms, form.value.code)"
+                <form (ngSubmit)="goToCreate(form.value.code)"
                       novalidate
                       class="u-height-100">
                     <div fxLayout="column"
@@ -30,7 +29,7 @@
                         <div fxFlex="15%"
                              fxLayout="column">
                             <div class="inputLabel u-marginBottom-20">
-                                What is your room code bruh?
+                                What's the room code bruh?
                             </div>
                             <div fxLayout="row"
                                  fxLayoutAlign="center">
@@ -56,9 +55,9 @@
                                 <button mat-raised-button
                                         color="accent"
                                         class="c-btn u-width-100"
-                                        (click)="goToCreate(rooms, form.value)"
+                                        (click)="goToCreate(form.value)"
                                         [ngClass]="{ 'c-btn-bottom-border--light-black': hasInputCode(), 'c-btn--grey c-btn--name--disabled': !hasInputCode() }">
-                                    Yeah, that's the room code
+                                    Yeah, that's it
                                 </button>
                             </div>
                         </div>

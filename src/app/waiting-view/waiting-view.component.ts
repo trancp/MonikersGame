@@ -36,14 +36,14 @@ export class WaitingViewComponent implements OnDestroy, OnInit {
     }
 
     ngOnInit() {
-        const name = this.route.snapshot.paramMap.get('name');
+        const slug = this.route.snapshot.paramMap.get('slug');
         const roomCode = this.route.snapshot.paramMap.get('code');
         this.roomService.getRoomByCode(roomCode)
             .pipe(
                 takeUntil(this.componentDestroy),
                 tap((room: Room) => {
                     this.roomState.next(room);
-                    this.getPlayerByNameForRoom(room, name)
+                    this.getPlayerByNameForRoom(room, slug)
                         .pipe(
                             takeUntil(this.componentDestroy),
                             tap((player: Player) => {
@@ -57,7 +57,7 @@ export class WaitingViewComponent implements OnDestroy, OnInit {
         this.roomState.pipe(
             filter((room: Room) => room.started),
             take(1),
-            tap((room: Room) => this.router.navigate(['game', room.code, name])),
+            tap((room: Room) => this.router.navigate([room.code, slug, 'game'])),
         ).subscribe();
     }
 
@@ -66,8 +66,8 @@ export class WaitingViewComponent implements OnDestroy, OnInit {
         this.componentDestroy.complete();
     }
 
-    getPlayerByNameForRoom(room: Room, name: string) {
-        return this.playerService.getPlayerByName(room, name)
+    getPlayerByNameForRoom(room: Room, slug: string) {
+        return this.playerService.getPlayerByName(room, slug)
             .pipe(
                 tap((player: Player) => {
                     this.playerService.updatePlayerProperties(player, { ready: true });

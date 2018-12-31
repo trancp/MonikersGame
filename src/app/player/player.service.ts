@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { map } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
-import { getAvailableTeam, getPlayerIndexForTeam, getPlayerKey, VALID_UPDATE_KEYS } from './player.helpers';
+import { buildPlayerSlug, getAvailableTeam, getPlayerIndexForTeam, getPlayerKey, VALID_UPDATE_KEYS } from './player.helpers';
 import { Room } from '../interfaces/room.model';
 import { Player } from '../interfaces/player.model';
 
@@ -17,8 +18,11 @@ export class PlayerService {
     constructor(private db: AngularFireDatabase) {
     }
 
-    getPlayerByName(room: Room, name: string) {
-        const playerKey = getPlayerKey(room.players, name);
+    getPlayerByName(room: Room, slug: string) {
+        const playerKey = getPlayerKey(room.players, buildPlayerSlug(slug));
+        if (!playerKey) {
+            return throwError('Invalid User');
+        }
         const url = `/rooms/${room.pushKey}/players/${playerKey}`;
         return this.db.object(url)
             .pipe(
@@ -42,6 +46,7 @@ export class PlayerService {
         const player = {
             name,
             ready: false,
+            slug: buildPlayerSlug(name),
             teamPlayerIndex: getPlayerIndexForTeam(teamToJoin, room.players),
             team: teamToJoin,
             vip: isVip,

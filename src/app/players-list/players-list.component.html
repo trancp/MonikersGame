@@ -20,6 +20,7 @@
                   [dataToTransfer]="dataToTransfer"
                   (onDragStart)="dragStart($event)"
                   (onDragDrop)="dragDrop($event)"
+                  (remove)="remove.emit($event)"
                   [alignment]="alignment">
     </app-name-tag>
 </div>

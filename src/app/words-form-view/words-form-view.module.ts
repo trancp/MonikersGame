@@ -5,6 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 
 import { GetValuesPipeModule } from '../pipes/get-values-pipe/get-values-pipe.module';
 import { LoadingViewModule } from '../loading-view/loading-view.module';
@@ -26,6 +27,7 @@ import { WordsFormViewComponent } from './words-form-view.component';
         LoadingViewModule,
         MatButtonModule,
         MatFormFieldModule,
+        MatIconModule,
         MatInputModule,
         ReactiveFormsModule,
         RoomCodeModule,

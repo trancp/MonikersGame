@@ -17,7 +17,6 @@ import flatten from 'lodash-es/flatten';
 import get from 'lodash-es/get';
 import isEmpty from 'lodash-es/isEmpty';
 import isEqual from 'lodash-es/isEqual';
-import keys from 'lodash-es/keys';
 import map from 'lodash-es/map';
 import pickBy from 'lodash-es/pickBy';
 import shuffle from 'lodash-es/shuffle';
@@ -42,18 +41,14 @@ export class GameViewComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        this.route.paramMap
-            .subscribe(() => {
-                this.routeGuardService.checkExistingUser(this.playerState);
-            });
-        const name = this.route.snapshot.paramMap.get('name');
+        const slug = this.route.snapshot.paramMap.get('slug');
         const roomCode = this.route.snapshot.paramMap.get('code');
         this.roomService.getRoomByCode(roomCode)
             .pipe(
                 takeUntil(this.componentDestroy),
                 tap((room: Room) => {
                     this.roomState.next(room);
-                    this.getPlayerByNameForRoom(room, name)
+                    this.playerService.getPlayerByName(room, slug)
                         .pipe(
                             takeUntil(this.componentDestroy),
                             tap((player: Player) => {
@@ -141,6 +136,7 @@ export class GameViewComponent implements OnInit, OnDestroy {
             };
         });
         const isGameOver = isEqual(3, room.round) && lastPlayerDone;
+        const readyPlayers = pickBy(room.players, (player: Player) => player.ready);
         const update = {
             round: !isGameOver && isRoundOver ? room.round + 1 : room.round,
             gameOver: isGameOver,
@@ -148,7 +144,7 @@ export class GameViewComponent implements OnInit, OnDestroy {
             timer: '',
             turn: isRoundOver ? 0 : room.turn + 1,
             turnOrder: isRoundOver ? this.initTurnOrderForNewRound(room.players, nextTeamToStart) : room.turnOrder,
-            words: isRoundOver ? compileShuffledRoomWords(room.players) : shuffle(room.words),
+            words: isRoundOver ? compileShuffledRoomWords(readyPlayers) : shuffle(room.words),
         };
         this.roomService.updateRoomProperties(room, update);
     }
@@ -161,15 +157,6 @@ export class GameViewComponent implements OnInit, OnDestroy {
     }
 
     public calculateRemainingWordsProgress(room: Room) {
-        return (get(room, 'words.length', 0) / (keys(get(room, 'players', [])).length * 5)) * 100;
-    }
-
-    getPlayerByNameForRoom(room: Room, name: string) {
-        return this.playerService.getPlayerByName(room, name)
-            .pipe(
-                tap((player: Player) => {
-                    this.playerService.updatePlayerProperties(player, { ready: true });
-                }),
-            );
+        return (get(room, 'words.length', 0) / room.numOfWords) * 100;
     }
 }

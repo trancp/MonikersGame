@@ -6,23 +6,11 @@ export const appRoutes: Routes = [
         loadChildren: './main/main.module#MainModule',
     },
     {
-        path: 'create',
-        loadChildren: './create/create.module#CreateModule',
-    },
-    {
         path: 'join',
         loadChildren: './join/join.module#JoinModule',
     },
     {
-        path: 'room',
-        loadChildren: './room/room.module#RoomModule',
-    },
-    {
-        path: 'game',
-        loadChildren: './game/game.module#GameModule',
-    },
-    {
-        path: 'waiting',
-        loadChildren: './waiting-view/waiting-view.module#WaitingViewModule',
+        path: ':code',
+        loadChildren: './create/create.module#CreateModule',
     },
 ];

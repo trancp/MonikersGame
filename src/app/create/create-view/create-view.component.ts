@@ -1,8 +1,11 @@
+declare let window: any;
+
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { filter, take, takeUntil, tap } from 'rxjs/operators';
 import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Location } from '@angular/common';
 
 import { RoomService } from '../../room/room.service';
 import { PlayerService } from '../../player/player.service';
@@ -10,8 +13,9 @@ import { DialogService } from '../../dialog/dialog.service';
 
 import { DialogConfirmPromptComponent } from '../../dialog/dialog-confirm-prompt/dialog-confirm-prompt.component';
 
+import { buildPlayerSlug } from '../../player/player.helpers';
+
 import find from 'lodash-es/find';
-import get from 'lodash-es/get';
 import isEqual from 'lodash-es/isEqual';
 import random from 'lodash-es/random';
 
@@ -54,13 +58,13 @@ const CONFIRM_AS_EXISTING_USER_PROMPT = {
 
 export class CreateViewComponent implements OnInit, OnDestroy {
     inputPlaceholder: string;
-    isJoiningGame: boolean;
     form = new FormControl();
-    roomState = new BehaviorSubject([]);
+    roomState = new BehaviorSubject<Room>({});
     isLoading = true;
     componentDestroy = new Subject();
 
     constructor(private dialogService: DialogService,
+                private location: Location,
                 public route: ActivatedRoute,
                 private router: Router,
                 private roomService: RoomService,
@@ -72,14 +76,13 @@ export class CreateViewComponent implements OnInit, OnDestroy {
         this.roomService.getRoomByCode(roomCode)
             .pipe(
                 takeUntil(this.componentDestroy),
-                tap((room: Room[]) => {
+                tap((room: Room) => {
                     this.roomState.next(room);
                     this.isLoading = false;
                 }),
             )
             .subscribe();
         this.inputPlaceholder = this._getRandomInputPlaceholder();
-        this.isJoiningGame = isEqual('join', get(this.route, 'url.value[0].path'));
     }
 
     ngOnDestroy() {
@@ -87,11 +90,10 @@ export class CreateViewComponent implements OnInit, OnDestroy {
         this.componentDestroy.complete();
     }
 
-    public goBack(): void {
-        const backState = this.isJoiningGame
-            ? '/join'
-            : '/';
-        this.router.navigate([backState]);
+    public goBack() {
+        return 1 === window.history.length
+            ? this.router.navigate(['/'])
+            : this.location.back();
     }
 
     public onSubmit(formInput: string): void {
@@ -100,16 +102,18 @@ export class CreateViewComponent implements OnInit, OnDestroy {
         this.form.patchValue(inputName);
     }
 
-    public onGoToWords(room: any, name: string): void {
+    public onGoToWords(name: string): void {
         if (!name) {
             return;
         }
-        const playerAlreadyInRoom = find(room.players, (player: Player) => isEqual(player.name, name));
-        const nextStateUrl = this._generateNextStateUrl(room.code, name);
+        const slug = buildPlayerSlug(name);
+        const room = this.roomState.getValue();
+        const playerAlreadyInRoom = find(room.players, (player: Player) => isEqual(player.slug, slug));
+        const nextStateUrl = `/${room.code}/${slug}/words`;
         if (playerAlreadyInRoom) {
             const context = {
                 ...CONFIRM_AS_EXISTING_USER_PROMPT,
-                title: CONFIRM_AS_EXISTING_USER_PROMPT.title(name),
+                title: CONFIRM_AS_EXISTING_USER_PROMPT.title(playerAlreadyInRoom.name),
             };
             const config = {
                 component: DialogConfirmPromptComponent,
@@ -128,13 +132,6 @@ export class CreateViewComponent implements OnInit, OnDestroy {
         }
         this.playerService.createPlayer(room, name);
         this.router.navigate([nextStateUrl]);
-    }
-
-    private _generateNextStateUrl(code: string, name: string): string {
-        const nextState = this.isJoiningGame
-            ? '/join'
-            : '/create';
-        return `${nextState}/${code}/${name}/words`;
     }
 
     private _getRandomInputPlaceholder() {

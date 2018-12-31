@@ -1,18 +1,18 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+
+import { Player } from '../interfaces/player.model';
+import { DataTransfer } from '../interfaces/data-transfer.model';
 
 import get from 'lodash-es/get';
 import some from 'lodash-es/some';
 import values from 'lodash-es/values';
-
-import { Player } from '../interfaces/player.model';
-import { DataTransfer } from '../interfaces/data-transfer.model';
 
 @Component({
     selector: 'app-name-tag',
     templateUrl: './name-tag.component.html',
     styleUrls: ['./name-tag.component.scss'],
 })
-export class NameTagComponent implements OnInit {
+export class NameTagComponent {
     @Input() alignment: string;
     @Input() player: Player;
     @Input() user: Player;
@@ -20,12 +20,10 @@ export class NameTagComponent implements OnInit {
     @Output() onDragDrop: EventEmitter<any> = new EventEmitter();
     @Input() id: string;
     @Input() dataToTransfer: DataTransfer;
+    @Output() remove = new EventEmitter();
     dragStart: boolean;
     defaultX: string;
     defaultY: string;
-
-    ngOnInit() {
-    }
 
     startDrag(event) {
         if (event.dataTransfer) {
@@ -68,5 +66,9 @@ export class NameTagComponent implements OnInit {
         dragElement.style.position = '';
         this.endDrag();
         this.onDragDrop.emit({});
+    }
+
+    removePlayer(player: Player) {
+        this.remove.emit(player);
     }
 }

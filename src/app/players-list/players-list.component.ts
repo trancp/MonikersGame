@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { DataTransfer } from '../interfaces/data-transfer.model';
 import get from 'lodash-es/get';
@@ -24,24 +24,16 @@ interface ImovingPlayer {
     templateUrl: './players-list.component.html',
     styleUrls: ['./players-list.component.scss'],
 })
-export class PlayersListComponent implements OnInit, OnChanges {
+export class PlayersListComponent {
     @Input() players: Iplayer[];
     @Input() alignment: string;
     @Input() teamName: string;
     @Input() teamId: string;
     @Input() user: Player;
-    @Output() onDragStart: EventEmitter<any> = new EventEmitter();
-    @Output() switchPlayerToNewTeam: EventEmitter<any> = new EventEmitter();
+    @Output() onDragStart = new EventEmitter();
+    @Output() switchPlayerToNewTeam = new EventEmitter();
+    @Output() remove = new EventEmitter();
     @Input() dataToTransfer: DataTransfer;
-
-    constructor() {
-    }
-
-    ngOnInit() {
-    }
-
-    ngOnChanges() {
-    }
 
     switchTeamsHandler(event, listIndex) {
         const playerStringify = event.dataTransfer.getData('player');

@@ -5,6 +5,7 @@ import filter from 'lodash-es/filter';
 import get from 'lodash-es/get';
 import isEqual from 'lodash-es/isEqual';
 import sortBy from 'lodash-es/sortBy';
+import words from 'lodash-es/words';
 
 export const VALID_UPDATE_KEYS = ['name', 'ready', 'team', 'teamPlayerIndex', 'vip', 'words'];
 
@@ -24,6 +25,10 @@ export function getPlayerIndexForTeam(teamToJoin: number, players: any[]) {
     return get(getTeamPlayers(players, teamToJoin), 'length', 0);
 }
 
-export function getPlayerKey(players: Player[], name: string): number {
-    return findKey(players, (player: Player) => isEqual(player.name, name));
+export function getPlayerKey(players: Player[], slug: string): number {
+    return findKey(players, (player: Player) => isEqual(player.slug, slug));
+}
+
+export function buildPlayerSlug(name: string) {
+    return words(name.toLowerCase()).join('-');
 }

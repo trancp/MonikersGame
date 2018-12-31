@@ -4,6 +4,7 @@ export interface Player {
     name?: string;
     pushKey?: string;
     ready?: boolean;
+    slug?: string;
     team?: number;
     vip?: boolean;
     words?: string[];
