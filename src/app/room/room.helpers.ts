@@ -2,6 +2,7 @@ import { Player } from '../interfaces/player.model';
 import { Room } from '../interfaces/room.model';
 
 import capitalize from 'lodash-es/capitalize';
+import compact from 'lodash-es/compact';
 import flatten from 'lodash-es/flatten';
 import includes from 'lodash-es/includes';
 import map from 'lodash-es/map';
@@ -102,7 +103,7 @@ function sanitizeWords(words: string[]): string[] {
 }
 
 export function compileShuffledRoomWords(players: Player[]): string[] {
-    return shuffle(flatten(map(players, (player: Player) => player.words)));
+    return shuffle(flatten(compact(map(players, (player: Player) => player.words))));
 }
 
 export function sortPlayersByStartingTeam(players: Player[], startingTeam: number) {

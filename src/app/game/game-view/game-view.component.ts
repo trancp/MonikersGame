@@ -17,7 +17,6 @@ import flatten from 'lodash-es/flatten';
 import get from 'lodash-es/get';
 import isEmpty from 'lodash-es/isEmpty';
 import isEqual from 'lodash-es/isEqual';
-import keys from 'lodash-es/keys';
 import map from 'lodash-es/map';
 import pickBy from 'lodash-es/pickBy';
 import shuffle from 'lodash-es/shuffle';
@@ -137,6 +136,7 @@ export class GameViewComponent implements OnInit, OnDestroy {
             };
         });
         const isGameOver = isEqual(3, room.round) && lastPlayerDone;
+        const readyPlayers = pickBy(room.players, (player: Player) => player.ready);
         const update = {
             round: !isGameOver && isRoundOver ? room.round + 1 : room.round,
             gameOver: isGameOver,
@@ -144,7 +144,7 @@ export class GameViewComponent implements OnInit, OnDestroy {
             timer: '',
             turn: isRoundOver ? 0 : room.turn + 1,
             turnOrder: isRoundOver ? this.initTurnOrderForNewRound(room.players, nextTeamToStart) : room.turnOrder,
-            words: isRoundOver ? compileShuffledRoomWords(room.players) : shuffle(room.words),
+            words: isRoundOver ? compileShuffledRoomWords(readyPlayers) : shuffle(room.words),
         };
         this.roomService.updateRoomProperties(room, update);
     }
