@@ -67,7 +67,7 @@ export class RoomViewComponent implements OnInit, OnDestroy {
                 tap((room: Room) => {
                     this.roomState.next(room);
                     this.goToGameViewOnGameStarted(slug);
-                    this.getPlayerByNameForRoom(room, slug)
+                    this.playerService.getPlayerByNameForRoom(room, slug)
                         .pipe(
                             takeUntil(this.componentDestroy),
                             tap((player: Player) => {
@@ -205,16 +205,6 @@ export class RoomViewComponent implements OnInit, OnDestroy {
             maxHeight: '100vh',
         };
         this.dialog.open(DialogRulesComponent, config);
-    }
-
-    getPlayerByNameForRoom(room: Room, slug: string) {
-        return this.playerService.getPlayerByName(room, slug)
-            .pipe(
-                tap((player: Player) => {
-                    this.playerService.updatePlayerProperties(player, { ready: true });
-                }),
-                this.routeGuardService.invalidUserError(),
-            );
     }
 
     removePlayerFromRoom(player: Player) {

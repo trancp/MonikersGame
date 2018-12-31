@@ -250,7 +250,7 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
                     this._initializeForm(get(player, 'words', []));
                     this.playerService.updatePlayerProperties(player, { ready: false });
                 }),
-                this.routeGuardService.invalidUserError(),
+                this.playerService.catchErrorInvalidUser(),
             );
     }
 

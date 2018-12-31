@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import {catchError, filter as rxjsFilter, takeUntil, tap} from 'rxjs/operators';
+import { takeUntil, tap } from 'rxjs/operators';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subject } from 'rxjs/Subject';
 
@@ -23,7 +23,6 @@ import pickBy from 'lodash-es/pickBy';
 import shuffle from 'lodash-es/shuffle';
 import slice from 'lodash-es/slice';
 import zip from 'lodash-es/zip';
-import {EMPTY} from 'rxjs';
 
 @Component({
     selector: 'app-game-view',
@@ -50,7 +49,7 @@ export class GameViewComponent implements OnInit, OnDestroy {
                 takeUntil(this.componentDestroy),
                 tap((room: Room) => {
                     this.roomState.next(room);
-                    this.getPlayerByNameForRoom(room, slug)
+                    this.playerService.getPlayerByNameForRoom(room, slug)
                         .pipe(
                             takeUntil(this.componentDestroy),
                             tap((player: Player) => {
@@ -159,15 +158,5 @@ export class GameViewComponent implements OnInit, OnDestroy {
 
     public calculateRemainingWordsProgress(room: Room) {
         return (get(room, 'words.length', 0) / (keys(get(room, 'players', [])).length * 5)) * 100;
-    }
-
-    getPlayerByNameForRoom(room: Room, slug: string) {
-        return this.playerService.getPlayerByName(room, slug)
-            .pipe(
-                tap((player: Player) => {
-                    this.playerService.updatePlayerProperties(player, { ready: true });
-                }),
-                this.routeGuardService.invalidUserError(),
-            );
     }
 }

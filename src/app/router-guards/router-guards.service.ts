@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { combineLatest } from 'rxjs';
-import { catchError, filter, take, tap } from 'rxjs/operators';
+import { filter, take, tap } from 'rxjs/operators';
 
 import { Player } from '../interfaces/player.model';
-import { ToastService } from '../toast/toast.service';
 import { Room } from '../interfaces/room.model';
 
 import isEmpty from 'lodash-es/isEmpty';
@@ -12,15 +11,7 @@ import isEmpty from 'lodash-es/isEmpty';
 @Injectable()
 export class RouteGuardService {
 
-    constructor(private router: Router,
-                private toastService: ToastService) {
-    }
-
-    invalidUserError() {
-        return catchError(() => {
-            this.toastService.showError('Player does not exist!');
-            return this.router.navigate(['/']);
-        });
+    constructor(private router: Router) {
     }
 
     returnToWordsFormViewOnPlayAgain(roomState: any, playerState: any) {
