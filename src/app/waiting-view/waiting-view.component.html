@@ -1,6 +1,6 @@
 <div *ngIf="roomState | async as room"
      class="u-height-100">
-    <div *ngIf="!room.isLoading"
+    <div *ngIf="!room.loading"
          style="padding: 20px;"
          class="u-fontFamily-CircularStd-Black u-height-100"
          fxLayout="column">
@@ -20,7 +20,7 @@
             </div>
         </div>
     </div>
-    <ng-container *ngIf="room.isLoading">
+    <ng-container *ngIf="room.loading">
         <app-loading-view></app-loading-view>
     </ng-container>
 </div>

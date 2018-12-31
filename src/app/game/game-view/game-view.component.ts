@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, ParamMap } from '@angular/router';
-import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
-import { filter as rxjsFilter, take, tap } from 'rxjs/operators';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { takeUntil, tap } from 'rxjs/operators';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Subject } from 'rxjs/Subject';
 
 import { RoomService } from '../../room/room.service';
 import { PlayerService } from '../../player/player.service';
@@ -10,7 +10,7 @@ import { RouteGuardService } from '../../router-guards/router-guards.service';
 
 import { Room } from '../../interfaces/room.model';
 import { Player } from '../../interfaces/player.model';
-import { AppState } from '../../app.state';
+import { compileShuffledRoomWords, sortPlayersByStartingTeam } from '../../room/room.helpers';
 
 import concat from 'lodash-es/concat';
 import flatten from 'lodash-es/flatten';
@@ -29,45 +29,57 @@ import zip from 'lodash-es/zip';
     templateUrl: './game-view.component.html',
     styleUrls: ['./game-view.component.scss'],
 })
-export class GameViewComponent implements OnInit {
-    roomState: Observable<Room>;
-    playerState: Observable<Player>;
+export class GameViewComponent implements OnInit, OnDestroy {
+    roomState: BehaviorSubject<Room> = new BehaviorSubject({ loading: true });
+    playerState: BehaviorSubject<Player> = new BehaviorSubject({ loading: true });
     stopTime: string;
+    componentDestroy = new Subject();
 
     constructor(private routeGuardService: RouteGuardService,
                 public route: ActivatedRoute,
-                private store: Store<AppState>,
                 private roomService: RoomService,
                 private playerService: PlayerService) {
-        this.route.paramMap
-            .subscribe((params: ParamMap) => {
-                const code = params.get('code');
-                const name = params.get('name');
-                this.roomService.dispatchGetRoom(code);
-                this.playerService.dispatchGetPlayer(name);
-                this.roomState = this.store.select('room');
-                this.playerState = this.store.select('player');
-                this.routeGuardService.checkExistingUser();
-            });
-        this.playerState.pipe(
-            rxjsFilter((playerState: Player) => !isEmpty(playerState) && !playerState.ready && !playerState.loading),
-            take(1),
-            tap(() => this.playerService.dispatchUpdatePlayer({ ready: true })),
-        ).subscribe();
     }
 
     ngOnInit() {
-        this.routeGuardService.goToGameOverViewOnGameOverStatus();
+        this.route.paramMap
+            .subscribe(() => {
+                this.routeGuardService.checkExistingUser(this.playerState);
+            });
+        const name = this.route.snapshot.paramMap.get('name');
+        const roomCode = this.route.snapshot.paramMap.get('code');
+        this.roomService.getRoomByCode(roomCode)
+            .pipe(
+                takeUntil(this.componentDestroy),
+                tap((room: Room) => {
+                    this.roomState.next(room);
+                    this.getPlayerByNameForRoom(room, name)
+                        .pipe(
+                            takeUntil(this.componentDestroy),
+                            tap((player: Player) => {
+                                this.playerState.next(player);
+                            }),
+                        )
+                        .subscribe();
+                }),
+            )
+            .subscribe();
+        this.routeGuardService.goToGameOverViewOnGameOverStatus(this.roomState, this.playerState);
     }
 
-    public startTimer(isTurn: boolean): void {
+    ngOnDestroy() {
+        this.componentDestroy.next();
+        this.componentDestroy.complete();
+    }
+
+    public startTimer(room: Room, isTurn: boolean): void {
         if (!isTurn) {
             return;
         }
         const stopTime = new Date();
         stopTime.setMinutes(stopTime.getMinutes() + 1);
-        this.stopTime = stopTime.toString();
-        this.roomService.dispatchUpdateRoom({ timer: this.stopTime });
+        this.stopTime = stopTime.toISOString();
+        this.roomService.updateRoomProperties(room, { timer: this.stopTime });
     }
 
     public onTimerEnd(user: Player, room: Room): void {
@@ -78,11 +90,11 @@ export class GameViewComponent implements OnInit {
         this.handleNextTurn(room);
     }
 
-    public skip(wordIndex: number, remainingWords: string[]): void {
+    public skip(room: Room, wordIndex: number, remainingWords: string[]): void {
         const incrementedWordIndex = (wordIndex + 1) > (remainingWords.length - 1)
             ? 0
             : wordIndex + 1;
-        this.roomService.dispatchUpdateRoom({ word: incrementedWordIndex });
+        this.roomService.updateRoomProperties(room, { word: incrementedWordIndex });
     }
 
     public score(wordIndex: number, room: Room): void {
@@ -107,7 +119,7 @@ export class GameViewComponent implements OnInit {
             word: incrementedWordIndex,
             words: updatedWordsList,
         };
-        this.roomService.dispatchUpdateRoom(update);
+        this.roomService.updateRoomProperties(room, update);
     }
 
     private handleNextTurn(room: Room) {
@@ -136,19 +148,28 @@ export class GameViewComponent implements OnInit {
             timer: '',
             turn: isRoundOver ? 0 : room.turn + 1,
             turnOrder: isRoundOver ? this.initTurnOrderForNewRound(room.players, nextTeamToStart) : room.turnOrder,
-            words: isRoundOver ? this.roomService.compileShuffledRoomWords(room.players) : shuffle(room.words),
+            words: isRoundOver ? compileShuffledRoomWords(room.players) : shuffle(room.words),
         };
-        this.roomService.dispatchUpdateRoom(update);
+        this.roomService.updateRoomProperties(room, update);
     }
 
     private initTurnOrderForNewRound(players: Player[], teamToStart: number) {
         const readyPlayers = pickBy(players, (player: Player) => player.ready);
-        const sortPlayersByStartingTeam = this.roomService.sortPlayersByStartingTeam(readyPlayers, teamToStart);
-        const shuffledReadyPlayers = map(sortPlayersByStartingTeam, (team: Player[]) => shuffle(team));
+        const playersSortedByStartingTeam = sortPlayersByStartingTeam(readyPlayers, teamToStart);
+        const shuffledReadyPlayers = map(playersSortedByStartingTeam, (team: Player[]) => shuffle(team));
         return flatten(zip(...shuffledReadyPlayers));
     }
 
     public calculateRemainingWordsProgress(room: Room) {
         return (get(room, 'words.length', 0) / (keys(get(room, 'players', [])).length * 5)) * 100;
+    }
+
+    getPlayerByNameForRoom(room: Room, name: string) {
+        return this.playerService.getPlayerByName(room, name)
+            .pipe(
+                tap((player: Player) => {
+                    this.playerService.updatePlayerProperties(player, { ready: true });
+                }),
+            );
     }
 }

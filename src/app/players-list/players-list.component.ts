@@ -31,7 +31,7 @@ export class PlayersListComponent implements OnInit, OnChanges {
     @Input() teamId: string;
     @Input() user: Player;
     @Output() onDragStart: EventEmitter<any> = new EventEmitter();
-    @Output() switchPlayerToNewTeam: EventEmitter<ImovingPlayer> = new EventEmitter();
+    @Output() switchPlayerToNewTeam: EventEmitter<any> = new EventEmitter();
     @Input() dataToTransfer: DataTransfer;
 
     constructor() {
@@ -66,7 +66,7 @@ export class PlayersListComponent implements OnInit, OnChanges {
 
     dragDrop(data: DataTransfer) {
         if (data.player) {
-            const playerToMove: ImovingPlayer = {
+            const playerToMove = {
                 player: data.player,
                 listIndex: data.dropZoneIndex,
                 newTeam: this.getTeamNumber(data.teamList),

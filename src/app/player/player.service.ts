@@ -1,57 +1,67 @@
 import { Injectable } from '@angular/core';
 import { AngularFireDatabase } from 'angularfire2/database';
-import { Store } from '@ngrx/store';
+import { map } from 'rxjs/operators';
 
-import { CreatePlayer, GetPlayer, SetPlayer, UpdatePlayer } from './player.actions';
+import { getAvailableTeam, getPlayerIndexForTeam, getPlayerKey, VALID_UPDATE_KEYS } from './player.helpers';
+import { Room } from '../interfaces/room.model';
+import { Player } from '../interfaces/player.model';
 
-import findKey from 'lodash-es/findKey';
-import filter from 'lodash-es/filter';
 import get from 'lodash-es/get';
 import isEqual from 'lodash-es/isEqual';
-import sortBy from 'lodash-es/sortBy';
-
-import { AppState } from '../app.state';
+import pick from 'lodash-es/pick';
+import values from 'lodash-es/values';
 
 @Injectable()
 export class PlayerService {
 
-    constructor(private db: AngularFireDatabase,
-                private store: Store<AppState>) {
+    constructor(private db: AngularFireDatabase) {
     }
 
-    public getAvailableTeam(room: any) {
-        const teamOnePlayers = this.getTeamPlayers(room.players, 1);
-        const teamTwoPlayers = this.getTeamPlayers(room.players, 2);
-        return teamTwoPlayers.length < teamOnePlayers.length
-            ? 2
-            : 1;
+    getPlayerByName(room: Room, name: string) {
+        const playerKey = getPlayerKey(room.players, name);
+        const url = `/rooms/${room.pushKey}/players/${playerKey}`;
+        return this.db.object(url)
+            .pipe(
+                map((player: any) => {
+                    return {
+                        ...player,
+                        pushKey: url,
+                        id: playerKey,
+                        loading: false,
+                    };
+                }),
+            );
     }
 
-    public getPlayerIndexForTeam(teamToJoin: number, players: any[]) {
-        return get(this.getTeamPlayers(players, teamToJoin), 'length', 0);
+    createPlayer(room: Room, name: string) {
+        const roomPlayers = values(get(room, 'players', []));
+        const teamToJoin = getAvailableTeam(room);
+        const playersLength = get(roomPlayers, 'length', 0);
+        const isVip = isEqual(0, playersLength);
+        const url = `/rooms/${room.pushKey}/players`;
+        const player = {
+            name,
+            ready: false,
+            teamPlayerIndex: getPlayerIndexForTeam(teamToJoin, room.players),
+            team: teamToJoin,
+            vip: isVip,
+            words: [],
+        };
+        return this.db
+            .list(url)
+            .push(player)
+            .then((playerRef: any) => {
+                return {
+                    ...player,
+                    id: playerRef.key,
+                    pushKey: `${url}/${playerRef.key}`,
+                };
+            });
     }
 
-    public getPlayerKey(players: any[], name: string): number {
-        return findKey(players, {name});
-    }
-
-    public dispatchUpdatePlayer(update: any): void {
-        this.store.dispatch(UpdatePlayer(update));
-    }
-
-    public dispatchGetPlayer(name: string): void {
-        this.store.dispatch(GetPlayer(name));
-    }
-
-    public dispatchSetPlayer(player: any): void {
-        this.store.dispatch(SetPlayer(player));
-    }
-
-    public dispatchCreatePlayer(name: string): void {
-        this.store.dispatch(CreatePlayer(name));
-    }
-
-    public getTeamPlayers(players: any[], team: number) {
-        return sortBy(filter(players, player => isEqual(team, player.team)), 'teamPlayerIndex');
+    updatePlayerProperties(player: Player, update: any) {
+        return this.db
+            .object(player.pushKey)
+            .update(pick(update, VALID_UPDATE_KEYS));
     }
 }

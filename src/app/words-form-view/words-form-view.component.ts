@@ -1,31 +1,29 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { Store } from '@ngrx/store';
-import { Observable, Subscription } from 'rxjs';
-import { filter, map, take } from 'rxjs/operators';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { map, takeUntil, tap } from 'rxjs/operators';
+import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Subject } from 'rxjs/Subject';
 
 import { PlayerService } from '../player/player.service';
 import { RoomService } from '../room/room.service';
 import { RouteGuardService } from '../router-guards/router-guards.service';
+import { WordsService } from '../words/words.service';
 
-import { GetWords } from '../words/words.actions';
-
-import { AppState } from '../app.state';
-import { WordsState } from '../interfaces/words.interfaces';
+import { Room } from '../interfaces/room.model';
+import { Player } from '../interfaces/player.model';
 
 import compact from 'lodash-es/compact';
 import difference from 'lodash-es/difference';
-import fill from 'lodash-es/fill';
-import findIndex from 'lodash-es/findIndex';
-import flatten from 'lodash-es/flatten';
+import findKey from 'lodash-es/findKey';
 import get from 'lodash-es/get';
 import includes from 'lodash-es/includes';
 import isEmpty from 'lodash-es/isEmpty';
 import isEqual from 'lodash-es/isEqual';
-import pick from 'lodash-es/pick';
+import isUndefined from 'lodash-es/isUndefined';
 import random from 'lodash-es/random';
 import reduce from 'lodash-es/reduce';
+import set from 'lodash-es/set';
 import values from 'lodash-es/values';
 
 const INPUT_PLACEHOLDERS = [
@@ -48,7 +46,7 @@ const INPUT_PLACEHOLDERS = [
     'Mom jokes',
 ];
 const MAX_WORD_SUBMISSIONS = 5;
-const WORD_BANKS = ['custom', 'monikers'];
+const EMPTY_WORDS_ARRAY = new Array(MAX_WORD_SUBMISSIONS);
 
 @Component({
     selector: 'app-words-form-view',
@@ -56,18 +54,22 @@ const WORD_BANKS = ['custom', 'monikers'];
     styleUrls: ['./words-form-view.component.scss'],
 })
 export class WordsFormViewComponent implements OnInit, OnDestroy {
+    @ViewChild('input') private inputElement: ElementRef;
+    EMPTY_WORDS_ARRAY = EMPTY_WORDS_ARRAY;
     inputPlaceholder: string;
-    inputWord: string;
     words: string[];
-    wordIndex: number;
     isJoiningGame: boolean;
-    room$: Observable<any>;
-    player$: Observable<any>;
-    wordsState = this.store.select('words');
     GLOBAL_WORD_BANK: string[] = [];
-    wordsForm: FormGroup;
-    wordsFormSubscription: Subscription;
     autoFilledWords: string[] = [];
+    wordsFormGroup = reduce(EMPTY_WORDS_ARRAY, (result: any, value: any, index: number) => {
+        return set(result, index, new FormControl(''));
+    }, {});
+    formGroup = new FormGroup(this.wordsFormGroup);
+    inputForm = new FormControl('');
+    editIndex = 0;
+    roomState: BehaviorSubject<Room> = new BehaviorSubject({ loading: true });
+    playerState: BehaviorSubject<Player> = new BehaviorSubject({ loading: true });
+    componentDestroy = new Subject();
 
     constructor(private formBuilder: FormBuilder,
                 private routeGuardService: RouteGuardService,
@@ -75,58 +77,69 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
                 private roomService: RoomService,
                 private route: ActivatedRoute,
                 private router: Router,
-                private store: Store<AppState>) {
-        this.route.paramMap
-            .subscribe((params: ParamMap) => {
-                const code = params.get('code');
-                const name = params.get('name');
-                this.roomService.dispatchGetRoom(code);
-                this.room$ = this.store.select('room');
-                this.playerService.dispatchGetPlayer(name);
-                this.player$ = this.store.select('player');
-                this.player$.pipe(
-                    filter((playerState: any) => !isEmpty(playerState)),
-                    take(1),
-                    map((playerState: any) => this._initializeForm(get(playerState, 'words', []))),
-                ).subscribe();
-                this.routeGuardService.checkExistingUser();
-            });
-        this.playerService.dispatchUpdatePlayer({ ready: false });
+                private wordsService: WordsService) {
     }
 
     ngOnInit() {
-        this.store.dispatch(GetWords());
-        this.wordsState.pipe(
-            filter((wordsState: WordsState) => wordsState.isLoaded),
-            take(1),
-            map((wordsState: WordsState) => {
-                this.GLOBAL_WORD_BANK = flatten(values(pick(wordsState, WORD_BANKS)));
-            }),
-        ).subscribe();
+        this.route.paramMap
+            .subscribe(() => {
+                this.routeGuardService.checkExistingUser(this.playerState);
+            });
+        const name = this.route.snapshot.paramMap.get('name');
+        const roomCode = this.route.snapshot.paramMap.get('code');
+        this.roomService.getRoomByCode(roomCode)
+            .pipe(
+                takeUntil(this.componentDestroy),
+                tap((room: Room) => {
+                    this.roomState.next(room);
+                    this.getPlayerByNameForRoom(room, name)
+                        .pipe(
+                            takeUntil(this.componentDestroy),
+                            tap((player: Player) => {
+                                this.playerState.next(player);
+                            }),
+                        )
+                        .subscribe();
+                }),
+            )
+            .subscribe();
+        this.wordsService.getAllWordsFromDb()
+            .pipe(
+                takeUntil(this.componentDestroy),
+                map((words: string[]) => {
+                    this.GLOBAL_WORD_BANK = words;
+                }),
+            ).subscribe();
     }
 
     ngOnDestroy() {
-        this.wordsFormSubscription.unsubscribe();
+        this.componentDestroy.next();
+        this.componentDestroy.complete();
     }
 
     private _initializeForm(words: string[]): void {
-        this.inputWord = '';
-        this.wordIndex = 0;
-        const initWordFormValues = isEmpty(words)
-            ? fill(new Array(MAX_WORD_SUBMISSIONS), '')
-            : words;
-        const form = reduce(initWordFormValues, (result: any, formValue: string, index: number) => {
-            result[index] = [formValue];
-            return result;
-        }, {});
-        this.wordsForm = this.formBuilder.group(form);
-        this.inputPlaceholder = this._getRandomInputPlaceholder();
-        this.wordsFormSubscription = this.wordsForm.valueChanges.subscribe((wordsForm: any) => {
-            this.inputWord = '';
-            this.inputPlaceholder = this._getRandomInputPlaceholder();
-            this.autoFilledWords = this.autoFilledWords.filter((autoFilledWord: string) => includes(values(wordsForm), autoFilledWord));
-        });
+        this.inputPlaceholder = this.getRandomInputPlaceholder();
+        this.initializeWordsForm(words);
+        this.formGroup.valueChanges
+            .pipe(
+                takeUntil(this.componentDestroy),
+                tap((wordsForm: any) => {
+                    this.inputPlaceholder = this.getRandomInputPlaceholder();
+                    this.autoFilledWords = this.autoFilledWords.filter((autoFilledWord: string) => includes(values(wordsForm), autoFilledWord));
+                }),
+            )
+            .subscribe();
         this.isJoiningGame = isEqual('join', get(this.route, 'url.value[0].path'));
+    }
+
+    private initializeWordsForm(initWordFormValues: string[]) {
+        if (isEmpty(initWordFormValues)) {
+            return;
+        }
+        const formControls = reduce(initWordFormValues, (result: any, formValue: string, index: number) => {
+            return set(result, index, formValue);
+        }, {});
+        this.formGroup.patchValue(formControls);
     }
 
     public goBack(code: string): void {
@@ -137,25 +150,26 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
     }
 
     public onSubmit(word: string, index: number): void {
-        this.inputWord = word
+        const inputWord = word
             || this.inputPlaceholder;
-        this._addWordToList(this.inputWord, index);
+        this._addWordToList(inputWord, index);
+        this.editIndex = this.getNextEmptyWordForm();
+        this.enableInformFormIfFormHasEmptyValues();
+        this.inputForm.patchValue('');
     }
 
     private _addWordToList(inputWord: string, index: number): void {
         if (!inputWord) {
             return;
         }
-        this.wordsForm.get(`${index}`).patchValue(inputWord);
-        this.wordIndex = findIndex(values(this.wordsForm.value), (word: string) => isEqual('', word));
+        this.formGroup.get(`${index}`).patchValue(inputWord);
     }
 
     public submitWordList(room: any, player: any): void {
-        const wordList = values(this.wordsForm.value);
-        if (MAX_WORD_SUBMISSIONS !== compact(wordList).length) {
+        if (!this.hasEnoughWords()) {
             return;
         }
-        this.playerService.dispatchUpdatePlayer({ words: wordList });
+        this.playerService.updatePlayerProperties(player, { words: values(this.formGroup.value) });
         this._goToRoom(room.code, player.name);
     }
 
@@ -164,21 +178,14 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
     }
 
     public hasEnoughWords(): boolean {
-        return MAX_WORD_SUBMISSIONS === get(compact(values(this.wordsForm.value)), 'length');
+        return MAX_WORD_SUBMISSIONS === get(compact(values(this.formGroup.value)), 'length');
     }
 
-    public editWord(wordIndex: number): void {
-        const wordToEdit = this.wordsForm.get(`${wordIndex}`).value;
-        this.wordsForm.get(`${wordIndex}`).patchValue('');
-        this.inputWord = wordToEdit;
-        this.wordIndex = wordIndex;
-    }
-
-    private _getRandomInputPlaceholder(): string {
+    getRandomInputPlaceholder(): string {
         if (this.hasEnoughWords()) {
             return '';
         }
-        const remainingPlaceholders = difference(INPUT_PLACEHOLDERS, values(this.wordsForm.value));
+        const remainingPlaceholders = difference(INPUT_PLACEHOLDERS, values(this.formGroup.value));
         const placeholderIndex = random(remainingPlaceholders.length - 1);
         return remainingPlaceholders[placeholderIndex];
     }
@@ -187,14 +194,17 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
         if (this.hasEnoughWords()) {
             return;
         }
-        const currentWords = values(this.wordsForm.value);
-        const emptyWords = currentWords.map((word: string, index: number) => ({ value: word, index })).filter((word: any) => !word.value);
+        const currentWords = values(this.formGroup.value);
+        const emptyWords = currentWords.map((word: string, index: number) => ({
+            value: word,
+            index,
+        })).filter((word: any) => !word.value);
         const newWords = reduce(emptyWords, (result: any, emptyWord: any) => {
             result[emptyWord.index] = this.getUniqueRandomWord(globalWordBank, [...currentWords, ...result]);
             return result;
         }, {});
         this.autoFilledWords = [...this.autoFilledWords, ...values(newWords)];
-        this.wordsForm.patchValue(newWords);
+        this.formGroup.patchValue(newWords);
     }
 
     private getUniqueRandomWord(globalWordBank: string[], currentWordBank: string[]) {
@@ -207,5 +217,53 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
     private getRandomWordFromGlobalWordBank(globalWordBank: string[]): string {
         const randomWordFromGlobalBankIndex = random(globalWordBank.length - 1);
         return globalWordBank[randomWordFromGlobalBankIndex];
+    }
+
+    getFormControl(index: number) {
+        return this.formGroup.get(`${index}`);
+    }
+
+    setFormToEdit(wordIndex: number) {
+        this.editIndex = wordIndex;
+        this.inputForm.patchValue(this.formGroup.get(`${wordIndex}`).value);
+        this.enableInformFormIfFormHasEmptyValues();
+        this.inputElement.nativeElement.focus();
+    }
+
+    submitCurrentWord() {
+        if (isUndefined(this.editIndex)) {
+            return;
+        }
+        const wordForm = this.formGroup.get(`${this.editIndex}`);
+        const currentWord = get(wordForm, 'value');
+        if (currentWord || !this.inputForm.value) {
+            return;
+        }
+        wordForm.patchValue(this.inputForm.value);
+    }
+
+    getNextEmptyWordForm() {
+        const index = findKey(this.formGroup.value, (word: string) => !word);
+        if (isUndefined(index)) {
+            return index;
+        }
+        return parseInt(index, 10);
+    }
+
+    enableInformFormIfFormHasEmptyValues() {
+        if (isUndefined(this.editIndex)) {
+            return this.inputForm.disable();
+        }
+        return this.inputForm.enable();
+    }
+
+    getPlayerByNameForRoom(room: Room, name: string) {
+        return this.playerService.getPlayerByName(room, name)
+            .pipe(
+                tap((player: Player) => {
+                    this._initializeForm(get(player, 'words', []));
+                    this.playerService.updatePlayerProperties(player, { ready: false });
+                }),
+            );
     }
 }

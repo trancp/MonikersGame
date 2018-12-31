@@ -1,176 +1,83 @@
 import { Injectable } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { AngularFireDatabase } from 'angularfire2/database';
+import { map } from 'rxjs/operators';
 
-import { CreateRoom, GetRoom, InitRoom, ResetRoom, StartGame, UpdateRoom, } from './room.actions';
+import { DEFAULT_ROOM_PROPERTIES, Room } from '../interfaces/room.model';
+import { initializeGame, initializeRoomForGame } from './room.helpers';
 
-import { AppState } from '../app.state';
-import { Player } from '../interfaces/player.model';
-import { Room } from '../interfaces/room.model';
-import { Rooms } from '../interfaces/rooms.model';
-
-import capitalize from 'lodash-es/capitalize';
-import flatten from 'lodash-es/flatten';
 import includes from 'lodash-es/includes';
-import map from 'lodash-es/map';
-import mapValues from 'lodash-es/mapValues';
-import random from 'lodash-es/random';
-import reduce from 'lodash-es/reduce';
-import shuffle from 'lodash-es/shuffle';
-import zip from 'lodash-es/zip';
-
-const CODE_CHARACTERS = [
-    'A',
-    'B',
-    'C',
-    'D',
-    'E',
-    'F',
-    'G',
-    'H',
-    'I',
-    'J',
-    'K',
-    'L',
-    'M',
-    'N',
-    'O',
-    'P',
-    'Q',
-    'R',
-    'S',
-    'T',
-    'U',
-    'V',
-    'W',
-    'X',
-    'Y',
-    'Z',
-];
-const CODE_LENGTH = 4;
-const MAX_NUM_ROOMS = Math.pow(CODE_LENGTH, CODE_CHARACTERS.length);
+import upperCase from 'lodash-es/upperCase';
 
 @Injectable()
 export class RoomService {
 
-    constructor(private store: Store<AppState>) {
+    constructor(private db: AngularFireDatabase) {
     }
 
-    public findNewRoomCode(rooms: Rooms): string {
-        const existingCodes = map(rooms, (room: any) => room.code);
-        const noAvailableRooms = existingCodes.length >= MAX_NUM_ROOMS;
-        return noAvailableRooms
-            ? ''
-            : this._newRoomCode(existingCodes);
+    getRoomByCode(code: string) {
+        return this.db
+            .list('/rooms', {
+                query: {
+                    orderByChild: 'code',
+                    equalTo: upperCase(code),
+                },
+            })
+            .pipe(
+                map(([room]: any) => {
+                    return {
+                        ...room,
+                        words: room.words || [],
+                        pushKey: room.$key,
+                        loading: false,
+                    };
+                }),
+            );
     }
 
-    private _newRoomCode(existingCodes: string[]): string {
-        const code = map(new Array(CODE_LENGTH), () => this._generateRandomRoomCode()).join('');
-        return includes(existingCodes, code)
-            ? this._newRoomCode(existingCodes)
-            : code;
-    }
-
-    private _generateRandomRoomCode(): string {
-        return CODE_CHARACTERS[random(0, CODE_CHARACTERS.length - 1)];
-    }
-
-    public initializeGame(room: Room): any {
-        const words = this.sanitizeWords(this.compileShuffledRoomWords(room.players));
-        const startingTeam = random(0, 1);
-        const teams = [
-            {
-                name: 'Team 1',
-                teamId: 1,
-                isTurn: false,
-                words: [],
-            },
-            {
-                name: 'Team 2',
-                teamId: 2,
-                isTurn: false,
-                words: [],
-            },
-        ];
-        const teamList = this.sortPlayersByStartingTeam(room.players, startingTeam + 1);
-        const turnOrder = flatten(zip(...map(teamList, (team: any) => shuffle(team))));
-        teams[startingTeam].isTurn = true;
-        return {
-            words,
-            teams,
-            turnOrder,
-            numOfWords: words.length,
-            started: true,
-            round: 1,
-            turn: 0,
-            teamToStart: startingTeam + 1,
-            word: 0,
-        };
-    }
-
-    private sanitizeWords(words: string[]): string[] {
-        return words.map((word: string) => {
-            const wordSplitBySpace = word.split(' ');
-            return wordSplitBySpace.map((wordInSplit: string) => capitalize(wordInSplit)).join(' ');
-        });
-    }
-
-    public compileShuffledRoomWords(players: Player[]): string[] {
-        return shuffle(flatten(map(players, (player: Player) => player.words)));
-    }
-
-    public sortPlayersByStartingTeam(players: Player[], startingTeam: number) {
-        return reduce(players, (accumulator: any[], player: Player, id: string) => {
-            if (startingTeam === player.team) {
-                accumulator[0].push({...player, id});
-            } else {
-                accumulator[1].push({...player, id});
-            }
-            return accumulator;
-        }, [[], []]);
-    }
-
-    public initializeRoom(room: Room) {
-        return {
-            code: room.code,
-            gameOver: false,
-            round: 1,
-            started: false,
-            teams: [],
-            timer: '',
-            turnOrder: [],
-            words: [],
-            word: 0,
-            players: mapValues(room.players, (player: Player) => {
+    createRoom(code: string) {
+        return this.db
+            .list('/rooms')
+            .push({
+                code,
+                created_at: new Date().toString(),
+                ...DEFAULT_ROOM_PROPERTIES,
+            })
+            .then((roomRef: any) => {
                 return {
-                    ...player,
-                    ready: false,
-                    words: [],
+                    code,
+                    pushKey: roomRef.key,
                 };
-            }),
-        };
+            });
     }
 
-    public dispatchGetRoom(code: string): void {
-        this.store.dispatch(GetRoom(code));
+    initializeRoom(room: Room) {
+        const url = `/rooms/${room.pushKey}`;
+        return this.updateRoom(url, initializeRoomForGame(room));
     }
 
-    public dispatchCreateRoom(code: string): void {
-        this.store.dispatch(CreateRoom(code));
+    updateRoom(url: string, update: any) {
+        return this.db
+            .object(url)
+            .update(update)
+            .then(() => update);
     }
 
-    public dispatchUpdateRoom(update: any): void {
-        this.store.dispatch(UpdateRoom(update));
+    startGame(room: Room) {
+        const url = `/rooms/${room.pushKey}`;
+        return this.updateRoom(url, initializeGame(room));
     }
 
-    public dispatchStartGame(payload: { user: Player, globalWordBank: string[] }): void {
-        this.store.dispatch(StartGame(payload));
+    updateRoomProperties(room: Room, update: any) {
+        const url = `/rooms/${room.pushKey}`;
+        return this.updateRoom(url, update);
     }
 
-    public dispatchResetRoom(): void {
-        this.store.dispatch(ResetRoom());
-    }
-
-    public dispatchInitializeRoom(): void {
-        this.store.dispatch(InitRoom());
+    addToGlobalWordBank(roomWords: string[], globalWordBank: string[]) {
+        const wordsToPush = roomWords.filter((word: string) => !includes(globalWordBank, word));
+        wordsToPush.map((word: string) => {
+            return this.db
+                .list('/words/custom')
+                .push(word);
+        });
     }
 }

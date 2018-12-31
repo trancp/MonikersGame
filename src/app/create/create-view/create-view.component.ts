@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { Store } from '@ngrx/store';
-import { filter, take, tap } from 'rxjs/operators';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { filter, take, takeUntil, tap } from 'rxjs/operators';
+import { Subject } from 'rxjs/Subject';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { RoomService } from '../../room/room.service';
 import { PlayerService } from '../../player/player.service';
@@ -9,15 +10,14 @@ import { DialogService } from '../../dialog/dialog.service';
 
 import { DialogConfirmPromptComponent } from '../../dialog/dialog-confirm-prompt/dialog-confirm-prompt.component';
 
-import { Observable } from 'rxjs';
-
 import find from 'lodash-es/find';
 import get from 'lodash-es/get';
 import isEqual from 'lodash-es/isEqual';
 import random from 'lodash-es/random';
 
-import { AppState } from '../../app.state';
 import { Player } from '../../interfaces/player.model';
+import { FormControl } from '@angular/forms';
+import { Room } from '../../interfaces/room.model';
 
 const INPUT_PLACEHOLDERS = [
     'Asshat',
@@ -52,30 +52,39 @@ const CONFIRM_AS_EXISTING_USER_PROMPT = {
     styleUrls: ['./create-view.component.scss'],
 })
 
-export class CreateViewComponent implements OnInit {
+export class CreateViewComponent implements OnInit, OnDestroy {
     inputPlaceholder: string;
-    inputName: string;
     isJoiningGame: boolean;
-    room$: Observable<any>;
+    form = new FormControl();
+    roomState = new BehaviorSubject([]);
+    isLoading = true;
+    componentDestroy = new Subject();
 
     constructor(private dialogService: DialogService,
                 public route: ActivatedRoute,
                 private router: Router,
                 private roomService: RoomService,
-                private playerService: PlayerService,
-                private store: Store<AppState>) {
-        this.route.paramMap
-            .subscribe((params: ParamMap) => {
-                const code = params.get('code');
-                this.roomService.dispatchGetRoom(code);
-                this.room$ = this.store.select('room');
-            });
+                private playerService: PlayerService) {
     }
 
     ngOnInit(): void {
+        const roomCode = this.route.snapshot.paramMap.get('code');
+        this.roomService.getRoomByCode(roomCode)
+            .pipe(
+                takeUntil(this.componentDestroy),
+                tap((room: Room[]) => {
+                    this.roomState.next(room);
+                    this.isLoading = false;
+                }),
+            )
+            .subscribe();
         this.inputPlaceholder = this._getRandomInputPlaceholder();
-        this.inputName = '';
         this.isJoiningGame = isEqual('join', get(this.route, 'url.value[0].path'));
+    }
+
+    ngOnDestroy() {
+        this.componentDestroy.next();
+        this.componentDestroy.complete();
     }
 
     public goBack(): void {
@@ -86,8 +95,9 @@ export class CreateViewComponent implements OnInit {
     }
 
     public onSubmit(formInput: string): void {
-        this.inputName = formInput
+        const inputName = formInput
             || this.inputPlaceholder;
+        this.form.patchValue(inputName);
     }
 
     public onGoToWords(room: any, name: string): void {
@@ -116,7 +126,7 @@ export class CreateViewComponent implements OnInit {
             ).subscribe();
             return;
         }
-        this.playerService.dispatchCreatePlayer(name);
+        this.playerService.createPlayer(room, name);
         this.router.navigate([nextStateUrl]);
     }
 

@@ -2,35 +2,11 @@
     font-size: 15px;
     color: #D5D5D3;
     text-align: center;
-}
-
-.inputContainer {
-    max-width: 550px;
-    margin: 10px auto 0;
-    transition: color 100ms;
-}
-
-.inputEmptyContainer {
-    border-bottom: 2px solid #D5D5D3;
-}
-
-.inputExistsContainer {
-    max-width: 550px;
-    margin: 10px auto 0;
-    border-bottom: 2px solid #000;
-}
-
-.input {
-    font-size: 30px;
-    color: #D5D5D3;
-    border: none;
-    text-align: center;
-    width: 100%;
-    transition: color 100ms;
+    margin-bottom: 20px;
 }
 
 .inputEmpty {
-    opacity: 0.36;
+    opacity: 0.15;
 }
 
 .inputExists {
@@ -48,15 +24,17 @@
     border-bottom: 5px solid #e6e6e5;
 }
 
-.wordsContainer {
-    max-width: 550px;
-    margin: 30px auto 0;
-}
-
-.word {
-    cursor: pointer;
-}
-
 .c-btn-bottom-border--light-black {
     border-bottom: 5px solid #666 !important;
+}
+
+.u-border-black {
+    border: 2px dashed black;
+}
+
+.u-border-radius {
+    border-radius: 4px;
+}
+.bg-color-grey {
+    background-color: #f6f6f6;
 }

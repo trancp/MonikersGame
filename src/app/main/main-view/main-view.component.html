@@ -1,40 +1,40 @@
-<div class="bg-color-salmon color-white u-height-100 u-fontFamily-CircularStd-Black"
-     fxLayout="row"
-     fxLayoutAlign="start center"
-     style="padding: 10px 10px 30px 10px;">
-    <div fxFlex
+<ng-container *ngIf="!isLoading">
+    <div class="bg-color-salmon color-white u-height-100 u-fontFamily-CircularStd-Black"
          fxLayout="row"
-         class="u-height-100">
-        <div fxLayout="column"
-             fxFlex>
-            <div fxFlex
-                 fxLayout="row"
-                 fxLayoutAlign="center">
-                <div fxFlex="none"
-                     fxLayout="column"
-                     fxLayoutAlign="center center">
-                    <div class="title"
-                         fxFlex="none">
-                        Monikers.
-                    </div>
-                    <div class="subtitle"
-                         fxFlex="none">
-                        <span>A dumb party game</span>
-                        <div>
-                            that respects your intelligence.
+         fxLayoutAlign="start center"
+         style="padding: 10px 10px 30px 10px;">
+        <div fxFlex
+             fxLayout="row"
+             class="u-height-100">
+            <div fxLayout="column"
+                 fxFlex>
+                <div fxFlex
+                     fxLayout="row"
+                     fxLayoutAlign="center">
+                    <div fxFlex="none"
+                         fxLayout="column"
+                         fxLayoutAlign="center center">
+                        <div class="title"
+                             fxFlex="none">
+                            Monikers.
                         </div>
+                        <div class="subtitle"
+                             fxFlex="none">
+                            <span>A dumb party game</span>
+                            <div>
+                                that respects your intelligence.
+                            </div>
+                        </div>
+                        <div fxFlex="25%"></div>
                     </div>
-                    <div fxFlex="25%"></div>
+                    <div fxFlex="0%"
+                         fxFlex.xs="20%">
+                    </div>
                 </div>
-                <div fxFlex="0%"
-                     fxFlex.xs="20%">
-                </div>
-            </div>
-            <div *ngIf="rooms$ | async as rooms">
                 <div class="u-marginBottom-20">
                     <button mat-raised-button
                             color="accent"
-                            (click)="startAGame(rooms.items)"
+                            (click)="startAGame()"
                             class="c-btn u-width-100 c-btn-bottom-border--light-black">
                         Start a game
                     </button>
@@ -47,39 +47,39 @@
                         Join a game
                     </button>
                 </div>
-            </div>
-            <div [ngStyle]="{ 'margin-top': '10px', 'font-size': '10px' }"
-                 fxLayout="column"
-                 fxLayoutAlign="center center">
-                <div fxFlex="none"
-                     class="color-white">
-                    Game by Palm Court LLC.
-                </div>
-                <div fxFlex="none">
-                    <a href="http://www.monikersgame.com"
-                       target="_blank"
-                       class="color-white">
-                        http://www.monikersgame.com
-                    </a>
-                </div>
-                <div fxFlex="none">
-                    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/"
-                       target="_blank"
-                       class="color-white">
-                        License
-                    </a>
-                </div>
-                <div fxFlex="none">
-                    <a href="https://github.com/trancp/MonikersGame"
-                       target="_blank"
-                       class="color-white">
-                        Source
-                    </a>
+                <div [ngStyle]="{ 'margin-top': '10px', 'font-size': '10px' }"
+                     fxLayout="column"
+                     fxLayoutAlign="center center">
+                    <div fxFlex="none"
+                         class="color-white">
+                        Game by Palm Court LLC.
+                    </div>
+                    <div fxFlex="none">
+                        <a href="http://www.monikersgame.com"
+                           target="_blank"
+                           class="color-white">
+                            http://www.monikersgame.com
+                        </a>
+                    </div>
+                    <div fxFlex="none">
+                        <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/"
+                           target="_blank"
+                           class="color-white">
+                            License
+                        </a>
+                    </div>
+                    <div fxFlex="none">
+                        <a href="https://github.com/trancp/MonikersGame"
+                           target="_blank"
+                           class="color-white">
+                            Source
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-<div *ngIf="isLoading">
+</ng-container>
+<ng-container *ngIf="isLoading">
     <app-loading-view></app-loading-view>
-</div>
+</ng-container>

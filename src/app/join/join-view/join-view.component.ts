@@ -1,13 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
-import { Store } from '@ngrx/store';
+import { takeUntil, tap } from 'rxjs/operators';
+import { Subject } from 'rxjs/Subject';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { FormControl } from '@angular/forms';
 
 import { RoomsService } from '../../rooms/rooms.service';
 import { ToastService } from '../../toast/toast.service';
 
-import { AppState } from '../../app.state';
-import { Rooms } from '../../interfaces/rooms.model';
+import { Room } from '../../interfaces/room.model';
+import { roomExists } from '../../rooms/rooms.helpers';
 
 const INPUT_CODE_LENGTH = 4;
 const ERROR_ROOM_DOES_NOT_EXIST = 'Wrong code bro.';
@@ -17,38 +19,45 @@ const ERROR_ROOM_DOES_NOT_EXIST = 'Wrong code bro.';
     templateUrl: './join-view.component.html',
     styleUrls: ['./join-view.component.scss'],
 })
-export class JoinViewComponent implements OnInit {
-    inputCode: string;
-    inputFocused: boolean;
-    roomsState: Observable<Rooms> = this.store.select('rooms');
+export class JoinViewComponent implements OnInit, OnDestroy {
+    roomsState = new BehaviorSubject([]);
+    isLoading = true;
+    componentDestroy = new Subject();
+    form = new FormControl('');
 
     constructor(private router: Router,
                 private roomsService: RoomsService,
-                private store: Store<AppState>,
                 private toastService: ToastService) {
-        this.roomsService.dispatchGetRooms();
     }
 
     ngOnInit() {
-        this.inputFocused = false;
-        this.inputCode = '';
+        this.roomsService.getAllRooms()
+            .pipe(
+                takeUntil(this.componentDestroy),
+                tap((room: Room[]) => {
+                    this.roomsState.next(room);
+                    this.isLoading = false;
+                }),
+            )
+            .subscribe();
     }
 
-    goToCreate(rooms: Rooms, inputCode: string) {
+    ngOnDestroy() {
+        this.componentDestroy.next();
+        this.componentDestroy.complete();
+    }
+
+    goToCreate(rooms: Room[], inputCode: string) {
         if (!inputCode) {
             return;
         }
-        if (!this.roomsService.roomExists(rooms, inputCode)) {
+        if (!roomExists(rooms, inputCode)) {
             return this.toastService.showError(ERROR_ROOM_DOES_NOT_EXIST);
         }
         return this.router.navigate([`/join/${inputCode}`]);
     }
 
-    toggleFocus() {
-        this.inputFocused = !this.inputFocused;
-    }
-
     hasInputCode() {
-        return INPUT_CODE_LENGTH === this.inputCode.length;
+        return INPUT_CODE_LENGTH === this.form.value.length;
     }
 }

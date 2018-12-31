@@ -1,30 +1,24 @@
 import { Injectable } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { AngularFireDatabase } from 'angularfire2/database';
 
-import { GetRooms } from './rooms.actions';
+import capitalize from 'lodash-es/capitalize';
 
-import { AppState } from '../app.state';
-
-import { Room } from '../interfaces/room.model';
-import { Rooms } from '../interfaces/rooms.model';
-
-import find from 'lodash-es/find';
-import isEmpty from 'lodash-es/isEmpty';
-import isEqual from 'lodash-es/isEqual';
-import upperCase from 'lodash-es/upperCase';
+const WORDS_TO_ADD_TO_DEFAULT_MONIKERS_WORD_BANK = [];
 
 @Injectable()
 export class RoomsService {
 
-    constructor(private store: Store<AppState>) {
+    constructor(private db: AngularFireDatabase) {
     }
 
-    public dispatchGetRooms(): void {
-        this.store.dispatch(GetRooms());
+    getAllRooms() {
+        return this.db.list('/rooms');
     }
 
-    public roomExists(rooms: Rooms, code: string): boolean {
-        const foundRoom = find(rooms, (room: Room) => isEqual(room.code, upperCase(code)));
-        return !isEmpty(foundRoom);
+    submitMonikerWords() {
+        WORDS_TO_ADD_TO_DEFAULT_MONIKERS_WORD_BANK.map((word: string) => {
+            const wordToPush = word.split(' ').map((o: string) => capitalize(o)).join(' ');
+            this.db.list('/words/monikers').push(wordToPush);
+        });
     }
 }
