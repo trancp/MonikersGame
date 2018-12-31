@@ -157,6 +157,6 @@ export class GameViewComponent implements OnInit, OnDestroy {
     }
 
     public calculateRemainingWordsProgress(room: Room) {
-        return (get(room, 'words.length', 0) / (keys(get(room, 'players', [])).length * 5)) * 100;
+        return (get(room, 'words.length', 0) / room.numOfWords) * 100;
     }
 }
