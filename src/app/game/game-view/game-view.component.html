@@ -1,67 +1,71 @@
-<div *ngIf="roomState | async as room"
-     fxLayout="column"
+<div fxLayout="column"
      class="bg-color-blue u-height-100 u-fontFamily-CircularStd-Black">
     <ng-container *ngIf="playerState | async as user">
-        <div *ngIf="!room.loading"
+        <div *ngIf="!roomState.getValue().loading"
              fxLayout="column"
              [ngStyle]="{ 'padding': '20px 20px 30px 20px', 'position': 'relative' }"
              fxFlex="100%">
-            <app-timer *ngIf="room.timer && room.words.length"
-                       [stopTime]="room.timer || stopTime"
-                       (onTimerEnd)="onTimerEnd(user, room)"
+            <app-timer *ngIf="roomState.getValue().timer && roomState.getValue().words.length"
+                       [stopTime]="roomState.getValue().timer || stopTime"
+                       (onTimerEnd)="onTimerEnd(user, roomState.getValue())"
                        [ngStyle]="{ 'min-width': '0' }"
                        class="u-display-block">
             </app-timer>
             <app-score-board fxFlex="none"
                              class="u-display-block"
-                             [room]="room">
+                             [room]="roomState.getValue()">
             </app-score-board>
-            <div fxFlex="100%">
-                <ng-container *ngIf="room.turnOrder[room.turn].id !== user.id || !room.timer">
-                    <ng-container *ngFor="let team of room.teams">
+            <div fxFlex="100%"
+                 fxLayout="column">
+                <div class="u-textAlign-Center color-white">
+                    <div [ngStyle]="{ 'padding-top': '30px', 'font-size': '25px' }"
+                         [innerHTML]="roundText">
+                    </div>
+                </div>
+                <ng-container *ngIf="roomState.getValue().turnOrder[roomState.getValue().turn].id !== user.id || !roomState.getValue().timer">
+                    <ng-container *ngFor="let team of roomState.getValue().teams">
                         <div *ngIf="team.teamId === user.team"
                              fxFlex="100%"
                              fxLayout="column"
                              class="color-white">
                             <ng-container *ngIf="team.isTurn">
                                 <app-three-line-text [lineOne]="'Let\'s go'"
-                                                     [lineTwo]="room.turnOrder[room.turn].name"
+                                                     [lineTwo]="roomState.getValue().turnOrder[roomState.getValue().turn].name"
                                                      class="u-display-block u-height-100">
+
                                 </app-three-line-text>
                             </ng-container>
                             <ng-container *ngIf="!team.isTurn">
-                                <app-three-line-text [lineOne]="team.name + ','"
-                                                     [lineTwo]="'it\'s the other'"
-                                                     [lineThree]="'guys\' turn'"
+                                <app-three-line-text [lineOne]="'Other team\'s turn'"
+                                                     [lineTwo]="'Let\'s go ' + roomState.getValue().turnOrder[roomState.getValue().turn].name"
                                                      class="u-display-block u-height-100">
                                 </app-three-line-text>
                             </ng-container>
-                            <div fxFlex="none">
-                                <div class="u-marginBottom-20 alt-theme">
+                            <ng-container *ngIf="roomState.getValue().turnOrder[roomState.getValue().turn].id === user.id">
+                                <div fxFlex="none"
+                                     class="u-marginBottom-20 alt-theme">
                                     <button mat-raised-button
                                             color="primary"
-                                            (click)="startTimer(room, room.turnOrder[room.turn].id === user.id)"
-                                            [ngClass]="{ 'u-opacity-50': room.turnOrder[room.turn].id !== user.id }"
+                                            (click)="startTimer(roomState.getValue())"
                                             class="u-width-100 c-btn c-btn-bottom-border--light-blue">
                                         <div [innerHTML]="'Ready, start timer!'"></div>
                                     </button>
                                 </div>
-                            </div>
+                            </ng-container>
                         </div>
                     </ng-container>
                 </ng-container>
-                <ng-container *ngIf="room.turnOrder[room.turn].id === user.id && room.timer">
-                    <ng-container *ngIf="room.words.length">
-                        <app-word [word]="room.words[room.word]"
-                                  [wordIndex]="room.word"
-                                  [round]="room.round"
+                <ng-container *ngIf="roomState.getValue().turnOrder[roomState.getValue().turn].id === user.id && roomState.getValue().timer">
+                    <ng-container *ngIf="roomState.getValue().words.length">
+                        <app-word [word]="roomState.getValue().words[roomState.getValue().word]"
+                                  [wordIndex]="roomState.getValue().word"
                                   [ngStyle]="{ 'margin': '20px auto', 'max-width': '330px' }"
-                                  (onScoreWord)="score($event, room)"
-                                  (onSkipWord)="skip(room, $event, room.words)"
+                                  (onScoreWord)="score($event, roomState.getValue())"
+                                  (onSkipWord)="skip(roomState.getValue(), $event, roomState.getValue().words)"
                                   class="u-display-block u-width-100 u-height-100">
                         </app-word>
                     </ng-container>
-                    <ng-container *ngIf="!room.words.length">
+                    <ng-container *ngIf="!roomState.getValue().words.length">
                         <div fxLayout="column"
                              class="u-height-100 u-width-100">
                             <div fxFlex="100%">
@@ -76,7 +80,7 @@
                                 <button mat-raised-button
                                         color="primary"
                                         class="u-width-100 c-btn c-btn-bottom-border--light-blue"
-                                        (click)="handleNextTurn(room)">
+                                        (click)="handleNextTurn(roomState.getValue())">
                                     <div [innerHTML]="'Okay next player!'"></div>
                                 </button>
                             </div>
@@ -86,16 +90,16 @@
             </div>
         </div>
     </ng-container>
-    <div *ngIf="!room.loading && room.timer"
+    <div *ngIf="!roomState.getValue().loading && roomState.getValue().timer"
          fxLayout="row"
          fxLayoutAlign="center center"
          class="progress-bar-color"
          [ngStyle]="{ 'padding': '20px 0' }">
-        <mat-progress-bar [value]="calculateRemainingWordsProgress(room)"
+        <mat-progress-bar [value]="calculateRemainingWordsProgress(roomState.getValue())"
                           [ngStyle]="{ 'width': '50%' }">
         </mat-progress-bar>
     </div>
-    <div *ngIf="room.loading"
+    <div *ngIf="roomState.getValue().loading"
          class="alt-theme">
         <app-loading-view color="accent"></app-loading-view>
     </div>

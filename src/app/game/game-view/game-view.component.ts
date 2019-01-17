@@ -20,8 +20,13 @@ import isEqual from 'lodash-es/isEqual';
 import map from 'lodash-es/map';
 import pickBy from 'lodash-es/pickBy';
 import shuffle from 'lodash-es/shuffle';
-import slice from 'lodash-es/slice';
 import zip from 'lodash-es/zip';
+
+const roundText = {
+    1: `Round 1: Say Anything You Want,${'<br>'}But The Word.`,
+    2: 'Round 2: One Word.',
+    3: 'Round 3: Charades. No Words.',
+};
 
 @Component({
     selector: 'app-game-view',
@@ -33,6 +38,7 @@ export class GameViewComponent implements OnInit, OnDestroy {
     playerState: BehaviorSubject<Player> = new BehaviorSubject({ loading: true });
     stopTime: string;
     componentDestroy = new Subject();
+    roundText: string;
 
     constructor(private routeGuardService: RouteGuardService,
                 public route: ActivatedRoute,
@@ -47,6 +53,7 @@ export class GameViewComponent implements OnInit, OnDestroy {
             .pipe(
                 takeUntil(this.componentDestroy),
                 tap((room: Room) => {
+                    this.roundText = get(roundText, room.round);
                     this.roomState.next(room);
                     this.playerService.getPlayerByName(room, slug)
                         .pipe(
@@ -67,10 +74,7 @@ export class GameViewComponent implements OnInit, OnDestroy {
         this.componentDestroy.complete();
     }
 
-    public startTimer(room: Room, isTurn: boolean): void {
-        if (!isTurn) {
-            return;
-        }
+    public startTimer(room: Room): void {
         const stopTime = new Date();
         stopTime.setMinutes(stopTime.getMinutes() + 1);
         this.stopTime = stopTime.toISOString();
@@ -100,11 +104,8 @@ export class GameViewComponent implements OnInit, OnDestroy {
             }
             return team;
         });
-        const remainingWords = room.words;
-        const startSlice = slice(remainingWords, 0, wordIndex);
-        const endSlice = slice(remainingWords, wordIndex + 1, remainingWords.length);
-        const updatedWordsList = concat(startSlice, endSlice);
-        const incrementedWordIndex = isEqual(wordIndex, (remainingWords.length - 1))
+        const updatedWordsList = room.words.filter((word: string, index: number) => !isEqual(wordIndex, index));
+        const incrementedWordIndex = isEqual(wordIndex, (room.words.length - 1))
             ? 0
             : wordIndex;
         const isGameOver = isEqual(3, room.round) && !updatedWordsList.length;
@@ -143,15 +144,14 @@ export class GameViewComponent implements OnInit, OnDestroy {
             teams: isRoundOver ? setTeamForNewRound : updatedTeams,
             timer: '',
             turn: isRoundOver ? 0 : room.turn + 1,
-            turnOrder: isRoundOver ? this.initTurnOrderForNewRound(room.players, nextTeamToStart) : room.turnOrder,
+            turnOrder: isRoundOver ? this.initTurnOrderForNewRound(readyPlayers, nextTeamToStart) : room.turnOrder,
             words: isRoundOver ? compileShuffledRoomWords(readyPlayers) : shuffle(room.words),
         };
         this.roomService.updateRoomProperties(room, update);
     }
 
     private initTurnOrderForNewRound(players: Player[], teamToStart: number) {
-        const readyPlayers = pickBy(players, (player: Player) => player.ready);
-        const playersSortedByStartingTeam = sortPlayersByStartingTeam(readyPlayers, teamToStart);
+        const playersSortedByStartingTeam = sortPlayersByStartingTeam(players, teamToStart);
         const shuffledReadyPlayers = map(playersSortedByStartingTeam, (team: Player[]) => shuffle(team));
         return flatten(zip(...shuffledReadyPlayers));
     }
