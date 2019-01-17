@@ -75,10 +75,7 @@ export class GameViewComponent implements OnInit, OnDestroy {
         this.componentDestroy.complete();
     }
 
-    public startTimer(room: Room, isTurn: boolean): void {
-        if (!isTurn) {
-            return;
-        }
+    public startTimer(room: Room): void {
         const stopTime = new Date();
         stopTime.setMinutes(stopTime.getMinutes() + 1);
         this.stopTime = stopTime.toISOString();
