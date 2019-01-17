@@ -1,8 +1,8 @@
 <div *ngIf="roomState | async as room"
      class="u-height-100 bg-color-blue">
     <div *ngIf="!room.loading"
-         style="padding: 20px;"
          class="u-fontFamily-CircularStd-Black u-height-100"
+         [ngStyle]="{ padding: '20px' }"
          fxLayout="column">
         <div fxFlex="20%">
             <app-score-board fxFlex="none"
@@ -12,8 +12,7 @@
         </div>
         <div fxFlex="80%"
              class="color-white"
-             style="font-size: 42px; margin-top: 20px;">
-            <div>Ayyyyyy</div>
+             [ngStyle]="{ 'font-size': '42px', 'margin-top': '20px' }">
             <div>{{(room.teams | appWinningTeam)?.name}} Wins!</div>
         </div>
         <ng-container *ngIf="playerState | async as user">
