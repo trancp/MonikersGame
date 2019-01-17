@@ -36,9 +36,8 @@
                                 </app-three-line-text>
                             </ng-container>
                             <ng-container *ngIf="!team.isTurn">
-                                <app-three-line-text [lineOne]="team.name + ','"
-                                                     [lineTwo]="'it\'s the other'"
-                                                     [lineThree]="'guys\' turn'"
+                                <app-three-line-text [lineOne]="'Other team\'s turn'"
+                                                     [lineTwo]="'Let\'s go ' + room.turnOrder[room.turn].name"
                                                      class="u-display-block u-height-100">
                                 </app-three-line-text>
                             </ng-container>
