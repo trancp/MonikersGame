@@ -17,13 +17,15 @@ export interface Room {
     turn?: number;
     turnOrder?: Player[];
     vip?: boolean;
+    word?: number;
     words?: string[];
 }
 
 interface Team {
-    name?: string;
-    words?: string[];
     isTurn?: boolean;
+    name?: string;
+    teamId?: number;
+    words?: string[];
 }
 
 export const DEFAULT_ROOM_PROPERTIES = {
