@@ -20,7 +20,6 @@ import isEqual from 'lodash-es/isEqual';
 import map from 'lodash-es/map';
 import pickBy from 'lodash-es/pickBy';
 import shuffle from 'lodash-es/shuffle';
-import slice from 'lodash-es/slice';
 import zip from 'lodash-es/zip';
 
 const roundText = {
@@ -105,11 +104,8 @@ export class GameViewComponent implements OnInit, OnDestroy {
             }
             return team;
         });
-        const remainingWords = room.words;
-        const startSlice = slice(remainingWords, 0, wordIndex);
-        const endSlice = slice(remainingWords, wordIndex + 1, remainingWords.length);
-        const updatedWordsList = concat(startSlice, endSlice);
-        const incrementedWordIndex = isEqual(wordIndex, (remainingWords.length - 1))
+        const updatedWordsList = room.words.filter((word: string, index: number) => !isEqual(wordIndex, index));
+        const incrementedWordIndex = isEqual(wordIndex, (room.words.length - 1))
             ? 0
             : wordIndex;
         const isGameOver = isEqual(3, room.round) && !updatedWordsList.length;
