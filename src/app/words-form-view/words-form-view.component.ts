@@ -16,6 +16,7 @@ import { WordsService } from '../words/words.service';
 import { Room } from '../interfaces/room.model';
 import { Player } from '../interfaces/player.model';
 
+import capitalize from 'lodash-es/capitalize';
 import compact from 'lodash-es/compact';
 import difference from 'lodash-es/difference';
 import findKey from 'lodash-es/findKey';
@@ -26,6 +27,7 @@ import isUndefined from 'lodash-es/isUndefined';
 import random from 'lodash-es/random';
 import reduce from 'lodash-es/reduce';
 import set from 'lodash-es/set';
+import trim from 'lodash-es/trim';
 import values from 'lodash-es/values';
 
 const INPUT_PLACEHOLDERS = [
@@ -148,13 +150,18 @@ export class WordsFormViewComponent implements OnInit, OnDestroy {
             : this.location.back();
     }
 
-    public onSubmit(word: string, index: number): void {
-        const inputWord = word
+    public submitPhrase(phrase: string, index: number): void {
+        const inputPhrase = phrase
             || this.inputPlaceholder;
-        this.formGroup.get(`${index}`).patchValue(inputWord);
+        const sanitizedPhrase = this.sanitizePhrase(inputPhrase);
+        this.formGroup.get(`${index}`).patchValue(sanitizedPhrase);
         this.editIndex = this.getNextEmptyWordForm();
         this.toggleInputForm(this.editIndex);
         this.inputForm.patchValue('');
+    }
+
+    sanitizePhrase(phrase: string) {
+        return trim(phrase).split(' ').map((word: string) => capitalize(word)).join(' ');
     }
 
     public submitWordList(player: any): void {
