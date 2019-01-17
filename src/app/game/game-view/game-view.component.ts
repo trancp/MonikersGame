@@ -143,15 +143,14 @@ export class GameViewComponent implements OnInit, OnDestroy {
             teams: isRoundOver ? setTeamForNewRound : updatedTeams,
             timer: '',
             turn: isRoundOver ? 0 : room.turn + 1,
-            turnOrder: isRoundOver ? this.initTurnOrderForNewRound(room.players, nextTeamToStart) : room.turnOrder,
+            turnOrder: isRoundOver ? this.initTurnOrderForNewRound(readyPlayers, nextTeamToStart) : room.turnOrder,
             words: isRoundOver ? compileShuffledRoomWords(readyPlayers) : shuffle(room.words),
         };
         this.roomService.updateRoomProperties(room, update);
     }
 
     private initTurnOrderForNewRound(players: Player[], teamToStart: number) {
-        const readyPlayers = pickBy(players, (player: Player) => player.ready);
-        const playersSortedByStartingTeam = sortPlayersByStartingTeam(readyPlayers, teamToStart);
+        const playersSortedByStartingTeam = sortPlayersByStartingTeam(players, teamToStart);
         const shuffledReadyPlayers = map(playersSortedByStartingTeam, (team: Player[]) => shuffle(team));
         return flatten(zip(...shuffledReadyPlayers));
     }
