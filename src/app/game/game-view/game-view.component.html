@@ -16,7 +16,13 @@
                              class="u-display-block"
                              [room]="room">
             </app-score-board>
-            <div fxFlex="100%">
+            <div fxFlex="100%"
+                 fxLayout="column">
+                <div class="u-textAlign-Center color-white">
+                    <div [ngStyle]="{ 'padding-top': '30px', 'font-size': '25px' }"
+                         [innerHTML]="roundText">
+                    </div>
+                </div>
                 <ng-container *ngIf="room.turnOrder[room.turn].id !== user.id || !room.timer">
                     <ng-container *ngFor="let team of room.teams">
                         <div *ngIf="team.teamId === user.team"
@@ -54,7 +60,6 @@
                     <ng-container *ngIf="room.words.length">
                         <app-word [word]="room.words[room.word]"
                                   [wordIndex]="room.word"
-                                  [round]="room.round"
                                   [ngStyle]="{ 'margin': '20px auto', 'max-width': '330px' }"
                                   (onScoreWord)="score($event, room)"
                                   (onSkipWord)="skip(room, $event, room.words)"

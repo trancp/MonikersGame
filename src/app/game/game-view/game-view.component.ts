@@ -23,6 +23,12 @@ import shuffle from 'lodash-es/shuffle';
 import slice from 'lodash-es/slice';
 import zip from 'lodash-es/zip';
 
+const roundText = {
+    1: `Round 1: Say Anything You Want,${'<br>'}But The Word.`,
+    2: 'Round 2: One Word.',
+    3: 'Round 3: Charades. No Words.',
+};
+
 @Component({
     selector: 'app-game-view',
     templateUrl: './game-view.component.html',
@@ -33,6 +39,7 @@ export class GameViewComponent implements OnInit, OnDestroy {
     playerState: BehaviorSubject<Player> = new BehaviorSubject({ loading: true });
     stopTime: string;
     componentDestroy = new Subject();
+    roundText: string;
 
     constructor(private routeGuardService: RouteGuardService,
                 public route: ActivatedRoute,
@@ -47,6 +54,7 @@ export class GameViewComponent implements OnInit, OnDestroy {
             .pipe(
                 takeUntil(this.componentDestroy),
                 tap((room: Room) => {
+                    this.roundText = get(roundText, room.round);
                     this.roomState.next(room);
                     this.playerService.getPlayerByName(room, slug)
                         .pipe(
